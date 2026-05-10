@@ -11,7 +11,6 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://ecotron.co.in/static/logo_preview.png">
     
-    <!-- Caching & Performance -->
     <meta http-equiv="Cache-Control" content="public, max-age=3600">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -89,7 +88,7 @@
                 <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
-            <div class="ad-box" style="width: 160px; height: 300px; margin-top: 20px;">
+            <div class="ad-box" style="width: 160px; height: 300px;">
                 <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 250, 'width' : 160, 'params' : {} };</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
@@ -150,11 +149,22 @@
                 <script>atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };</script>
                 <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
             </div>
-            <div class="ad-box" style="width: 300px; height: 600px; margin-top: 20px;">
-                <span class="ad-tag">SPONSORED</span>
-                <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 300, 'params' : {} };</script>
-                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
+            
+            <!-- Native Banner -->
+            <div class="ad-box p-4" style="width: 300px; min-height: 400px;">
+                <span class="ad-tag">RECOMMENDED</span>
+                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
+                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
             </div>
+
+            <!-- Smartlink Button -->
+            <a href="https://developdomicile.com/a6rpd16c?key=8db16496ba8519d14e25e11f38876bc0" target="_blank" class="w-full flex items-center justify-between p-6 glass rounded-2xl border-l-4 border-sky-500 hover:bg-sky-500/10 transition-all group mb-6">
+                <div>
+                    <p class="text-[10px] font-black uppercase text-sky-500 tracking-widest mb-1">PRO ACCESS</p>
+                    <p class="text-xs font-bold text-white">Unlock Institutional Feed</p>
+                </div>
+                <i data-lucide="external-link" class="w-4 h-4 text-slate-600 group-hover:text-sky-500 transition-colors"></i>
+            </a>
         </aside>
     </div>
 
@@ -326,7 +336,6 @@
             } catch (e) {}
         }
 
-        // Initialize active tasks if any
         if (activeTaskId) {
             startPolling(activeTaskId);
             taskIndicator.classList.remove('hidden');

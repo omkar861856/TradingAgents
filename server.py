@@ -511,7 +511,9 @@ async def get_blog_page(blog_id: str):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{blog['title']} | Ecotron Neural Intelligence</title>
+    <title>{blog['title']} | Ecotron Neural Intelligence</title>    <!-- Popunder Ad -->
+    <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -535,33 +537,38 @@ async def get_blog_page(blog_id: str):
         .card-amber {{ border-top: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05); }}
         .card-orange {{ border-top: 4px solid #f97316; background: rgba(249, 115, 22, 0.05); }}
         .card-rose {{ border-top: 4px solid #f43f5e; background: rgba(244, 63, 94, 0.05); }}
+        
+        .custom-scrollbar::-webkit-scrollbar {{ width: 4px; }}
+        .custom-scrollbar::-webkit-scrollbar-thumb {{ background: #334155; border-radius: 10px; }}
     </style>
 </head>
 <body>
-    <header class="w-full glass px-8 py-5 border-b border-white/5">
+    <header class="w-full glass sticky top-0 z-[100] px-8 py-5 border-b border-white/5">
         <div class="max-w-[1400px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center"><i data-lucide="trending-up" class="text-black"></i></div>
-                <h1 class="text-2xl font-black uppercase" onclick="window.location.href='/'" style="cursor:pointer">ECOTRON <span class="text-sky-500">TRADING</span></h1>
+                <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20"><i data-lucide="trending-up" class="text-black"></i></div>
+                <h1 class="text-2xl font-black uppercase tracking-tighter" onclick="window.location.href='/'" style="cursor:pointer">ECOTRON <span class="text-sky-500">TRADING</span></h1>
             </div>
-            <a href="/" class="text-xs font-black uppercase text-slate-500 hover:text-white">Back to Terminal</a>
+            <a href="/" class="text-xs font-black uppercase text-slate-500 hover:text-white transition-colors">Back to Terminal</a>
         </div>
     </header>
 
-    <div class="max-w-[1600px] mx-auto flex gap-10 px-6 mt-10 pb-20">
-        <aside style="width:160px; flex-shrink:0; position: sticky; top: 120px; height: fit-content;">
+    <div class="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-10 px-6 mt-10 pb-20">
+        <!-- Left Sidebar -->
+        <aside class="hidden lg:block w-[160px] flex-shrink-0 sticky top-[120px] h-fit">
             <div class="ad-box" style="width: 160px; height: 600px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
-            <div class="ad-box" style="width: 160px; height: 300px; margin-top: 20px;">
+            <div class="ad-box" style="width: 160px; height: 300px;">
                 <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 250, 'width' : 160, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="flex-grow min-w-0 max-w-[1100px]">
             <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
                 <span class="ad-tag">SPONSORED</span>
@@ -571,16 +578,16 @@ async def get_blog_page(blog_id: str):
 
             <div class="space-y-12 prose-custom">
                 <div>
-                    <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black uppercase">Intelligence Report [{blog['ticker']}]</span>
-                    <h1 class="text-7xl font-black tracking-tighter uppercase mt-6">{blog['title']}</h1>
-                    <div id="summary-content" class="text-2xl text-slate-400 font-bold leading-tight"></div>
+                    <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black uppercase tracking-widest">Intelligence Report [{blog['ticker']}]</span>
+                    <h1 class="text-7xl font-black tracking-tighter uppercase mt-6 leading-none">{blog['title']}</h1>
+                    <div id="summary-content" class="text-2xl text-slate-400 font-bold leading-tight mt-6"></div>
                 </div>
 
-                <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{active_color}-500">
-                    <div class="flex justify-between items-start mb-10">
+                <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{active_color}-500 shadow-2xl relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-10 relative z-10">
                         <div>
-                            <h2 class="text-6xl font-black tracking-tighter m-0">{blog['ticker']}</h2>
-                            <div class="flex gap-4 mt-6">
+                            <h2 class="text-6xl font-black tracking-tighter m-0 leading-none">{blog['ticker']}</h2>
+                            <div class="flex gap-4 mt-8">
                                 <a href="https://twitter.com/intent/tweet?text={blog['title']}&url=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#1DA1F2]/10 text-[#1DA1F2] rounded-xl hover:bg-[#1DA1F2] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-twitter"></i></a>
                                 <a href="https://www.facebook.com/sharer/sharer.php?u=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#4267B2]/10 text-[#4267B2] rounded-xl hover:bg-[#4267B2] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-facebook-f"></i></a>
                                 <a href="https://api.whatsapp.com/send?text={blog['title']}%20https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#25D366]/10 text-[#25D366] rounded-xl hover:bg-[#25D366] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-whatsapp"></i></a>
@@ -588,11 +595,11 @@ async def get_blog_page(blog_id: str):
                         </div>
                         <div class="px-10 py-5 bg-{active_color}-500 text-black rounded-3xl text-3xl font-black uppercase shadow-xl shadow-{active_color}-500/30">{blog['decision']}</div>
                     </div>
-                    <div id="verdict-content" class="text-xl text-slate-100 font-bold"></div>
+                    <div id="verdict-content" class="text-xl text-slate-100 font-bold relative z-10 leading-relaxed"></div>
                 </div>
 
                 <div class="pt-12">
-                    <h2 class="text-3xl font-black uppercase tracking-tighter mb-8 flex items-center gap-4">
+                    <h2 class="text-3xl font-black uppercase tracking-tighter mb-10 flex items-center gap-4">
                         <i data-lucide="layers" class="text-sky-500"></i> Analyst Synthesis
                     </h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -650,13 +657,31 @@ async def get_blog_page(blog_id: str):
             </div>
         </main>
 
+        <!-- Right Sidebar -->
         <aside class="hidden xl:block w-[300px] flex-shrink-0 sticky top-[120px] h-fit">
             <div class="ad-box" style="width: 300px; height: 250px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = {{ 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
             </div>
-            <div class="ad-box" style="width: 300px; height: 600px; margin-top: 20px;">
+            
+            <!-- Native Banner -->
+            <div class="ad-box p-4" style="width: 300px; min-height: 400px;">
+                <span class="ad-tag">RECOMMENDED</span>
+                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
+                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
+            </div>
+
+            <!-- Smartlink Button -->
+            <a href="https://developdomicile.com/a6rpd16c?key=8db16496ba8519d14e25e11f38876bc0" target="_blank" class="w-full flex items-center justify-between p-6 glass rounded-2xl border-l-4 border-sky-500 hover:bg-sky-500/10 transition-all group mb-6">
+                <div>
+                    <p class="text-[10px] font-black uppercase text-sky-500 tracking-widest mb-1">PRO ACCESS</p>
+                    <p class="text-xs font-bold text-white">Unlock Institutional Feed</p>
+                </div>
+                <i data-lucide="external-link" class="w-4 h-4 text-slate-600 group-hover:text-sky-500 transition-colors"></i>
+            </a>
+
+            <div class="ad-box" style="width: 300px; height: 600px;">
                 <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 300, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
