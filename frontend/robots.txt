@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /status/
-
-Sitemap: https://ecotron.co.in/sitemap.xml

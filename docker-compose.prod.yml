@@ -52,10 +52,9 @@ services:
     restart: always
 
   frontend:
-    image: nginx:alpine
+    build:
+      context: ./frontend
     container_name: trading-frontend
-    volumes:
-      - ./frontend:/usr/share/nginx/html
     networks:
       - trading-network
     restart: always
