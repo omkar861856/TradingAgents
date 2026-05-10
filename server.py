@@ -439,6 +439,7 @@ async def get_blog_page(blog_id: str):
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body {{ font-family: 'Inter', sans-serif; background: #020203; color: #f8fafc; overflow-x: hidden; }}
@@ -465,7 +466,7 @@ async def get_blog_page(blog_id: str):
     </header>
 
     <div class="max-w-[1400px] mx-auto flex gap-10 px-6 mt-10 pb-20">
-        <aside style="width:160px; flex-shrink:0;">
+        <aside style="width:160px; flex-shrink:0; position: sticky; top: 120px; height: fit-content;">
             <div class="ad-box" style="width: 160px; height: 600px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {{}} }};</script>
@@ -492,9 +493,9 @@ async def get_blog_page(blog_id: str):
                         <div>
                             <h2 class="text-6xl font-black tracking-tighter m-0">{blog['ticker']}</h2>
                             <div class="flex gap-4 mt-6">
-                                <a href="https://twitter.com/intent/tweet?text={blog['title']}&url=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#1DA1F2]/10 text-[#1DA1F2] rounded-xl hover:bg-[#1DA1F2] hover:text-white transition-all shadow-lg"><i data-lucide="twitter"></i></a>
-                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#4267B2]/10 text-[#4267B2] rounded-xl hover:bg-[#4267B2] hover:text-white transition-all shadow-lg"><i data-lucide="facebook"></i></a>
-                                <a href="https://api.whatsapp.com/send?text={blog['title']}%20https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#25D366]/10 text-[#25D366] rounded-xl hover:bg-[#25D366] hover:text-white transition-all shadow-lg"><i data-lucide="message-circle"></i></a>
+                                <a href="https://twitter.com/intent/tweet?text={blog['title']}&url=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#1DA1F2]/10 text-[#1DA1F2] rounded-xl hover:bg-[#1DA1F2] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-twitter"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#4267B2]/10 text-[#4267B2] rounded-xl hover:bg-[#4267B2] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-facebook-f"></i></a>
+                                <a href="https://api.whatsapp.com/send?text={blog['title']}%20https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#25D366]/10 text-[#25D366] rounded-xl hover:bg-[#25D366] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                         </div>
                         <div class="px-10 py-5 bg-white text-black rounded-3xl text-3xl font-black uppercase">{blog['decision']}</div>
