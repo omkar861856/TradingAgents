@@ -284,44 +284,61 @@ async def get_status(task_id: str):
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(username: str = Depends(get_current_username)):
-    cursor = activity_collection.find().sort("timestamp", -1).limit(100)
-    activities = []
-    async for doc in cursor:
-        activities.append(f"""
-            <tr style="border-bottom: 1px solid #334155;">
-                <td style="padding: 12px;">{doc.get('timestamp')}</td>
-                <td style="padding: 12px;">{doc.get('user_id')}</td>
-                <td style="padding: 12px; font-weight: bold; color: #38bdf8;">{doc.get('ticker')}</td>
-                <td style="padding: 12px;">{doc.get('provider')}</td>
-                <td style="padding: 12px;"><span style="background: #1e293b; padding: 4px 8px; border-radius: 4px;">{doc.get('status')}</span></td>
+    pipeline = [
+        {"$group": {
+            "_id": "$user_id", 
+            "last_active": {"$max": "$timestamp"},
+            "task_count": {"$sum": 1},
+            "last_ticker": {"$last": "$ticker"}
+        }},
+        {"$sort": {"last_active": -1}}
+    ]
+    cursor = activity_collection.aggregate(pipeline)
+    users_html = []
+    async for user in cursor:
+        uid = user['_id'] or "anonymous"
+        users_html.append(f"""
+            <tr style="border-bottom: 1px solid #334155; cursor: pointer;" onclick="window.location='/admin/user/{uid}'">
+                <td style="padding: 12px; font-family: monospace; font-size: 11px;">{uid}</td>
+                <td style="padding: 12px;">{user['last_active']}</td>
+                <td style="padding: 12px; text-align: center;">
+                    <span style="background: #0369a1; padding: 2px 8px; border-radius: 99px; font-size: 11px;">{user['task_count']} Tasks</span>
+                </td>
+                <td style="padding: 12px; color: #38bdf8; font-weight: bold;">{user.get('last_ticker', 'N/A')}</td>
+                <td style="padding: 12px; text-align: right; color: #94a3b8;">View Details &rarr;</td>
             </tr>
         """)
     
     html_content = f"""
     <html>
         <head>
-            <title>Ecotron Admin</title>
+            <title>Ecotron Admin | Users</title>
             <style>
                 body {{ font-family: sans-serif; background: #050507; color: #f8fafc; padding: 40px; }}
-                table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; }}
-                th {{ text-align: left; background: #1e293b; padding: 12px; color: #94a3b8; font-size: 12px; text-transform: uppercase; }}
+                table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
+                th {{ text-align: left; background: #1e293b; padding: 15px 12px; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }}
+                tr:hover {{ background: #1e293b; }}
+                .badge {{ background: #38bdf8; color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 10px; }}
             </style>
         </head>
         <body>
-            <h1 style="color: #38bdf8;">Ecotron Neural Logs (MongoDB)</h1>
-            <p>Authenticated as: {{username}}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h1 style="color: #38bdf8; margin: 0;">Ecotron Neural Logs <span class="badge">PRO</span></h1>
+                <div style="color: #64748b; font-size: 12px;">Authenticated: {username}</div>
+            </div>
+            <p style="color: #94a3b8; margin-bottom: 30px;">Unique analysts identified by browser fingerprinting.</p>
             <table>
                 <thead>
                     <tr>
-                        <th>Timestamp</th>
                         <th>User Fingerprint</th>
-                        <th>Ticker</th>
-                        <th>Provider</th>
-                        <th>Status</th>
+                        <th>Last Active</th>
+                        <th style="text-align: center;">Activity Volume</th>
+                        <th>Latest Asset</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {"".join(activities)}
+                    {"".join(users_html) if users_html else '<tr><td colspan="5" style="padding: 40px; text-align: center; color: #475569;">No user activity recorded yet.</td></tr>'}
                 </tbody>
             </table>
         </body>
@@ -329,6 +346,55 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
     """
     return html_content
 
+@app.get("/admin/user/{user_id}", response_class=HTMLResponse)
+async def user_detail(user_id: str, username: str = Depends(get_current_username)):
+    cursor = activity_collection.find({"user_id": user_id}).sort("timestamp", -1)
+    history_html = []
+    async for doc in cursor:
+        history_html.append(f"""
+            <tr style="border-bottom: 1px solid #334155;">
+                <td style="padding: 12px; color: #94a3b8;">{doc.get('timestamp')}</td>
+                <td style="padding: 12px; font-weight: bold; color: #38bdf8;">{doc.get('ticker')}</td>
+                <td style="padding: 12px;"><span style="background: #1e293b; padding: 4px 8px; border-radius: 4px; font-size: 11px;">{doc.get('status')}</span></td>
+                <td style="padding: 12px; font-family: monospace; font-size: 10px; color: #475569;">{doc.get('task_id')}</td>
+            </tr>
+        """)
+
+    html_content = f"""
+    <html>
+        <head>
+            <title>User History | {user_id}</title>
+            <style>
+                body {{ font-family: sans-serif; background: #050507; color: #f8fafc; padding: 40px; }}
+                .back {{ color: #38bdf8; text-decoration: none; font-size: 14px; margin-bottom: 20px; display: inline-block; }}
+                table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; }}
+                th {{ text-align: left; background: #1e293b; padding: 15px 12px; color: #94a3b8; font-size: 11px; text-transform: uppercase; }}
+            </style>
+        </head>
+        <body>
+            <a href="/admin" class="back">&larr; Back to Users</a>
+            <h1 style="color: #38bdf8; margin-top: 10px;">Activity Report</h1>
+            <p style="font-family: monospace; color: #64748b; font-size: 12px; margin-bottom: 30px;">ID: {user_id}</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Ticker</th>
+                        <th>Status</th>
+                        <th>Task ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {"".join(history_html)}
+                </tbody>
+            </table>
+        </body>
+    </html>
+    """
+    return html_content
+
+if __name__ == "__main__":
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

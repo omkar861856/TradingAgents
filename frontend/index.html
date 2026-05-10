@@ -40,7 +40,6 @@
             <div class="flex items-center gap-6">
                 <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
                     <a href="#" onclick="switchView('dashboard')" class="nav-link hover:text-white transition-colors text-white" id="nav-dashboard">Dashboard</a>
-                    <a href="#" onclick="switchView('research')" class="nav-link hover:text-white transition-colors" id="nav-research">Research</a>
                     <a href="#" onclick="switchView('strategy')" class="nav-link hover:text-white transition-colors" id="nav-strategy">Strategy</a>
                     <a href="#" onclick="switchView('portfolio')" class="nav-link hover:text-white transition-colors" id="nav-portfolio">Portfolio</a>
                 </nav>
@@ -170,8 +169,8 @@
                     </div>
 
                     <div id="empty-state" class="glass p-12 rounded-2xl flex flex-col items-center justify-center text-center min-h-[400px]">
-                        <div class="w-12 h-12 border-4 border-sky-500/10 border-t-sky-500/40 rounded-full animate-spin mb-6"></div>
-                        <i data-lucide="brain-circuit" class="w-16 h-16 text-slate-800 mb-6"></i>
+                        <div id="loading-spinner" class="hidden w-12 h-12 border-4 border-sky-500/10 border-t-sky-500/40 rounded-full animate-spin mb-6"></div>
+                        <i id="brain-icon" data-lucide="brain-circuit" class="w-16 h-16 text-slate-800 mb-6"></i>
                     </div>
                 </div>
             </div>
@@ -242,11 +241,11 @@
                 </div>
             </div>
 
-            <!-- Research View (Intelligence Feed) -->
-            <div id="view-research" class="view-section hidden">
+            <!-- Blog / Intelligence Feed (Restored to Bottom) -->
+            <div class="mt-16 border-t border-slate-800/50 pt-12">
                 <div class="flex items-center justify-between mb-8">
                     <div>
-                        <h2 class="text-3xl font-bold flex items-center gap-3">
+                        <h2 class="text-2xl font-bold flex items-center gap-3">
                             <i data-lucide="scroll-text" class="text-sky-400"></i>
                             Neural <span class="gradient-text">Research</span> Feed
                         </h2>
@@ -379,7 +378,8 @@
 
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = `<span>Initializing...</span>`;
-            loadingSpinner.classList.remove('hidden');
+            document.getElementById('loading-spinner').classList.remove('hidden');
+            document.getElementById('brain-icon').classList.add('hidden');
             resultSummary.classList.add('hidden');
             logContainer.classList.remove('hidden');
             emptyState.classList.remove('hidden');
@@ -564,7 +564,7 @@
             document.getElementById(`nav-${viewId}`).classList.add('text-white');
             
             // Refresh data if needed
-            if (viewId === 'portfolio' || viewId === 'dashboard' || viewId === 'research') fetchBlogs();
+            if (viewId === 'portfolio' || viewId === 'dashboard') fetchBlogs();
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
