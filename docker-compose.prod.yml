@@ -48,10 +48,8 @@ services:
     volumes:
       - trading_data:/app/data
     depends_on:
-      ollama:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
+      - ollama
+      - mongodb
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -67,7 +65,7 @@ services:
     volumes:
       - mongo_data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5

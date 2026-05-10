@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
@@ -47,6 +48,9 @@ async def security_headers(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # MongoDB setup
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/tradingagents")
@@ -514,7 +518,7 @@ async def get_blog_page(blog_id: str):
     <title>{blog['title']} | Ecotron Neural Intelligence</title>    <!-- Popunder Ad -->
     <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/static/dist.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
@@ -758,7 +762,7 @@ async def get_blog_page(blog_id: str):
                         localStorage.removeItem('active_task_id');
                         if (taskIndicator) taskIndicator.classList.add('hidden');
                     }}
-                } catch (e) {{}}
+                }} catch (e) {{}}
             }}, 5000);
         }}
     </script>
@@ -767,7 +771,7 @@ async def get_blog_page(blog_id: str):
         """
         return html
     except Exception as e:
-        return f"Error: {{str(e)}}", 400
+        return f"Error: {str(e)}", 400
 
 if __name__ == "__main__":
     import uvicorn

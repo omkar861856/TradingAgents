@@ -37,5 +37,9 @@ ecotron.co.in, www.ecotron.co.in {
         }
     }
 
+    handle /static* {
+        reverse_proxy api:8000
+    }
+
     encode gzip
 }
