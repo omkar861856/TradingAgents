@@ -185,8 +185,9 @@ class PortfolioDecision(BaseModel):
     )
     executive_summary: str = Field(
         description=(
-            "A concise action plan covering entry strategy, position sizing, "
-            "key risk levels, and time horizon. Two to four sentences."
+            "A comprehensive action plan covering entry strategy, position sizing, "
+            "key risk levels, and time horizon. Provide all necessary details "
+            "to guide the user's trading decision."
         ),
     )
     investment_thesis: str = Field(
