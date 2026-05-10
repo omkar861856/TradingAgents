@@ -472,7 +472,14 @@ async def get_blog_page(blog_id: str):
 
                 <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{ 'emerald' if 'BUY' in blog['decision'] or 'BULL' in blog['decision'] else 'rose' if 'SELL' in blog['decision'] or 'BEAR' in blog['decision'] else 'sky' }-500">
                     <div class="flex justify-between items-start mb-10">
-                        <h2 class="text-6xl font-black tracking-tighter m-0">{blog['ticker']}</h2>
+                        <div>
+                            <h2 class="text-6xl font-black tracking-tighter m-0">{blog['ticker']}</h2>
+                            <div class="flex gap-4 mt-6">
+                                <a href="https://twitter.com/intent/tweet?text={blog['title']}&url=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="p-3 bg-white/5 rounded-xl hover:bg-sky-500 hover:text-black transition-all"><i data-lucide="twitter"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="p-3 bg-white/5 rounded-xl hover:bg-sky-500 hover:text-black transition-all"><i data-lucide="facebook"></i></a>
+                                <a href="https://api.whatsapp.com/send?text={blog['title']}%20https://ecotron.co.in/blog/{blog_id}" target="_blank" class="p-3 bg-white/5 rounded-xl hover:bg-sky-500 hover:text-black transition-all"><i data-lucide="message-circle"></i></a>
+                            </div>
+                        </div>
                         <div class="px-10 py-5 bg-white text-black rounded-3xl text-3xl font-black uppercase">{blog['decision']}</div>
                     </div>
                     <div id="verdict-content" class="text-xl text-slate-100 font-bold"></div>

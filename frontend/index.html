@@ -32,6 +32,12 @@
         .prose-custom th { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
         .prose-custom td { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8; }
 
+        /* Masonry Layout */
+        .feed-columns { column-gap: 1.5rem; }
+        .feed-columns > div { break-inside: avoid; margin-bottom: 1.5rem; }
+        @media (min-width: 768px) { .feed-columns { column-count: 2; } }
+        @media (min-width: 1024px) { .feed-columns { column-count: 3; } }
+
         .section-market { border-top: 8px solid #38bdf8; background: rgba(56, 189, 248, 0.02); }
         .section-sentiment { border-top: 8px solid #fbbf24; background: rgba(251, 191, 36, 0.02); }
         .section-fundamental { border-top: 8px solid #10b981; background: rgba(16, 185, 129, 0.02); }
@@ -44,6 +50,9 @@
         .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
         .nav-link { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; transition: all 0.3s; cursor: pointer; }
         .nav-link.active { color: #38bdf8; }
+
+        .share-btn { width: 32px; height: 32px; display: flex; items-center: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.05); color: #94a3b8; transition: all 0.2s; }
+        .share-btn:hover { background: #38bdf8; color: #000; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -63,7 +72,6 @@
     </header>
 
     <div class="app-container mt-10 pb-20">
-        <!-- Left Ads -->
         <aside class="ad-left hidden xl:block">
             <div class="ad-box" style="width: 160px; height: 600px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
@@ -77,29 +85,15 @@
             </div>
         </aside>
 
-        <!-- Main Column -->
         <main class="main-content">
-            <!-- Hero Top Ad -->
             <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
                 <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
             </div>
 
-            <!-- Support Banner -->
-            <div class="mb-10 p-6 glass rounded-2xl border-l-4 border-l-sky-500 shadow-xl flex items-center justify-between gap-6">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-sky-500/10 rounded-xl"><i data-lucide="heart" class="text-sky-400 w-6 h-6"></i></div>
-                    <div>
-                        <h4 class="text-xs font-black uppercase tracking-widest text-white">Neural Intelligence Support</h4>
-                        <p class="text-[11px] text-slate-400 leading-tight">Clicking ads helps maintain our high-performance GPU clusters for free public use.</p>
-                    </div>
-                </div>
-            </div>
-
             <div id="view-dashboard" class="view-section space-y-12">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <!-- Engine -->
                     <div class="lg:col-span-5 space-y-6">
                         <div class="glass p-8 rounded-3xl border border-white/5 shadow-2xl space-y-8">
                             <h2 class="text-xl font-black uppercase tracking-tight flex items-center gap-3">
@@ -115,7 +109,6 @@
                         </div>
                     </div>
 
-                    <!-- Results -->
                     <div class="lg:col-span-7">
                         <div id="empty-state" class="glass h-[400px] rounded-3xl flex flex-col items-center justify-center text-center p-10 border-2 border-dashed border-white/5">
                             <i id="brain-icon" data-lucide="brain-circuit" class="w-16 h-16 text-slate-800 mb-6"></i>
@@ -123,17 +116,13 @@
                             <p class="text-xs font-bold text-slate-600 uppercase tracking-widest mt-4">Neural Stream Offline</p>
                         </div>
 
-                        <div id="result-summary" class="hidden space-y-8 animate-fade">
-                            <!-- Summary Infographic -->
-                        </div>
-                        
+                        <div id="result-summary" class="hidden space-y-8 animate-fade"></div>
                         <div id="navigation-bridge" class="hidden animate-fade">
                             <button id="view-report-btn" class="w-full bg-white text-black font-black py-4 rounded-2xl uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-sky-400 transition-colors">
                                 View Full Intelligence Report
                                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
                         </div>
-
                         <div id="log-container" class="hidden mt-8 glass p-6 rounded-3xl">
                             <div id="logs" class="space-y-1.5 font-mono text-[10px] text-slate-500 max-h-40 overflow-y-auto custom-scrollbar"></div>
                         </div>
@@ -142,20 +131,11 @@
 
                 <div class="pt-12 border-t border-white/5">
                     <h2 class="text-2xl font-black uppercase tracking-tighter mb-8">Intelligence <span class="text-sky-500">Feed</span></h2>
-                    <div id="blog-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    <div id="blog-feed" class="feed-columns"></div>
                 </div>
-            </div>
-
-            <!-- Detail View -->
-            <div id="view-blog-detail" class="view-section hidden animate-fade">
-                <button onclick="switchView('dashboard')" class="mb-10 flex items-center gap-3 text-xs font-black text-slate-500 hover:text-sky-500 transition-colors uppercase tracking-widest">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Feed
-                </button>
-                <div id="blog-detail-content" class="prose-custom pb-20"></div>
             </div>
         </main>
 
-        <!-- Right Ads -->
         <aside class="ad-right hidden lg:block">
             <div class="ad-box" style="width: 300px; height: 250px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
@@ -167,25 +147,17 @@
                 <script>atOptions = { 'key' : 'f60abc3ad258484f0670ebbbace5b661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };</script>
                 <script src="https://developdomicile.com/f60abc3ad258484f0670ebbbace5b661/invoke.js"></script>
             </div>
-            <div class="ad-box w-full" style="min-height: 200px;">
-                <span class="ad-tag">SPONSORED</span>
-                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
-                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
-            </div>
         </aside>
     </div>
 
-    <!-- Footer Ad -->
     <footer class="w-full glass py-12 mt-20 border-t border-white/5 flex flex-col items-center gap-8">
         <div class="ad-box" style="width: 728px; height: 90px;">
             <span class="ad-tag">ADVERTISEMENT</span>
             <script>atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };</script>
             <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
         </div>
-        <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">&copy; 2026 Ecotron Advanced Trading Systems</p>
     </footer>
 
-    <!-- Research Initiation Popup -->
     <div id="research-popup" class="fixed inset-0 z-[200] flex items-center justify-center p-6 hidden">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="document.getElementById('research-popup').classList.add('hidden')"></div>
         <div class="glass max-w-md w-full p-10 rounded-[40px] border border-white/10 relative z-10 text-center space-y-6 animate-fade">
@@ -193,12 +165,8 @@
                 <i data-lucide="coffee" class="w-10 h-10 text-sky-400"></i>
             </div>
             <h3 class="text-2xl font-black uppercase tracking-tighter text-white">Sit Back & Relax</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-                Our neural agents are now synthesizing your request. Grab a coffee or explore the featured ads—it directly helps us fund the high-performance GPU clusters that power this intelligence.
-            </p>
-            <button onclick="document.getElementById('research-popup').classList.add('hidden')" class="w-full py-4 bg-sky-500 hover:bg-sky-400 text-black font-black rounded-2xl uppercase tracking-widest text-[10px] transition-all">
-                Understood, Proceed
-            </button>
+            <p class="text-slate-400 text-sm leading-relaxed">Our neural agents are now synthesizing your request. Grab a coffee or explore the featured ads—it directly helps us fund the high-performance GPU clusters.</p>
+            <button onclick="document.getElementById('research-popup').classList.add('hidden')" class="w-full py-4 bg-sky-500 hover:bg-sky-400 text-black font-black rounded-2xl uppercase tracking-widest text-[10px] transition-all">Understood, Proceed</button>
         </div>
     </div>
 
@@ -227,7 +195,6 @@
         analyzeBtn.addEventListener('click', async () => {
             const ticker = tickerInput.value.trim().toUpperCase();
             if (!ticker) return;
-            
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = `<span>Synthesizing...</span>`;
             brainIcon.classList.add('hidden');
@@ -236,10 +203,8 @@
             navBridge.classList.add('hidden');
             logContainer.classList.add('hidden');
             logsDiv.innerHTML = '';
-            
             document.getElementById('research-popup').classList.remove('hidden');
             lucide.createIcons();
-
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
@@ -305,26 +270,42 @@
                 const res = await fetch('/blogs');
                 const blogs = await res.json();
                 const feed = document.getElementById('blog-feed');
-                feed.innerHTML = blogs.map(b => `
-                    <div onclick="openBlog('${b._id}')" class="glass p-8 rounded-3xl border border-white/5 hover:border-sky-500/40 transition-all cursor-pointer group hover:-translate-y-2">
-                        <div class="flex justify-between items-center mb-6">
-                            <span class="px-3 py-1 bg-slate-900 rounded-lg text-[10px] font-black text-sky-500 uppercase tracking-widest border border-white/5">${b.ticker}</span>
-                            <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
+                feed.innerHTML = blogs.map(b => {
+                    const url = encodeURIComponent(`https://ecotron.co.in/blog/${b._id}`);
+                    const text = encodeURIComponent(b.title);
+                    return `
+                    <div class="glass p-8 rounded-3xl border border-white/5 hover:border-sky-500/40 transition-all cursor-pointer group">
+                        <div onclick="openBlog('${b._id}')">
+                            <div class="flex justify-between items-center mb-6">
+                                <span class="px-3 py-1 bg-slate-900 rounded-lg text-[10px] font-black text-sky-500 uppercase tracking-widest border border-white/5">${b.ticker}</span>
+                                <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
+                            </div>
+                            <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tight">${b.title}</h3>
+                            <div class="text-[11px] text-slate-400 prose-custom mb-6">${marked.parse(b.summary)}</div>
                         </div>
-                        <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tight line-clamp-2">${b.title}</h3>
-                        <div class="text-[11px] text-slate-400 prose-custom mb-6">${marked.parse(b.summary)}</div>
                         <div class="flex items-center justify-between pt-6 border-t border-white/5">
-                            <span class="text-[10px] font-black uppercase text-slate-600">ANALYST CORE</span>
+                            <div class="flex gap-2">
+                                <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="share-btn"><i data-lucide="twitter" class="w-3.5 h-3.5"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="share-btn"><i data-lucide="facebook" class="w-3.5 h-3.5"></i></a>
+                                <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="share-btn"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></a>
+                                <button onclick="copyLink('${b._id}')" class="share-btn"><i data-lucide="link" class="w-3.5 h-3.5"></i></button>
+                            </div>
                             <span class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision}</span>
                         </div>
-                    </div>
-                `).join('');
+                    </div>`;
+                }).join('');
                 lucide.createIcons();
             } catch (e) {}
         }
 
         async function openBlog(id) {
             window.location.href = `/blog/${id}`;
+        }
+
+        function copyLink(id) {
+            const url = `https://ecotron.co.in/blog/${id}`;
+            navigator.clipboard.writeText(url);
+            alert("Report link copied to clipboard!");
         }
 
         const urlParams = new URLSearchParams(window.location.search);
