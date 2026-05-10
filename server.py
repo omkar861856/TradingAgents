@@ -37,6 +37,8 @@ def get_graph(config_overrides: Optional[Dict[str, Any]] = None):
     if config.get("llm_provider") == "ollama":
         # Check for OLLAMA_HOST env var, default to http://ollama:11434 in docker
         ollama_host = os.getenv("OLLAMA_HOST", "http://ollama:11434")
+        if not ollama_host.endswith("/v1"):
+            ollama_host = ollama_host.rstrip("/") + "/v1"
         config["backend_url"] = ollama_host
 
     return TradingAgentsGraph(debug=True, config=config)
