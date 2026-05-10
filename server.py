@@ -49,8 +49,7 @@ async def security_headers(request: Request, call_next):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 # MongoDB setup
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/tradingagents")
@@ -59,8 +58,7 @@ db = mongo_client.get_default_database()
 activity_collection = db.activity
 blogs_collection = db.blogs
 
-# Static files with caching
-from fastapi.staticfiles import StaticFiles
+
 if os.path.exists("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
