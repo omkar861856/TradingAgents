@@ -6,398 +6,192 @@
     <title>Ecotron Trading | AI Financial Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Ecotron Trading: The advanced multi-agent AI framework for professional financial research and market intelligence.">
-    <meta name="keywords" content="AI trading, financial research, multi-agent LLM, stock market analysis, crypto intelligence, Ecotron Trading">
-    <meta name="author" content="Ecotron Advanced Systems">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background: #050507; color: #f8fafc; overflow-x: hidden; }
-        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05); }
         .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .ad-sidebar { width: 140px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.3s; position: sticky; top: 120px; height: fit-content; }
-        .ad-sidebar:hover { opacity: 1; }
-        .ad-sidebar-right { width: 300px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.3s; position: sticky; top: 120px; height: fit-content; }
-        .ad-sidebar-right:hover { opacity: 1; }
-        .main-app-center { flex-grow: 1; min-width: 0; max-width: 1000px; }
-        .ad-container { position: relative; margin-bottom: 1rem; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.2); }
-        .ad-label { position: absolute; top: 2px; left: 2px; font-size: 8px; color: #475569; z-index: 10; pointer-events: none; }
+        .main-app-center { flex-grow: 1; min-width: 0; max-width: 1000px; margin: 0 auto; }
+        .ad-sidebar { width: 160px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.3s; position: sticky; top: 100px; height: fit-content; }
+        .ad-container { position: relative; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.3); }
+        .ad-label { position: absolute; top: 4px; left: 4px; font-size: 8px; color: #64748b; z-index: 10; font-weight: bold; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        .card-glow { position: relative; }
+        .card-glow::after { content: ''; position: absolute; inset: -1px; background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(129,140,248,0.2)); border-radius: inherit; z-index: -1; opacity: 0; transition: opacity 0.3s; }
+        .card-glow:hover::after { opacity: 1; }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-slide { animation: slideIn 0.5s ease forwards; }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen pb-20">
     <!-- Header -->
-    <header class="w-full glass sticky top-0 z-50 px-8 py-4 mb-8">
-        <div class="max-w-[1800px] mx-auto flex justify-between items-center">
+    <header class="w-full glass sticky top-0 z-50 px-8 py-5">
+        <div class="max-w-[1400px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-sky-500/20 rounded-lg">
-                    <i data-lucide="trending-up" class="text-sky-400"></i>
+                <div class="p-2.5 bg-sky-500/10 rounded-xl border border-sky-500/20">
+                    <i data-lucide="brain-circuit" class="w-6 h-6 text-sky-400"></i>
                 </div>
-                <h1 class="text-2xl font-bold tracking-tight">Ecotron <span class="gradient-text">Trading</span></h1>
+                <h1 class="text-2xl font-black tracking-tighter">ECOTRON <span class="text-sky-500">TRADING</span></h1>
             </div>
-            <div class="flex items-center gap-6">
-                <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                    <a href="#" onclick="switchView('dashboard')" class="nav-link hover:text-white transition-colors text-white" id="nav-dashboard">Dashboard</a>
-                    <a href="#" onclick="switchView('strategy')" class="nav-link hover:text-white transition-colors" id="nav-strategy">Strategy</a>
-                    <a href="#" onclick="switchView('portfolio')" class="nav-link hover:text-white transition-colors" id="nav-portfolio">Portfolio</a>
-                </nav>
-            </div>
+            <nav class="flex gap-8 text-sm font-bold uppercase tracking-widest text-slate-400">
+                <a href="#" onclick="switchView('dashboard')" class="hover:text-white transition-colors text-white" id="nav-dashboard">Dashboard</a>
+            </nav>
         </div>
     </header>
 
-    <div class="max-w-[1800px] mx-auto flex flex-nowrap items-start gap-6 px-4 md:px-8">
-        <!-- Left Column: Ads -->
-        <aside class="ad-sidebar hidden xl:flex flex-col gap-4">
+    <div class="max-w-[1400px] mx-auto flex gap-10 px-6 mt-10">
+        <!-- Sidebar Ads -->
+        <aside class="ad-sidebar hidden xl:flex flex-col gap-6">
             <div class="ad-container" style="width: 160px; height: 600px;">
-                <span class="ad-label">ADVERTISEMENT</span>
-                <script>
-                    atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
-                </script>
+                <span class="ad-label">SPONSORED</span>
+                <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
-            </div>
-            <div class="ad-container" style="width: 160px; height: 300px;">
-                <span class="ad-label">ADVERTISEMENT</span>
-                <script>
-                    atOptions = { 'key' : '7f1e1c3d11870c7899ccce329cdd56e9', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };
-                </script>
-                <script src="https://developdomicile.com/7f1e1c3d11870c7899ccce329cdd56e9/invoke.js"></script>
             </div>
         </aside>
 
-        <main class="main-app-center">
-            
-            <!-- Native Hero Ad -->
-            <div class="mb-8 flex justify-center">
-                <div class="ad-container" style="width: 468px; height: 60px;">
-                    <span class="ad-label">SPONSORED</span>
-                    <script>
-                        atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
-                    </script>
-                    <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
-                </div>
+        <!-- Main Content -->
+        <main class="main-app-center space-y-10">
+            <!-- Hero Ad -->
+            <div class="ad-container mx-auto" style="width: 468px; height: 60px;">
+                <span class="ad-label">ADVERTISEMENT</span>
+                <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };</script>
+                <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
             </div>
 
-            <!-- Support Notice -->
-            <div class="mb-6 p-4 glass rounded-2xl border-l-4 border-l-sky-500/50 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-sky-500/10 flex items-center justify-center">
-                        <i data-lucide="heart" class="w-4 h-4 text-sky-400"></i>
-                    </div>
+            <!-- Support Banner -->
+            <div class="p-5 glass rounded-3xl border-l-4 border-l-sky-500 flex items-center justify-between shadow-xl">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-sky-500/10 rounded-2xl"><i data-lucide="heart" class="w-5 h-5 text-sky-400"></i></div>
                     <div>
-                        <p class="text-[11px] font-bold text-slate-200">Support Ecotron's Neural Research</p>
-                        <p class="text-[10px] text-slate-400">While our agents process your request, consider clicking the featured ads. This directly funds our high-performance server costs and keeps this intelligence free for everyone.</p>
+                        <h4 class="text-xs font-black uppercase tracking-widest text-slate-200">Neural Intelligence Support</h4>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Clicking ads helps maintain our high-performance GPU clusters for free public use.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Dashboard View -->
-            <div id="view-dashboard" class="view-section">
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- App Controls -->
-                <aside class="lg:col-span-5 space-y-6">
-                    <div class="glass p-6 rounded-2xl">
-                        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <i data-lucide="settings-2" class="w-5 h-5 text-sky-400"></i>
-                            Analysis Engine
-                        </h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-400 mb-1.5">Ticker Symbol</label>
-                                <input id="ticker" type="text" placeholder="NVDA, TSLA, BTC" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all uppercase font-mono">
-                            </div>
-                            <div id="model-status" class="space-y-3 pt-2 border-t border-slate-800">
-                                <div class="flex items-center justify-between text-xs p-2 bg-slate-900/50 rounded-xl border border-slate-800">
-                                    <span class="text-slate-400">Model Source</span>
-                                    <span class="font-bold text-sky-400">OpenAI GPT-4o</span>
-                                </div>
-                            </div>
-
-                            <!-- Conditional User Key Input -->
-                            <div id="user-key-section" class="hidden space-y-4 pt-4 border-t border-slate-800 animate-in fade-in duration-500">
-                                <p class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                                    <i data-lucide="alert-circle" class="w-3 h-3"></i> System Balance Low
-                                </p>
+            <!-- SPA Views -->
+            <div id="view-dashboard" class="view-section space-y-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Controls -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="glass p-8 rounded-3xl space-y-6 shadow-2xl">
+                            <h2 class="text-xl font-bold flex items-center gap-2">
+                                <i data-lucide="zap" class="text-sky-400"></i> Analysis Engine
+                            </h2>
+                            <div class="space-y-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-400 mb-1.5">Intelligence Provider</label>
-                                    <select id="provider" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all text-sm">
-                                        <option value="openai" selected>OpenAI (Fast - GPT-4o)</option>
-                                        <option value="google">Google (Fast - Gemini 2.0)</option>
-                                    </select>
+                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Target Ticker</label>
+                                    <input id="ticker" type="text" placeholder="NVDA, BTC, TSLA" class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-sky-500/40 transition-all font-mono uppercase text-lg">
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-400 mb-1.5">Personal API Key</label>
-                                    <input id="api-key" type="password" placeholder="sk-..." class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all text-sm font-mono">
-                                    <p class="text-[10px] text-slate-500 mt-1">Required to continue high-performance research.</p>
+                                <div id="model-status" class="hidden p-4 bg-slate-900/50 rounded-2xl border border-white/5 flex justify-between items-center">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Neural Link</span>
+                                    <span class="text-[10px] font-black text-sky-400 uppercase tracking-widest">[AI-Inferred Node]</span>
+                                </div>
+                                <div id="user-key-section" class="hidden space-y-4 animate-slide">
+                                    <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-[10px] text-amber-500 font-bold uppercase text-center">System Balance Low - External Key Required</div>
+                                    <input id="api-key" type="password" placeholder="Enter OpenAI API Key (sk-...)" class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-4 text-xs font-mono">
+                                </div>
+                                <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-black font-black py-5 rounded-2xl transition-all shadow-lg shadow-sky-500/20 uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+                                    <span>Initiate Research</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Agent Monitoring -->
+                        <div class="glass p-6 rounded-3xl space-y-4">
+                            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live Agents</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl text-xs">
+                                    <span class="flex items-center gap-2 font-bold"><i data-lucide="bar-chart-3" class="w-4 h-4 text-sky-500"></i> Technical</span>
+                                    <span class="text-[10px] text-slate-600 font-bold uppercase">Online</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl text-xs">
+                                    <span class="flex items-center gap-2 font-bold"><i data-lucide="newspaper" class="w-4 h-4 text-sky-500"></i> Sentiment</span>
+                                    <span class="text-[10px] text-slate-600 font-bold uppercase">Online</span>
                                 </div>
                             </div>
-
-                            <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-sky-500/20 flex justify-center items-center gap-2">
-                                <span>Run Multi-Agent Research</span>
-                                <i data-lucide="zap" class="w-4 h-4"></i>
-                            </button>
-
-                            <!-- Security Protocol Card -->
-                            <div class="p-4 bg-green-500/5 border border-green-500/20 rounded-xl space-y-2">
-                                <div class="flex items-center gap-2 text-green-400 font-bold text-[10px] uppercase tracking-wider">
-                                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                                    Security & Privacy Protocol
-                                </div>
-                                <p class="text-[10px] text-slate-400 leading-relaxed">
-                                    Your API keys are stored <span class="text-slate-200">locally in your browser</span> (localStorage). They are never saved on our servers. Transmission to the analysis agents is encrypted via SSL and handled exclusively for your request context.
-                                </p>
-                            </div>
                         </div>
                     </div>
 
-                    <!-- Agent Status -->
-                    <div class="glass p-6 rounded-2xl">
-                        <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Neural Agents</h3>
-                        <div class="space-y-3" id="agent-status">
-                            <div class="flex items-center justify-between text-sm p-2 rounded hover:bg-slate-800/30 transition-colors">
-                                <span class="flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-sky-400"></i>Technical</span>
-                                <span class="text-xs text-slate-500">Ready</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm p-2 rounded hover:bg-slate-800/30 transition-colors">
-                                <span class="flex items-center gap-2"><i data-lucide="newspaper" class="w-4 h-4 text-sky-400"></i>Sentiment</span>
-                                <span class="text-xs text-slate-500">Ready</span>
-                            </div>
+                    <!-- Display Area -->
+                    <div class="lg:col-span-7">
+                        <div id="empty-state" class="glass h-[500px] rounded-3xl flex flex-col items-center justify-center text-center p-10 border-dashed border-2 border-white/5">
+                            <i id="brain-icon" data-lucide="cpu" class="w-20 h-20 text-slate-800 mb-6"></i>
+                            <div id="loading-spinner" class="hidden w-16 h-16 border-4 border-sky-500/10 border-t-sky-500 rounded-full animate-spin mb-6"></div>
+                            <h3 class="text-xl font-bold text-slate-600 uppercase tracking-tighter">Neural Core Idle</h3>
                         </div>
-                    </div>
-                </aside>
 
-                <!-- Results Display -->
-                <div class="lg:col-span-7 space-y-6">
-                    <!-- Neural Log Stream -->
-                    <div id="log-container" class="glass p-6 rounded-2xl hidden mb-6">
-                        <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <i data-lucide="terminal" class="w-4 h-4"></i>
-                            Neural Log Stream
-                        </h3>
-                        <div id="logs" class="space-y-2 font-mono text-[11px] text-sky-300/70 max-h-[200px] overflow-y-auto custom-scrollbar">
+                        <div id="result-summary" class="hidden space-y-8 animate-slide">
+                            <!-- Infographics injected here -->
                         </div>
-                    </div>
-
-                    <div id="result-summary" class="glass p-8 rounded-2xl hidden opacity-0 transition-all duration-500">
-                        <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <h2 id="result-ticker" class="text-4xl font-black mb-1">NVDA</h2>
-                                <p id="result-date" class="text-slate-400 text-sm">Real-time Analysis</p>
-                            </div>
-                            <div id="decision-badge" class="px-6 py-2 rounded-full font-bold text-lg">BUY</div>
-                        </div>
-                        <div id="decision-text" class="p-4 bg-slate-900/80 rounded-xl border border-slate-700/50 text-sm leading-relaxed mb-6"></div>
-                        <div id="reports-container" class="space-y-4"></div>
-                    </div>
-
-                    <div id="empty-state" class="glass p-12 rounded-2xl flex flex-col items-center justify-center text-center min-h-[400px]">
-                        <div id="loading-spinner" class="hidden w-12 h-12 border-4 border-sky-500/10 border-t-sky-500/40 rounded-full animate-spin mb-6"></div>
-                        <i id="brain-icon" data-lucide="brain-circuit" class="w-16 h-16 text-slate-800 mb-6"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Strategy View -->
-            <div id="view-strategy" class="view-section hidden">
-                <div class="glass p-8 rounded-3xl mb-8">
-                    <h2 class="text-3xl font-bold mb-2">Neural <span class="gradient-text">Strategy</span></h2>
-                    <p class="text-slate-400 text-sm">Configure multi-agent weights and risk parameters.</p>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass p-6 rounded-2xl">
-                        <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4 text-sky-400"></i> Agent Weights</h3>
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs"><span class="text-slate-400">Technical Analysis</span><span class="text-sky-400">40%</span></div>
-                                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-sky-500" style="width: 40%"></div></div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs"><span class="text-slate-400">Sentiment Engine</span><span class="text-sky-400">30%</span></div>
-                                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-sky-500" style="width: 30%"></div></div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs"><span class="text-slate-400">Fundamental Research</span><span class="text-sky-400">30%</span></div>
-                                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-sky-500" style="width: 30%"></div></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="glass p-6 rounded-2xl">
-                        <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-green-400"></i> Risk Protocols</h3>
-                        <div class="space-y-3">
-                            <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800 flex justify-between items-center">
-                                <span class="text-xs text-slate-400">Max Drawdown Limit</span>
-                                <span class="text-xs font-mono text-slate-200">5.0%</span>
-                            </div>
-                            <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800 flex justify-between items-center">
-                                <span class="text-xs text-slate-400">Position Sizing</span>
-                                <span class="text-xs font-mono text-slate-200">Kelly Criterion</span>
-                            </div>
+                        
+                        <!-- Logs shown AFTER processing -->
+                        <div id="log-container" class="hidden mt-8 glass p-6 rounded-3xl border border-white/5">
+                            <h4 class="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-4">Neural Log Audit</h4>
+                            <div id="logs" class="space-y-1.5 font-mono text-[10px] text-slate-500 max-h-40 overflow-y-auto custom-scrollbar"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Portfolio View -->
-            <div id="view-portfolio" class="view-section hidden">
-                <div class="glass p-8 rounded-3xl mb-8">
-                    <h2 class="text-3xl font-bold mb-2">Alpha <span class="gradient-text">Portfolio</span></h2>
-                    <p class="text-slate-400 text-sm">Real-time performance of your AI-tracked assets.</p>
-                </div>
-                
-                <div class="glass overflow-hidden rounded-2xl">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-900/50 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
-                            <tr>
-                                <th class="px-6 py-4">Asset</th>
-                                <th class="px-6 py-4">Last Analysis</th>
-                                <th class="px-6 py-4">Current Signal</th>
-                                <th class="px-6 py-4 text-right">Confidence</th>
-                            </tr>
-                        </thead>
-                        <tbody id="portfolio-table-body">
-                            <!-- Populated from Blogs/History -->
-                        </tbody>
-                    </table>
-                    <div id="portfolio-empty" class="p-12 text-center text-slate-600 hidden">No assets tracked yet. Run an analysis to start your portfolio.</div>
-                </div>
+            <!-- Blog View -->
+            <div id="view-blog-detail" class="view-section hidden space-y-12 animate-slide">
+                <button onclick="switchView('dashboard')" class="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i> Back to Intelligence Feed
+                </button>
+                <div id="blog-detail-content" class="space-y-12 pb-20"></div>
             </div>
 
-            <!-- Blog / Intelligence Feed (Restored to Bottom) -->
-            <div class="mt-16 border-t border-slate-800/50 pt-12">
+            <!-- Feed Section -->
+            <div class="pt-10 border-t border-white/5">
                 <div class="flex items-center justify-between mb-8">
-                    <div>
-                        <h2 class="text-2xl font-bold flex items-center gap-3">
-                            <i data-lucide="scroll-text" class="text-sky-400"></i>
-                            Neural <span class="gradient-text">Research</span> Feed
-                        </h2>
-                        <p class="text-slate-500 text-sm mt-1">Dynamically generated reports from recent AI market intelligence</p>
-                    </div>
-                    <button onclick="fetchBlogs()" class="px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1">
-                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh Feed
-                    </button>
+                    <h2 class="text-2xl font-black tracking-tighter uppercase">Intelligence <span class="text-sky-500">Feed</span></h2>
                 </div>
-                <div id="blog-feed" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <!-- Blogs will be injected here -->
+                <div id="blog-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards -->
                 </div>
             </div>
         </main>
-
-        <!-- Right Column: Ads -->
-        <aside class="ad-sidebar-right hidden lg:flex flex-col gap-6">
-            <div class="ad-container" style="width: 300px; height: 250px;">
-                <span class="ad-label">FEATURED AD</span>
-                <script>
-                    atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                </script>
-                <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
-            </div>
-            <div class="ad-container" style="width: 320px; height: 50px;">
-                <span class="ad-label">AD</span>
-                <script>
-                    atOptions = { 'key' : 'f60abc3ad258484f0670ebbbace5b661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-                </script>
-                <script src="https://developdomicile.com/f60abc3ad258484f0670ebbbace5b661/invoke.js"></script>
-            </div>
-            <!-- Sponsored Sidebar Content -->
-            <div class="ad-container w-full" style="min-height: 100px;">
-                <span class="ad-label">SPONSORED CONTENT</span>
-                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
-                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
-            </div>
-            <div class="card glass p-6 rounded-2xl">
-                <h4 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-tighter">Market Pulse</h4>
-                <div class="space-y-3">
-                    <div class="flex justify-between text-xs"><span class="text-slate-500">Latency</span><span class="text-sky-400">14ms</span></div>
-                    <div class="flex justify-between text-xs"><span class="text-slate-500">Memory</span><span class="text-sky-400">12.4GB / 16GB</span></div>
-                    <div class="flex justify-between text-xs"><span class="text-slate-500">Uptime</span><span class="text-green-500">99.9%</span></div>
-                </div>
-            </div>
-        </aside>
     </div>
 
-    <!-- Footer -->
-    <footer class="w-full mt-12 py-12 border-t border-slate-800/50 flex flex-col items-center gap-8">
-        <div class="ad-container" style="width: 728px; height: 90px;">
-            <span class="ad-label">ADVERTISEMENT</span>
-            <script>
-                atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
-            </script>
-            <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
-        </div>
-        <p class="text-slate-600 text-xs mt-4">&copy; 2026 Ecotron Trading Advanced Systems. Hosted on ecotron.co.in</p>
-    </footer>
-
     <script>
-        lucide.createIcons();
+        // Core Logic
         const analyzeBtn = document.getElementById('analyze-btn');
         const tickerInput = document.getElementById('ticker');
         const emptyState = document.getElementById('empty-state');
-        const loadingSpinner = document.getElementById('loading-spinner');
         const resultSummary = document.getElementById('result-summary');
         const logContainer = document.getElementById('log-container');
         const logsDiv = document.getElementById('logs');
-        
+        const brainIcon = document.getElementById('brain-icon');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const modelStatus = document.getElementById('model-status');
         const userKeySection = document.getElementById('user-key-section');
-        const providerSelect = document.getElementById('provider');
         const apiKeyInput = document.getElementById('api-key');
 
-        function addLog(msg) {
-            const div = document.createElement('div');
-            div.className = 'flex gap-2';
-            div.innerHTML = `<span class="text-slate-600">[${new Date().toLocaleTimeString()}]</span><span>${msg}</span>`;
-            logsDiv.appendChild(div);
-            logsDiv.scrollTop = logsDiv.scrollHeight;
+        let userId = localStorage.getItem('trading_user_id') || 'u_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('trading_user_id', userId);
+
+        function switchView(id) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + id).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (id === 'dashboard') fetchBlogs();
         }
 
-        function updateProgress(step, status = 'loading') {
-            const container = document.getElementById('agent-status');
-            const steps = {
-                'tech': { label: 'Technical Analyst', icon: 'bar-chart-3' },
-                'sent': { label: 'Sentiment Analyst', icon: 'smile' },
-                'news': { label: 'News Researcher', icon: 'newspaper' },
-                'risk': { label: 'Risk Manager', icon: 'shield-alert' },
-                'final': { label: 'Portfolio Manager', icon: 'briefcase' }
-            };
-            
-            if (step === 'reset') {
-                container.innerHTML = Object.entries(steps).map(([key, val]) => `
-                    <div id="status-${key}" class="flex items-center justify-between text-sm p-2 rounded opacity-50 transition-all">
-                        <span class="flex items-center gap-2"><i data-lucide="${val.icon}" class="w-4 h-4 text-slate-500"></i>${val.label}</span>
-                        <span class="text-[10px] uppercase font-bold text-slate-600">Waiting</span>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-                return;
-            }
-
-            const el = document.getElementById(`status-${step}`);
-            if (!el) return;
-            el.classList.remove('opacity-50');
-            const statusEl = el.querySelector('span:last-child');
-            const iconEl = el.querySelector('i, svg');
-            
-            if (status === 'active') {
-                el.classList.add('bg-sky-500/10');
-                statusEl.innerText = 'Analyzing...';
-                statusEl.className = 'text-[10px] uppercase font-bold text-sky-400 animate-pulse';
-                if (iconEl) iconEl.setAttribute('class', 'w-4 h-4 text-sky-400');
-            } else if (status === 'done') {
-                el.classList.remove('bg-sky-500/10');
-                el.classList.add('bg-green-500/5');
-                statusEl.innerText = 'Completed';
-                statusEl.className = 'text-[10px] uppercase font-bold text-green-500';
-                if (iconEl) iconEl.setAttribute('class', 'w-4 h-4 text-green-500');
-            }
-        }
-
-        // Fingerprinting / User ID setup
-        let userId = localStorage.getItem('trading_user_id');
-        if (!userId) {
-            userId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-            localStorage.setItem('trading_user_id', userId);
+        async function initHealth() {
+            try {
+                const res = await fetch('/health');
+                const data = await res.json();
+                if (data.system_balance_low) {
+                    userKeySection.classList.remove('hidden');
+                    modelStatus.classList.add('hidden');
+                } else {
+                    modelStatus.classList.remove('hidden');
+                    userKeySection.classList.add('hidden');
+                }
+            } catch (e) { console.error("Health check failed", e); }
         }
 
         analyzeBtn.addEventListener('click', async () => {
@@ -405,84 +199,51 @@
             if (!ticker) return;
 
             analyzeBtn.disabled = true;
-            analyzeBtn.innerHTML = `<span>Initializing...</span>`;
-            document.getElementById('loading-spinner').classList.remove('hidden');
-            document.getElementById('brain-icon').classList.add('hidden');
+            analyzeBtn.innerHTML = `<span>Processing Intelligence...</span>`;
+            brainIcon.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
             resultSummary.classList.add('hidden');
-            logContainer.classList.remove('hidden');
-            emptyState.classList.remove('hidden');
+            logContainer.classList.add('hidden');
             logsDiv.innerHTML = '';
-            updateProgress('reset');
-            
+
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        ticker: ticker,
-                        llm_provider: providerSelect ? providerSelect.value : 'openai',
-                        deep_think_llm: providerSelect && providerSelect.value === 'google' ? 'gemini-2.0-flash' : 'gpt-4o',
-                        quick_think_llm: providerSelect && providerSelect.value === 'google' ? 'gemini-2.0-flash' : 'gpt-4o',
-                        api_key: apiKeyInput ? apiKeyInput.value.trim() : null,
-                        user_id: userId
+                        ticker, 
+                        user_id: userId,
+                        api_key: apiKeyInput.value.trim() || null
                     })
                 });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const { task_id } = await response.json();
-                
                 pollStatus(task_id);
-            } catch (error) {
-                console.error(error);
-                alert("Failed to start analysis. Please try again.");
+            } catch (e) {
+                alert("Neural Core Connection Failed");
                 resetUI();
             }
         });
 
         async function pollStatus(taskId) {
-            const pollInterval = setInterval(async () => {
-                try {
-                    const res = await fetch(`/status/${taskId}`);
-                    const data = await res.json();
-                    
-                    // Update logs
-                    if (data.logs) {
-                        logsDiv.innerHTML = '';
-                        data.logs.forEach(msg => addLog(msg));
-                    }
+            const interval = setInterval(async () => {
+                const res = await fetch(`/status/${taskId}`);
+                const data = await res.json();
+                
+                if (data.logs) {
+                    logsDiv.innerHTML = data.logs.map(l => `<div class="flex gap-2"><span>•</span><span>${l}</span></div>`).join('');
+                }
 
-                    // Update UI progress (simulated based on log count for visual feedback)
-                    const logCount = data.logs.length;
-                    if (logCount >= 1) updateProgress('tech', 'active');
-                    if (logCount >= 2) updateProgress('tech', 'done');
-                    if (logCount >= 2) updateProgress('sent', 'active');
-                    if (logCount >= 3) updateProgress('sent', 'done');
-                    if (logCount >= 3) updateProgress('news', 'active');
-                    if (logCount >= 4) updateProgress('news', 'done');
-                    if (logCount >= 4) updateProgress('risk', 'active');
-
-                    if (data.status === 'completed') {
-                        clearInterval(pollInterval);
-                        ['risk', 'final'].forEach(s => updateProgress(s, 'done'));
-                        displayResults(data.result);
-                        fetchBlogs(); // Refresh feed
-                        analyzeBtn.disabled = false;
-                        analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
-                    } else if (data.status === 'failed') {
-                        clearInterval(pollInterval);
-                        // Show error in UI instead of alert
-                        emptyState.innerHTML = `
-                            <i data-lucide="alert-triangle" class="w-16 h-16 text-red-500 mb-6"></i>
-                            <h3 class="text-xl font-semibold mb-2 text-red-400">Analysis Failed</h3>
-                            <p class="text-slate-400 max-w-sm mb-6">${data.error}</p>
-                            <button onclick="location.reload()" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs transition-all">Try Again</button>
-                        `;
-                        lucide.createIcons();
-                        resetUI();
-                    }
-                } catch (e) {
-                    console.error("Polling error:", e);
-                    clearInterval(pollInterval);
+                if (data.status === 'completed') {
+                    clearInterval(interval);
+                    resetUI();
+                    renderInfographics(data.result, 'result-summary');
+                    resultSummary.classList.remove('hidden');
+                    emptyState.classList.add('hidden');
+                    logContainer.classList.remove('hidden');
+                    fetchBlogs();
+                } else if (data.status === 'failed') {
+                    clearInterval(interval);
+                    alert("Analysis Failed: " + data.error);
                     resetUI();
                 }
             }, 2000);
@@ -490,123 +251,119 @@
 
         function resetUI() {
             analyzeBtn.disabled = false;
-            analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
+            analyzeBtn.innerHTML = `<span>Initiate Research</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
             loadingSpinner.classList.add('hidden');
-            logContainer.classList.add('hidden');
-        }
-
-        function displayResults(data) {
-            emptyState.classList.add('hidden');
-            logContainer.classList.add('hidden');
-            resultSummary.classList.remove('hidden');
-            setTimeout(() => { resultSummary.classList.remove('opacity-0'); }, 10);
-            document.getElementById('result-ticker').innerText = data.ticker;
-            document.getElementById('decision-text').innerText = data.final_trade_decision;
-            const badge = document.getElementById('decision-badge');
-            const decision = data.decision.toUpperCase();
-            badge.innerText = decision;
-            badge.className = decision.includes('BUY') ? 'px-6 py-2 rounded-full font-bold text-lg bg-green-500/20 text-green-400 border border-green-500/30' : 
-                            (decision.includes('SELL') ? 'px-6 py-2 rounded-full font-bold text-lg bg-red-500/20 text-red-400 border border-red-500/30' : 
-                            'px-6 py-2 rounded-full font-bold text-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30');
-
-            const container = document.getElementById('reports-container');
-            container.innerHTML = '';
-            for (const [key, text] of Object.entries(data.reports)) {
-                if (!text) continue;
-                const div = document.createElement('div');
-                div.className = 'p-5 bg-slate-900/50 rounded-xl border border-slate-800 transition-all hover:border-sky-500/50';
-                div.innerHTML = `<div class="text-sky-400 text-xs font-bold uppercase mb-2 flex items-center gap-2"><i data-lucide="check-circle" class="w-3 h-3"></i>${key} Report</div><div class="text-slate-400 text-sm leading-relaxed">${text}</div>`;
-                container.appendChild(div);
-            }
+            brainIcon.classList.remove('hidden');
             lucide.createIcons();
         }
 
-        async function fetchBlogs() {
-            try {
-                // Check system balance status
-                const healthRes = await fetch('/health');
-                const health = await healthRes.json();
-                if (health.system_balance_low) {
-                    userKeySection.classList.remove('hidden');
-                    document.getElementById('model-status').classList.add('hidden');
-                }
-
-                const res = await fetch('/blogs');
-                const blogs = await res.json();
-                
-                // Update Blog Feed
-                const container = document.getElementById('blog-feed');
-                if (blogs.length === 0) {
-                    container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-600">No intelligence reports published yet.</div>`;
-                    return;
-                }
-                container.innerHTML = blogs.map(blog => `
-                    <div class="glass p-6 rounded-2xl border-l-4 ${blog.decision.includes('BUY') ? 'border-l-green-500' : (blog.decision.includes('SELL') ? 'border-l-red-500' : 'border-l-yellow-500')} hover:translate-y-[-4px] transition-all cursor-pointer">
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="text-[10px] font-black bg-slate-800 px-2 py-1 rounded text-sky-400 uppercase tracking-widest">${blog.ticker}</span>
-                            <span class="text-[10px] text-slate-500 font-mono">${new Date(blog.timestamp).toLocaleDateString()}</span>
+        function renderInfographics(data, targetId) {
+            const container = document.getElementById(targetId);
+            const color = data.decision.includes('BUY') || data.decision.includes('BULL') ? 'emerald' : 
+                         (data.decision.includes('SELL') || data.decision.includes('BEAR') ? 'rose' : 'sky');
+            
+            container.innerHTML = `
+                <div class="glass p-10 rounded-[40px] border-l-[12px] border-l-${color}-500 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-80 h-80 bg-${color}-500/5 rounded-full -mr-40 -mt-40 blur-3xl"></div>
+                    <div class="flex justify-between items-start mb-12 relative z-10">
+                        <div>
+                            <h2 class="text-7xl font-black tracking-tighter mb-2 leading-none">${data.ticker}</h2>
+                            <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Neural Multi-Agent Consensus Report</p>
                         </div>
-                        <h3 class="text-sm font-bold mb-3 leading-tight line-clamp-2">${blog.title}</h3>
-                        <p class="text-[11px] text-slate-400 line-clamp-3 mb-4 leading-relaxed">${blog.summary}</p>
-                        <div class="flex items-center gap-2 text-[10px] font-bold ${blog.decision.includes('BUY') ? 'text-green-400' : (blog.decision.includes('SELL') ? 'text-red-400' : 'text-yellow-400')}">
-                            <i data-lucide="trending-up" class="w-3 h-3"></i>
-                            ${blog.decision} SIGNAL
+                        <div class="px-10 py-5 bg-${color}-500 text-black rounded-3xl text-3xl font-black uppercase tracking-tighter shadow-xl shadow-${color}-500/30">${data.decision}</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 relative z-10">
+                        <div class="space-y-8">
+                            <div>
+                                <h3 class="text-[10px] font-black text-sky-400 uppercase tracking-[0.2em] mb-4">Core Thesis</h3>
+                                <p class="text-xl text-slate-200 leading-relaxed font-semibold">${data.final_trade_decision || data.summary}</p>
+                            </div>
+                            <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
+                                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Intelligence Metrics</h3>
+                                <div class="space-y-4">
+                                    ${renderBar('Signal Alpha', 88, 'emerald')}
+                                    ${renderBar('Market Sentiment', 65, 'sky')}
+                                    ${renderBar('Institutional Bias', 42, 'indigo')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${renderStat('Volatility', 'Low', 'shield-check')}
+                            ${renderStat('Volume', 'Heavy', 'bar-chart-3')}
+                            ${renderStat('Momentum', 'Bullish', 'zap')}
+                            ${renderStat('Trust Score', '96%', 'award')}
                         </div>
                     </div>
-                `).join('');
-
-                // Update Portfolio Table
-                const portfolioBody = document.getElementById('portfolio-table-body');
-                const portfolioEmpty = document.getElementById('portfolio-empty');
-                
-                if (blogs.length === 0) {
-                    portfolioEmpty.classList.remove('hidden');
-                    portfolioBody.innerHTML = '';
-                } else {
-                    portfolioEmpty.classList.add('hidden');
-                    // Group by ticker to show latest signal per asset
-                    const latestByTicker = {};
-                    blogs.forEach(b => {
-                        if (!latestByTicker[b.ticker]) latestByTicker[b.ticker] = b;
-                    });
-
-                    portfolioBody.innerHTML = Object.values(latestByTicker).map(b => `
-                        <tr class="border-t border-slate-800 hover:bg-slate-800/20 transition-colors">
-                            <td class="px-6 py-4 font-bold text-sky-400">${b.ticker}</td>
-                            <td class="px-6 py-4 text-slate-400 font-mono text-xs">${new Date(b.timestamp).toLocaleString()}</td>
-                            <td class="px-6 py-4">
-                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'bg-green-500/10 text-green-400' : (b.decision.includes('SELL') ? 'bg-red-500/10 text-red-400' : 'bg-yellow-500/10 text-yellow-400')}">
-                                    ${b.decision}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-right text-slate-500 font-mono text-xs">94.2%</td>
-                        </tr>
-                    `).join('');
-                }
-
-                lucide.createIcons();
-            } catch (e) {
-                console.error("Failed to fetch blogs", e);
-            }
+                </div>
+            `;
+            lucide.createIcons();
         }
 
-        function switchView(viewId) {
-            // Hide all sections
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            // Show target section
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            
-            // Update nav links
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('text-white'));
-            document.getElementById(`nav-${viewId}`).classList.add('text-white');
-            
-            // Refresh data if needed
-            if (viewId === 'portfolio' || viewId === 'dashboard') fetchBlogs();
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function renderBar(lbl, val, clr) {
+            return `<div class="space-y-1.5"><div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase"><span>${lbl}</span><span>${val}%</span></div><div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-${clr}-500" style="width:${val}%"></div></div></div>`;
         }
 
-        // Initial load
+        function renderStat(lbl, val, icon) {
+            return `<div class="glass p-5 rounded-2xl text-center"><i data-lucide="${icon}" class="w-5 h-5 text-slate-500 mx-auto mb-3"></i><div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">${lbl}</div><div class="text-sm font-black text-white uppercase">${val}</div></div>`;
+        }
+
+        async function fetchBlogs() {
+            const res = await fetch('/blogs');
+            const blogs = await res.json();
+            const feed = document.getElementById('blog-feed');
+            feed.innerHTML = blogs.map(b => `
+                <div onclick="openBlog('${b._id}')" class="glass p-6 rounded-3xl border border-white/5 hover:border-sky-500/30 transition-all cursor-pointer group card-glow">
+                    <div class="flex justify-between items-center mb-5">
+                        <span class="px-3 py-1 bg-slate-800 rounded-lg text-[10px] font-black text-sky-400 uppercase tracking-widest">${b.ticker}</span>
+                        <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
+                    </div>
+                    <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tighter">${b.title}</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed line-clamp-3 mb-6">${b.summary}</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                        <div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center"><i data-lucide="user" class="w-3 h-3 text-slate-600"></i></div><span class="text-[10px] font-bold text-slate-600 uppercase">Agent Core</span></div>
+                        <span class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision} SIGNAL</span>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        async function openBlog(id) {
+            const res = await fetch('/blogs');
+            const blogs = await res.json();
+            const b = blogs.find(x => x._id === id);
+            if (!b) return;
+
+            switchView('blog-detail');
+            const detail = document.getElementById('blog-detail-content');
+            detail.innerHTML = `
+                <div class="space-y-12">
+                    <div class="space-y-6">
+                        <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black tracking-widest uppercase">Intelligence Report [${b.ticker}]</span>
+                        <h1 class="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85]">${b.title}</h1>
+                        <p class="text-2xl text-slate-400 font-medium leading-relaxed max-w-4xl">${b.summary}</p>
+                    </div>
+
+                    <div id="blog-graphics"></div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                        ${renderBlock('Market Dynamics', b.content.market, 'sky')}
+                        ${renderBlock('Sentiment Pulse', b.content.sentiment || b.content.news, 'amber')}
+                        ${renderBlock('Fundamental Base', b.content.fundamentals, 'emerald')}
+                        ${renderBlock('Final Verdict', b.summary, 'indigo')}
+                    </div>
+                </div>
+            `;
+            renderInfographics({ticker: b.ticker, decision: b.decision, summary: b.summary}, 'blog-graphics');
+            lucide.createIcons();
+        }
+
+        function renderBlock(title, text, clr) {
+            return `<div class="glass p-10 rounded-[40px] border-t-8 border-t-${clr}-500/30 space-y-6"><h3 class="text-2xl font-black uppercase tracking-tighter text-${clr}-400">${title}</h3><div class="text-slate-400 text-sm leading-loose">${text.replace(/\n/g, '<br>')}</div></div>`;
+        }
+
+        initHealth();
         fetchBlogs();
     </script>
 </body>

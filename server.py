@@ -232,8 +232,8 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
         # Generate Dynamic Blog
         blog_post = {
             "ticker": request.ticker,
-            "title": f"Deep Dive: Why {request.ticker} is a {result['decision']} Today",
-            "summary": result["final_trade_decision"][:300] + "...",
+            "title": f"Intelligence Report: Why {request.ticker} is a {result['decision']} today",
+            "summary": result["final_trade_decision"][:250] + "...",
             "content": result["reports"],
             "decision": result["decision"],
             "timestamp": datetime.now(),
