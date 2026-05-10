@@ -320,6 +320,7 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
     <html>
         <head>
             <title>Ecotron Admin | Users</title>
+            <meta name="robots" content="noindex, nofollow">
             <style>
                 body {{ font-family: sans-serif; background: #050507; color: #f8fafc; padding: 40px; }}
                 table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
