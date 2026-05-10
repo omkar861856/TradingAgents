@@ -47,8 +47,8 @@ class AnalysisRequest(BaseModel):
     ticker: str
     date: Optional[str] = None
     llm_provider: Optional[str] = "ollama"
-    deep_think_llm: Optional[str] = "llama3:8b"
-    quick_think_llm: Optional[str] = "llama3:8b"
+    deep_think_llm: Optional[str] = "llama3.1:8b"
+    quick_think_llm: Optional[str] = "llama3.1:8b"
 
 @app.get("/")
 async def root():
