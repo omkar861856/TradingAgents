@@ -9,15 +9,17 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv directly into /usr/local/bin
-RUN curl -LsSf https://astral.sh/uv/install.sh | BINDIR=/usr/local/bin sh
+# Install uv and force it into the system path
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    ln -s /root/.cargo/bin/uv /usr/local/bin/uv && \
+    ln -s /root/.cargo/bin/uvx /usr/local/bin/uvx
 
 # Copy project files
 COPY . .
 
-# Install dependencies using the absolute path to uv just in case
-RUN /usr/local/bin/uv pip install --system -e .
-RUN /usr/local/bin/uv pip install --system fastapi uvicorn python-dotenv
+# Install dependencies
+RUN uv pip install --system -e .
+RUN uv pip install --system fastapi uvicorn python-dotenv
 
 # Run the API server
 CMD ["python", "server.py"]
