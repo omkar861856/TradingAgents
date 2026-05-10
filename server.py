@@ -9,6 +9,8 @@ import logging
 import os
 import json
 import secrets
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.default_config import DEFAULT_CONFIG
@@ -117,9 +119,10 @@ def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
         )
     return credentials.username
 
-# Global task storage
+# Global task storage and executor
 _tasks: Dict[str, Any] = {}
 _graph = None
+executor = ThreadPoolExecutor(max_workers=4)
 
 def get_graph(config_overrides: Optional[Dict[str, Any]] = None):
     global _graph
@@ -224,10 +227,15 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
         graph = get_graph(config_overrides)
         
         _tasks[task_id]["logs"].append("Coordinating expert analysts (Technical, Sentiment, News)...")
-        # In a more complex setup, we'd hook into the graph to get real-time node logs.
-        # For now, we simulate the sequence to keep the UI alive.
         
-        final_state, decision = graph.propagate(request.ticker, trade_date)
+        # Run blocking graph propagation in executor to keep FastAPI responsive
+        loop = asyncio.get_event_loop()
+        final_state, decision = await loop.run_in_executor(
+            executor, 
+            graph.propagate, 
+            request.ticker, 
+            trade_date
+        )
         
         result = {
             "ticker": request.ticker,
@@ -590,18 +598,33 @@ async def get_blog_page(blog_id: str):
 {blog.get('citation', '')}
                     </pre>
                 </div>
+
+                <div class="flex justify-center pt-10">
+                    <a href="https://wa.me/919321089065" target="_blank" class="flex items-center gap-4 px-8 py-4 bg-[#25D366]/10 text-[#25D366] rounded-full border border-[#25D366]/20 hover:bg-[#25D366] hover:text-white transition-all group">
+                        <i class="fa-brands fa-whatsapp text-2xl"></i>
+                        <div class="text-left">
+                            <p class="text-[10px] font-black uppercase tracking-widest opacity-60">Neural Support</p>
+                            <p class="text-sm font-bold">Chat with Ecotron Engineers</p>
+                        </div>
+                    </a>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
         lucide.createIcons();
-        document.getElementById('summary-content').innerHTML = marked.parse({repr(blog['summary'])});
-        document.getElementById('verdict-content').innerHTML = marked.parse({repr(blog['summary'])});
-        document.getElementById('market-content').innerHTML = marked.parse({repr(blog['content'].get('market', ''))});
-        document.getElementById('sentiment-content').innerHTML = marked.parse({repr(blog['content'].get('sentiment', blog['content'].get('news', '')))});
-        document.getElementById('fundamentals-content').innerHTML = marked.parse({repr(blog['content'].get('fundamentals', ''))});
-        document.getElementById('risk-content').innerHTML = marked.parse({repr(blog['summary'])});
+        const setHtml = (id, content) => {{
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = marked.parse(content || '');
+        }};
+        
+        setHtml('summary-content', {repr(blog['summary'])});
+        setHtml('verdict-content', {repr(blog['summary'])});
+        setHtml('market-content', {repr(blog['content'].get('market', ''))});
+        setHtml('sentiment-content', {repr(blog['content'].get('sentiment', blog['content'].get('news', '')))});
+        setHtml('fundamentals-content', {repr(blog['content'].get('fundamentals', ''))});
+        setHtml('risk-content', {repr(blog['summary'])});
     </script>
 </body>
 </html>
