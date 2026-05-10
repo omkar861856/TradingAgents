@@ -271,7 +271,7 @@ const Dashboard = ({
                       key={currentIconIdx}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      src={`/transhumans art/SVG/${TRANSHUMAN_ICONS[currentIconIdx]}`} 
+                      src={`/transhumans_art/SVG/${TRANSHUMAN_ICONS[currentIconIdx]}`} 
                       alt="Synthesis Node" 
                       className="w-48 h-48" 
                     />
@@ -417,7 +417,7 @@ const ReportSection = ({ title, content, icon }) => (
   <div className="glass-card p-12 lg:p-20 border-4 border-black space-y-16 bg-white shadow-none">
     <div className="flex flex-col md:flex-row items-center gap-10 border-b-8 border-black pb-10">
       <div className="agent-icon-container">
-        <img src={`/transhumans art/SVG/${icon}`} alt={title} className="w-32 h-32 object-contain" />
+        <img src={`/transhumans_art/SVG/${icon}`} alt={title} className="w-32 h-32 object-contain" />
         <div className="agent-status-tick">✓</div>
       </div>
       <h3 className="text-5xl lg:text-7xl font-black uppercase m-0 tracking-tighter text-black">{title}</h3>
@@ -507,7 +507,7 @@ const MainContainer = () => {
             </p>
          </div>
          <div className="flex items-center gap-5 grayscale hover:grayscale-0 transition-all cursor-pointer">
-            <img src="/transhumans art/SVG/Pilot.svg" className="w-14 h-14" alt="Ecotron" />
+            <img src="/transhumans_art/SVG/Pilot.svg" className="w-14 h-14" alt="Ecotron" />
             <span className="text-xl font-black uppercase tracking-[0.8em] text-black">ECOTRON.CO.IN</span>
          </div>
       </footer>
