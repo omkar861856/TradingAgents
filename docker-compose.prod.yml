@@ -20,6 +20,8 @@ services:
     container_name: trading-ollama
     volumes:
       - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
     healthcheck:
       test: ["CMD", "ollama", "list"]
       interval: 10s
@@ -35,7 +37,7 @@ services:
       dockerfile: Dockerfile.api
     container_name: trading-api
     environment:
-      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_HOST=http://trading-ollama:11434
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
