@@ -35,6 +35,20 @@ db = mongo_client.get_default_database()
 activity_collection = db.activity
 blogs_collection = db.blogs
 
+# Static files with caching
+from fastapi.staticfiles import StaticFiles
+if os.path.exists("static"):
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.middleware("http")
+async def add_cache_headers(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/static"):
+        response.headers["Cache-Control"] = "public, max-age=31536000"
+    elif request.url.path == "/" or request.url.path.startswith("/blog"):
+        response.headers["Cache-Control"] = "public, max-age=60"
+    return response
+
 @app.on_event("startup")
 async def startup_db_client():
     try:
@@ -502,27 +516,17 @@ async def get_blog_page(blog_id: str):
         </div>
     </header>
 
-    <div class="max-w-[1400px] mx-auto flex gap-10 px-6 mt-10 pb-20">
+    <div class="max-w-[1600px] mx-auto flex gap-10 px-6 mt-10 pb-20">
         <aside style="width:160px; flex-shrink:0; position: sticky; top: 120px; height: fit-content;">
             <div class="ad-box" style="width: 160px; height: 600px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
-        </aside>
-
-        <main style="flex-grow:1; min-width:0; max-width:1100px;">
-            <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
+            <div class="ad-box" style="width: 160px; height: 300px; margin-top: 20px;">
                 <span class="ad-tag">SPONSORED</span>
-                <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {{}} }};</script>
+                <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 250, 'width' : 160, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
-            </div>
-
-            <div class="space-y-12 prose-custom">
-                <div>
-                    <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black uppercase">Intelligence Report [{blog['ticker']}]</span>
-                    <h1 class="text-7xl font-black tracking-tighter uppercase mt-6">{blog['title']}</h1>
-                    <div id="summary-content" class="text-2xl text-slate-400 font-bold leading-tight"></div>
                 </div>
 
                 <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{active_color}-500">

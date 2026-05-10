@@ -10,10 +10,19 @@
     <meta property="og:image" content="https://ecotron.co.in/static/logo_preview.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://ecotron.co.in/static/logo_preview.png">
+    
+    <!-- Caching & Performance -->
+    <meta http-equiv="Cache-Control" content="public, max-age=3600">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://developdomicile.com">
+    
+    <!-- Popunder Ad -->
+    <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -32,8 +41,6 @@
         .prose-custom h1 { font-size: 3rem; font-weight: 900; margin-bottom: 1.5rem; color: #fff; letter-spacing: -0.05em; line-height: 1; }
         .prose-custom h2 { font-size: 1.8rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; color: #38bdf8; }
         .prose-custom p { margin-bottom: 1rem; line-height: 1.7; color: #cbd5e1; font-size: 0.95rem; }
-        .prose-custom ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: #94a3b8; }
-        .prose-custom table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: rgba(255,255,255,0.02); }
 
         .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
         .blog-card { height: 450px; display: flex; flex-direction: column; overflow: hidden; }
@@ -50,7 +57,6 @@
         .notification-toast { transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
         .notification-toast.active { transform: translateX(0); }
 
-        /* Neural Dino Animation */
         .neural-dino { width: 80px; height: 80px; position: relative; }
         .dino-pulse { position: absolute; inset: 0; border: 4px solid #38bdf8; border-radius: 50%; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
         @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
@@ -76,15 +82,29 @@
     </header>
 
     <div class="app-container mt-10 pb-20">
+        <!-- Left Ads -->
         <aside class="ad-left hidden xl:block">
             <div class="ad-box" style="width: 160px; height: 600px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
+            <div class="ad-box" style="width: 160px; height: 300px; margin-top: 20px;">
+                <span class="ad-tag">SPONSORED</span>
+                <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 250, 'width' : 160, 'params' : {} };</script>
+                <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
+            </div>
         </aside>
 
+        <!-- Main Column -->
         <main class="main-content">
+            <!-- Hero Top Ad -->
+            <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
+                <span class="ad-tag">SPONSORED</span>
+                <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };</script>
+                <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
+            </div>
+
             <div id="view-dashboard" class="view-section space-y-12">
                 <!-- Full Width Search -->
                 <div class="glass p-12 rounded-[40px] border border-white/5 shadow-2xl relative overflow-hidden">
@@ -123,11 +143,17 @@
             </div>
         </main>
 
+        <!-- Right Ads -->
         <aside class="ad-right hidden lg:block">
             <div class="ad-box" style="width: 300px; height: 250px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };</script>
                 <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
+            </div>
+            <div class="ad-box" style="width: 300px; height: 600px; margin-top: 20px;">
+                <span class="ad-tag">SPONSORED</span>
+                <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 300, 'params' : {} };</script>
+                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
         </aside>
     </div>
@@ -148,6 +174,11 @@
     </div>
 
     <footer class="w-full glass py-20 mt-20 border-t border-white/5 flex flex-col items-center gap-12 text-center px-6">
+        <div class="ad-box" style="width: 728px; height: 90px;">
+            <span class="ad-tag">ADVERTISEMENT</span>
+            <script>atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };</script>
+            <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
+        </div>
         <div class="max-w-4xl w-full space-y-4">
             <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">Built on the TradingAgents Framework</p>
             <pre class="text-[9px] text-slate-800 font-mono text-left bg-black/20 p-6 rounded-2xl overflow-x-auto border border-white/5">@misc{xiao2025tradingagentsmultiagentsllmfinancial,
@@ -274,9 +305,9 @@
                         </div>
                         <div class="flex items-center justify-between pt-6 border-t border-white/5 flex-shrink-0">
                             <div class="flex gap-2">
-                                <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="share-btn hover:text-[#1DA1F2]"><i class="fa-brands fa-twitter"></i></a>
-                                <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="share-btn hover:text-[#4267B2]"><i class="fa-brands fa-facebook-f"></i></a>
-                                <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="share-btn hover:text-[#25D366]"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="share-btn hover:text-[#1DA1F2] transition-colors"><i class="fa-brands fa-twitter"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="share-btn hover:text-[#4267B2] transition-colors"><i class="fa-brands fa-facebook-f"></i></a>
+                                <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="share-btn hover:text-[#25D366] transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                             <span class="text-[10px] font-black uppercase text-${color}-400">${b.decision}</span>
                         </div>
