@@ -6,155 +6,199 @@
     <title>Ecotron Trading | AI Financial Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #050507; color: #f8fafc; overflow-x: hidden; }
-        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05); }
+        body { font-family: 'Inter', sans-serif; background: #020203; color: #f8fafc; overflow-x: hidden; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
         .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .main-app-center { flex-grow: 1; min-width: 0; max-width: 1000px; margin: 0 auto; }
-        .ad-sidebar { width: 160px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.3s; position: sticky; top: 100px; height: fit-content; }
-        .ad-container { position: relative; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.3); }
-        .ad-label { position: absolute; top: 4px; left: 4px; font-size: 8px; color: #64748b; z-index: 10; font-weight: bold; }
+        
+        /* Layout */
+        .app-container { max-width: 1800px; margin: 0 auto; display: flex; gap: 24px; padding: 0 24px; }
+        .ad-left { width: 160px; flex-shrink: 0; position: sticky; top: 100px; height: fit-content; }
+        .ad-right { width: 300px; flex-shrink: 0; position: sticky; top: 100px; height: fit-content; }
+        .main-content { flex-grow: 1; min-width: 0; max-width: 1100px; }
+        
+        .ad-box { position: relative; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.4); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.03); }
+        .ad-tag { position: absolute; top: 4px; left: 6px; font-size: 8px; color: #475569; z-index: 10; font-weight: 800; letter-spacing: 0.1em; }
+
+        /* Typography Formatting */
+        .prose-custom h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1.5rem; color: #fff; letter-spacing: -0.05em; line-height: 1; }
+        .prose-custom h2 { font-size: 1.8rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; color: #38bdf8; }
+        .prose-custom h3 { font-size: 1.3rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #94a3b8; }
+        .prose-custom p { margin-bottom: 1rem; line-height: 1.7; color: #cbd5e1; font-size: 0.95rem; }
+        .prose-custom ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: #94a3b8; }
+        .prose-custom li { margin-bottom: 0.5rem; }
+        .prose-custom strong { color: #f1f5f9; font-weight: 700; }
+        
+        .prose-custom table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: rgba(255,255,255,0.02); border-radius: 12px; overflow: hidden; }
+        .prose-custom th { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .prose-custom td { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8; }
+
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        .card-glow { position: relative; }
-        .card-glow::after { content: ''; position: absolute; inset: -1px; background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(129,140,248,0.2)); border-radius: inherit; z-index: -1; opacity: 0; transition: opacity 0.3s; }
-        .card-glow:hover::after { opacity: 1; }
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .animate-slide { animation: slideIn 0.5s ease forwards; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+        
+        .nav-link { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; transition: all 0.3s; }
+        .nav-link.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
-    <!-- Header -->
-    <header class="w-full glass sticky top-0 z-50 px-8 py-5">
-        <div class="max-w-[1400px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-sky-500/10 rounded-xl border border-sky-500/20">
-                    <i data-lucide="brain-circuit" class="w-6 h-6 text-sky-400"></i>
+<body class="min-h-screen">
+    <!-- Top Header -->
+    <header class="w-full glass sticky top-0 z-[100] px-8 py-5 border-b border-white/5">
+        <div class="max-w-[1800px] mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20">
+                    <i data-lucide="trending-up" class="text-black w-6 h-6"></i>
                 </div>
-                <h1 class="text-2xl font-black tracking-tighter">ECOTRON <span class="text-sky-500">TRADING</span></h1>
+                <h1 class="text-2xl font-black tracking-tighter uppercase">ECOTRON <span class="text-sky-500">TRADING</span></h1>
             </div>
-            <nav class="flex gap-8 text-sm font-bold uppercase tracking-widest text-slate-400">
-                <a href="#" onclick="switchView('dashboard')" class="hover:text-white transition-colors text-white" id="nav-dashboard">Dashboard</a>
+            <nav class="flex gap-10">
+                <a href="#" onclick="switchView('dashboard')" class="nav-link active" id="nav-dashboard">Dashboard</a>
             </nav>
         </div>
     </header>
 
-    <div class="max-w-[1400px] mx-auto flex gap-10 px-6 mt-10">
-        <!-- Sidebar Ads -->
-        <aside class="ad-sidebar hidden xl:flex flex-col gap-6">
-            <div class="ad-container" style="width: 160px; height: 600px;">
-                <span class="ad-label">SPONSORED</span>
+    <div class="app-container mt-10 pb-20">
+        <!-- Left Ads -->
+        <aside class="ad-left hidden xl:block">
+            <div class="ad-box" style="width: 160px; height: 600px;">
+                <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
+            <div class="ad-box" style="width: 160px; height: 300px;">
+                <span class="ad-tag">ADVERTISEMENT</span>
+                <script>atOptions = { 'key' : '7f1e1c3d11870c7899ccce329cdd56e9', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };</script>
+                <script src="https://developdomicile.com/7f1e1c3d11870c7899ccce329cdd56e9/invoke.js"></script>
+            </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-app-center space-y-10">
-            <!-- Hero Ad -->
-            <div class="ad-container mx-auto" style="width: 468px; height: 60px;">
-                <span class="ad-label">ADVERTISEMENT</span>
+        <!-- Main Column -->
+        <main class="main-content">
+            <!-- Hero Top Ad -->
+            <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
+                <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
             </div>
 
             <!-- Support Banner -->
-            <div class="p-5 glass rounded-3xl border-l-4 border-l-sky-500 flex items-center justify-between shadow-xl">
+            <div class="mb-10 p-6 glass rounded-2xl border-l-4 border-l-sky-500 shadow-xl flex items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
-                    <div class="p-3 bg-sky-500/10 rounded-2xl"><i data-lucide="heart" class="w-5 h-5 text-sky-400"></i></div>
+                    <div class="p-3 bg-sky-500/10 rounded-xl"><i data-lucide="heart" class="text-sky-400 w-6 h-6"></i></div>
                     <div>
-                        <h4 class="text-xs font-black uppercase tracking-widest text-slate-200">Neural Intelligence Support</h4>
-                        <p class="text-[11px] text-slate-500 mt-0.5">Clicking ads helps maintain our high-performance GPU clusters for free public use.</p>
+                        <h4 class="text-xs font-black uppercase tracking-widest text-white">Neural Intelligence Support</h4>
+                        <p class="text-[11px] text-slate-400 leading-tight">Clicking ads helps maintain our high-performance GPU clusters for free public use.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- SPA Views -->
-            <div id="view-dashboard" class="view-section space-y-10">
+            <div id="view-dashboard" class="view-section space-y-12">
+                <!-- Dashboard Content -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <!-- Controls -->
+                    <!-- Left Engine -->
                     <div class="lg:col-span-5 space-y-6">
-                        <div class="glass p-8 rounded-3xl space-y-6 shadow-2xl">
-                            <h2 class="text-xl font-bold flex items-center gap-2">
-                                <i data-lucide="zap" class="text-sky-400"></i> Analysis Engine
+                        <div class="glass p-8 rounded-3xl border border-white/5 shadow-2xl space-y-8">
+                            <h2 class="text-xl font-black uppercase tracking-tight flex items-center gap-3">
+                                <i data-lucide="settings" class="text-sky-500"></i> Analysis Engine
                             </h2>
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Target Ticker</label>
-                                    <input id="ticker" type="text" placeholder="NVDA, BTC, TSLA" class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-sky-500/40 transition-all font-mono uppercase text-lg">
+                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Asset Identifier</label>
+                                    <input id="ticker" type="text" placeholder="BTC, NVDA, TSLA" class="w-full bg-slate-900 border border-white/5 rounded-2xl px-6 py-5 text-xl font-bold focus:outline-none focus:ring-2 focus:ring-sky-500/50 uppercase tracking-tighter">
                                 </div>
-                                <div id="model-status" class="hidden p-4 bg-slate-900/50 rounded-2xl border border-white/5 flex justify-between items-center">
-                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Neural Link</span>
-                                    <span class="text-[10px] font-black text-sky-400 uppercase tracking-widest">[AI-Inferred Node]</span>
+                                <div id="user-key-section" class="hidden animate-fade">
+                                    <input id="api-key" type="password" placeholder="OpenAI Key (sk-...)" class="w-full bg-slate-900 border border-white/5 rounded-2xl px-5 py-4 text-xs font-mono">
                                 </div>
-                                <div id="user-key-section" class="hidden space-y-4 animate-slide">
-                                    <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-[10px] text-amber-500 font-bold uppercase text-center">System Balance Low - External Key Required</div>
-                                    <input id="api-key" type="password" placeholder="Enter OpenAI API Key (sk-...)" class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-4 text-xs font-mono">
-                                </div>
-                                <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-black font-black py-5 rounded-2xl transition-all shadow-lg shadow-sky-500/20 uppercase tracking-widest text-xs flex items-center justify-center gap-2">
-                                    <span>Initiate Research</span>
-                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-black font-black py-5 rounded-2xl shadow-xl shadow-sky-500/20 uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-transform hover:scale-[1.02]">
+                                    <span>Initiate Neural Scan</span>
+                                    <i data-lucide="zap" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Agent Monitoring -->
+                        <!-- Status Monitor -->
                         <div class="glass p-6 rounded-3xl space-y-4">
-                            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live Agents</h3>
+                            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Analysts</h3>
                             <div class="space-y-2">
-                                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl text-xs">
-                                    <span class="flex items-center gap-2 font-bold"><i data-lucide="bar-chart-3" class="w-4 h-4 text-sky-500"></i> Technical</span>
-                                    <span class="text-[10px] text-slate-600 font-bold uppercase">Online</span>
+                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl text-xs font-bold">
+                                    <span class="flex items-center gap-3"><i data-lucide="cpu" class="w-4 h-4 text-sky-500"></i> Technical Core</span>
+                                    <span class="text-[10px] text-sky-400">ONLINE</span>
                                 </div>
-                                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl text-xs">
-                                    <span class="flex items-center gap-2 font-bold"><i data-lucide="newspaper" class="w-4 h-4 text-sky-500"></i> Sentiment</span>
-                                    <span class="text-[10px] text-slate-600 font-bold uppercase">Online</span>
+                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl text-xs font-bold">
+                                    <span class="flex items-center gap-3"><i data-lucide="message-square" class="w-4 h-4 text-sky-500"></i> Sentiment Hub</span>
+                                    <span class="text-[10px] text-sky-400">ONLINE</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Display Area -->
+                    <!-- Right Results -->
                     <div class="lg:col-span-7">
-                        <div id="empty-state" class="glass h-[500px] rounded-3xl flex flex-col items-center justify-center text-center p-10 border-dashed border-2 border-white/5">
-                            <i id="brain-icon" data-lucide="cpu" class="w-20 h-20 text-slate-800 mb-6"></i>
-                            <div id="loading-spinner" class="hidden w-16 h-16 border-4 border-sky-500/10 border-t-sky-500 rounded-full animate-spin mb-6"></div>
-                            <h3 class="text-xl font-bold text-slate-600 uppercase tracking-tighter">Neural Core Idle</h3>
+                        <div id="empty-state" class="glass h-[400px] rounded-3xl flex flex-col items-center justify-center text-center p-10 border-2 border-dashed border-white/5">
+                            <i id="brain-icon" data-lucide="activity" class="w-16 h-16 text-slate-800 mb-6"></i>
+                            <div id="loading-spinner" class="hidden w-16 h-16 border-4 border-sky-500/10 border-t-sky-500 rounded-full animate-spin"></div>
+                            <p class="text-xs font-bold text-slate-600 uppercase tracking-widest">Awaiting Neural Sequence</p>
                         </div>
 
-                        <div id="result-summary" class="hidden space-y-8 animate-slide">
-                            <!-- Infographics injected here -->
+                        <div id="result-summary" class="hidden space-y-8 animate-fade">
+                            <!-- Infographics -->
                         </div>
                         
-                        <!-- Logs shown AFTER processing -->
-                        <div id="log-container" class="hidden mt-8 glass p-6 rounded-3xl border border-white/5">
-                            <h4 class="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-4">Neural Log Audit</h4>
+                        <div id="log-container" class="hidden mt-8 glass p-6 rounded-3xl">
                             <div id="logs" class="space-y-1.5 font-mono text-[10px] text-slate-500 max-h-40 overflow-y-auto custom-scrollbar"></div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Intelligence Feed -->
+                <div class="pt-12 border-t border-white/5">
+                    <h2 class="text-2xl font-black uppercase tracking-tighter mb-8">Intelligence <span class="text-sky-500">Feed</span></h2>
+                    <div id="blog-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
             </div>
 
-            <!-- Blog View -->
-            <div id="view-blog-detail" class="view-section hidden space-y-12 animate-slide">
-                <button onclick="switchView('dashboard')" class="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest">
-                    <i data-lucide="chevron-left" class="w-4 h-4"></i> Back to Intelligence Feed
+            <!-- Detail View -->
+            <div id="view-blog-detail" class="view-section hidden animate-fade">
+                <button onclick="switchView('dashboard')" class="mb-10 flex items-center gap-3 text-xs font-black text-slate-500 hover:text-sky-500 transition-colors uppercase tracking-widest">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
                 </button>
-                <div id="blog-detail-content" class="space-y-12 pb-20"></div>
-            </div>
-
-            <!-- Feed Section -->
-            <div class="pt-10 border-t border-white/5">
-                <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-black tracking-tighter uppercase">Intelligence <span class="text-sky-500">Feed</span></h2>
-                </div>
-                <div id="blog-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Cards -->
-                </div>
+                <div id="blog-detail-content" class="prose-custom pb-20"></div>
             </div>
         </main>
+
+        <!-- Right Ads -->
+        <aside class="ad-right hidden lg:block">
+            <div class="ad-box" style="width: 300px; height: 250px;">
+                <span class="ad-tag">ADVERTISEMENT</span>
+                <script>atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };</script>
+                <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
+            </div>
+            <div class="ad-box" style="width: 320px; height: 50px;">
+                <span class="ad-tag">ADVERTISEMENT</span>
+                <script>atOptions = { 'key' : 'f60abc3ad258484f0670ebbbace5b661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };</script>
+                <script src="https://developdomicile.com/f60abc3ad258484f0670ebbbace5b661/invoke.js"></script>
+            </div>
+            <div class="ad-box w-full" style="min-height: 200px;">
+                <span class="ad-tag">SPONSORED</span>
+                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
+                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
+            </div>
+        </aside>
     </div>
+
+    <!-- Bottom Ad Footer -->
+    <footer class="w-full glass py-12 mt-20 border-t border-white/5 flex flex-col items-center gap-8">
+        <div class="ad-box" style="width: 728px; height: 90px;">
+            <span class="ad-tag">ADVERTISEMENT</span>
+            <script>atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };</script>
+            <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
+        </div>
+        <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">&copy; 2026 Ecotron Advanced Trading Systems. Hosted on ecotron.co.in</p>
+    </footer>
 
     <script>
         // Core Logic
@@ -162,11 +206,10 @@
         const tickerInput = document.getElementById('ticker');
         const emptyState = document.getElementById('empty-state');
         const resultSummary = document.getElementById('result-summary');
-        const logContainer = document.getElementById('log-container');
         const logsDiv = document.getElementById('logs');
+        const logContainer = document.getElementById('log-container');
         const brainIcon = document.getElementById('brain-icon');
         const loadingSpinner = document.getElementById('loading-spinner');
-        const modelStatus = document.getElementById('model-status');
         const userKeySection = document.getElementById('user-key-section');
         const apiKeyInput = document.getElementById('api-key');
 
@@ -176,22 +219,18 @@
         function switchView(id) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-' + id).classList.remove('hidden');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (id === 'dashboard') fetchBlogs();
         }
 
-        async function initHealth() {
+        async function checkBalance() {
             try {
                 const res = await fetch('/health');
                 const data = await res.json();
-                if (data.system_balance_low) {
-                    userKeySection.classList.remove('hidden');
-                    modelStatus.classList.add('hidden');
-                } else {
-                    modelStatus.classList.remove('hidden');
-                    userKeySection.classList.add('hidden');
-                }
-            } catch (e) { console.error("Health check failed", e); }
+                if (data.system_balance_low) userKeySection.classList.remove('hidden');
+            } catch (e) {}
         }
 
         analyzeBtn.addEventListener('click', async () => {
@@ -199,7 +238,7 @@
             if (!ticker) return;
 
             analyzeBtn.disabled = true;
-            analyzeBtn.innerHTML = `<span>Processing Intelligence...</span>`;
+            analyzeBtn.innerHTML = `<span>Synthesizing...</span>`;
             brainIcon.classList.add('hidden');
             loadingSpinner.classList.remove('hidden');
             resultSummary.classList.add('hidden');
@@ -219,7 +258,7 @@
                 const { task_id } = await response.json();
                 pollStatus(task_id);
             } catch (e) {
-                alert("Neural Core Connection Failed");
+                alert("Core Sync Error");
                 resetUI();
             }
         });
@@ -230,7 +269,7 @@
                 const data = await res.json();
                 
                 if (data.logs) {
-                    logsDiv.innerHTML = data.logs.map(l => `<div class="flex gap-2"><span>•</span><span>${l}</span></div>`).join('');
+                    logsDiv.innerHTML = data.logs.map(l => `<div class="flex gap-2"><span>[LOG]</span><span>${l}</span></div>`).join('');
                 }
 
                 if (data.status === 'completed') {
@@ -243,7 +282,7 @@
                     fetchBlogs();
                 } else if (data.status === 'failed') {
                     clearInterval(interval);
-                    alert("Analysis Failed: " + data.error);
+                    alert("Sequence Failed: " + data.error);
                     resetUI();
                 }
             }, 2000);
@@ -251,7 +290,7 @@
 
         function resetUI() {
             analyzeBtn.disabled = false;
-            analyzeBtn.innerHTML = `<span>Initiate Research</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+            analyzeBtn.innerHTML = `<span>Initiate Neural Scan</span><i data-lucide="zap" class="w-4 h-4"></i>`;
             loadingSpinner.classList.add('hidden');
             brainIcon.classList.remove('hidden');
             lucide.createIcons();
@@ -263,36 +302,26 @@
                          (data.decision.includes('SELL') || data.decision.includes('BEAR') ? 'rose' : 'sky');
             
             container.innerHTML = `
-                <div class="glass p-10 rounded-[40px] border-l-[12px] border-l-${color}-500 shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-80 h-80 bg-${color}-500/5 rounded-full -mr-40 -mt-40 blur-3xl"></div>
+                <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-${color}-500 shadow-2xl relative overflow-hidden">
                     <div class="flex justify-between items-start mb-12 relative z-10">
                         <div>
                             <h2 class="text-7xl font-black tracking-tighter mb-2 leading-none">${data.ticker}</h2>
-                            <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Neural Multi-Agent Consensus Report</p>
+                            <p class="text-slate-500 text-xs font-black uppercase tracking-widest">Neural Multi-Agent Report</p>
                         </div>
-                        <div class="px-10 py-5 bg-${color}-500 text-black rounded-3xl text-3xl font-black uppercase tracking-tighter shadow-xl shadow-${color}-500/30">${data.decision}</div>
+                        <div class="px-12 py-6 bg-${color}-500 text-black rounded-3xl text-4xl font-black uppercase tracking-tighter shadow-xl shadow-${color}-500/30">${data.decision}</div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 relative z-10">
-                        <div class="space-y-8">
-                            <div>
-                                <h3 class="text-[10px] font-black text-sky-400 uppercase tracking-[0.2em] mb-4">Core Thesis</h3>
-                                <p class="text-xl text-slate-200 leading-relaxed font-semibold">${data.final_trade_decision || data.summary}</p>
-                            </div>
-                            <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
-                                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Intelligence Metrics</h3>
-                                <div class="space-y-4">
-                                    ${renderBar('Signal Alpha', 88, 'emerald')}
-                                    ${renderBar('Market Sentiment', 65, 'sky')}
-                                    ${renderBar('Institutional Bias', 42, 'indigo')}
-                                </div>
-                            </div>
+                    <div class="space-y-12 relative z-10">
+                        <div class="p-8 bg-white/5 rounded-3xl border border-white/5">
+                            <h3 class="text-[10px] font-black text-sky-400 uppercase tracking-widest mb-4">Master Thesis</h3>
+                            <div class="text-xl text-slate-100 font-bold leading-tight prose-custom">${marked.parse(data.final_trade_decision || data.summary)}</div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            ${renderStat('Volatility', 'Low', 'shield-check')}
-                            ${renderStat('Volume', 'Heavy', 'bar-chart-3')}
-                            ${renderStat('Momentum', 'Bullish', 'zap')}
-                            ${renderStat('Trust Score', '96%', 'award')}
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            ${renderStat('Alpha', '88%', 'award')}
+                            ${renderStat('Volatility', 'Low', 'shield')}
+                            ${renderStat('Volume', 'Heavy', 'bar-chart')}
+                            ${renderStat('Score', '96', 'star')}
                         </div>
                     </div>
                 </div>
@@ -300,33 +329,31 @@
             lucide.createIcons();
         }
 
-        function renderBar(lbl, val, clr) {
-            return `<div class="space-y-1.5"><div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase"><span>${lbl}</span><span>${val}%</span></div><div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-${clr}-500" style="width:${val}%"></div></div></div>`;
-        }
-
         function renderStat(lbl, val, icon) {
-            return `<div class="glass p-5 rounded-2xl text-center"><i data-lucide="${icon}" class="w-5 h-5 text-slate-500 mx-auto mb-3"></i><div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">${lbl}</div><div class="text-sm font-black text-white uppercase">${val}</div></div>`;
+            return `<div class="glass p-5 rounded-2xl text-center"><i data-lucide="${icon}" class="w-4 h-4 text-slate-500 mx-auto mb-3"></i><div class="text-[9px] font-black text-slate-500 uppercase mb-1">${lbl}</div><div class="text-sm font-black text-white">${val}</div></div>`;
         }
 
         async function fetchBlogs() {
-            const res = await fetch('/blogs');
-            const blogs = await res.json();
-            const feed = document.getElementById('blog-feed');
-            feed.innerHTML = blogs.map(b => `
-                <div onclick="openBlog('${b._id}')" class="glass p-6 rounded-3xl border border-white/5 hover:border-sky-500/30 transition-all cursor-pointer group card-glow">
-                    <div class="flex justify-between items-center mb-5">
-                        <span class="px-3 py-1 bg-slate-800 rounded-lg text-[10px] font-black text-sky-400 uppercase tracking-widest">${b.ticker}</span>
-                        <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
+            try {
+                const res = await fetch('/blogs');
+                const blogs = await res.json();
+                const feed = document.getElementById('blog-feed');
+                feed.innerHTML = blogs.map(b => `
+                    <div onclick="openBlog('${b._id}')" class="glass p-8 rounded-3xl border border-white/5 hover:border-sky-500/40 transition-all cursor-pointer group hover:-translate-y-2">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="px-3 py-1 bg-slate-900 rounded-lg text-[10px] font-black text-sky-500 uppercase tracking-widest border border-white/5">${b.ticker}</span>
+                            <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tight line-clamp-2">${b.title}</h3>
+                        <div class="text-xs text-slate-500 leading-relaxed line-clamp-3 mb-6 prose-custom">${marked.parse(b.summary)}</div>
+                        <div class="flex items-center justify-between pt-6 border-t border-white/5">
+                            <span class="text-[10px] font-black uppercase text-slate-600">ANALYST CORE</span>
+                            <span class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision}</span>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tighter">${b.title}</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed line-clamp-3 mb-6">${b.summary}</p>
-                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                        <div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center"><i data-lucide="user" class="w-3 h-3 text-slate-600"></i></div><span class="text-[10px] font-bold text-slate-600 uppercase">Agent Core</span></div>
-                        <span class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision} SIGNAL</span>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
+                `).join('');
+                lucide.createIcons();
+            } catch (e) {}
         }
 
         async function openBlog(id) {
@@ -340,30 +367,38 @@
             detail.innerHTML = `
                 <div class="space-y-12">
                     <div class="space-y-6">
-                        <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black tracking-widest uppercase">Intelligence Report [${b.ticker}]</span>
-                        <h1 class="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85]">${b.title}</h1>
-                        <p class="text-2xl text-slate-400 font-medium leading-relaxed max-w-4xl">${b.summary}</p>
+                        <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black tracking-widest uppercase">Research Sequence [${b.ticker}]</span>
+                        <h1 class="text-7xl md:text-9xl font-black tracking-tighter leading-[0.85] uppercase">${b.title}</h1>
+                        <div class="text-2xl text-slate-400 font-bold leading-tight max-w-4xl prose-custom">${marked.parse(b.summary)}</div>
                     </div>
 
-                    <div id="blog-graphics"></div>
+                    <div id="blog-visual"></div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                        ${renderBlock('Market Dynamics', b.content.market, 'sky')}
-                        ${renderBlock('Sentiment Pulse', b.content.sentiment || b.content.news, 'amber')}
-                        ${renderBlock('Fundamental Base', b.content.fundamentals, 'emerald')}
-                        ${renderBlock('Final Verdict', b.summary, 'indigo')}
+                        <div class="glass p-10 rounded-[40px] border-t-8 border-t-sky-500/50 space-y-6">
+                            <h3 class="text-2xl font-black uppercase tracking-tighter text-sky-400">Market Vector</h3>
+                            <div class="prose-custom">${marked.parse(b.content.market)}</div>
+                        </div>
+                        <div class="glass p-10 rounded-[40px] border-t-8 border-t-amber-500/50 space-y-6">
+                            <h3 class="text-2xl font-black uppercase tracking-tighter text-amber-400">Sentiment Intelligence</h3>
+                            <div class="prose-custom">${marked.parse(b.content.sentiment || b.content.news)}</div>
+                        </div>
+                        <div class="glass p-10 rounded-[40px] border-t-8 border-t-emerald-500/50 space-y-6">
+                            <h3 class="text-2xl font-black uppercase tracking-tighter text-emerald-400">Fundamental Backbone</h3>
+                            <div class="prose-custom">${marked.parse(b.content.fundamentals)}</div>
+                        </div>
+                        <div class="glass p-10 rounded-[40px] border-t-8 border-t-indigo-500/50 space-y-6 bg-indigo-500/5">
+                            <h3 class="text-2xl font-black uppercase tracking-tighter text-indigo-400">Final Verdict</h3>
+                            <div class="text-xl font-bold text-slate-200 prose-custom">${marked.parse(b.summary)}</div>
+                        </div>
                     </div>
                 </div>
             `;
-            renderInfographics({ticker: b.ticker, decision: b.decision, summary: b.summary}, 'blog-graphics');
+            renderInfographics({ticker: b.ticker, decision: b.decision, summary: b.summary}, 'blog-visual');
             lucide.createIcons();
         }
 
-        function renderBlock(title, text, clr) {
-            return `<div class="glass p-10 rounded-[40px] border-t-8 border-t-${clr}-500/30 space-y-6"><h3 class="text-2xl font-black uppercase tracking-tighter text-${clr}-400">${title}</h3><div class="text-slate-400 text-sm leading-loose">${text.replace(/\n/g, '<br>')}</div></div>`;
-        }
-
-        initHealth();
+        checkBalance();
         fetchBlogs();
     </script>
 </body>
