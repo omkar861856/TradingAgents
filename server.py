@@ -519,52 +519,36 @@ async def get_blog_page(blog_id: str):
     <link href="/static/dist.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body {{ font-family: 'Inter', sans-serif; background: #020203; color: #f8fafc; overflow-x: hidden; }}
-        .glass {{ background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }}
-        .ad-box {{ position: relative; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.4); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.03); }}
-        .ad-tag {{ position: absolute; top: 4px; left: 6px; font-size: 8px; color: #475569; z-index: 10; font-weight: 800; letter-spacing: 0.1em; }}
-        .prose-custom h1 {{ font-size: 3rem; font-weight: 900; margin-bottom: 1.5rem; color: #fff; letter-spacing: -0.05em; }}
-        .prose-custom h2 {{ font-size: 1.8rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; color: #38bdf8; }}
-        .prose-custom p {{ margin-bottom: 1rem; line-height: 1.7; color: #cbd5e1; font-size: 0.95rem; }}
-        .prose-custom table {{ width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: rgba(255,255,255,0.02); }}
-        .prose-custom th {{ background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; text-align: left; }}
-        .prose-custom td {{ padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); }}
-        
-        .card-emerald {{ border-top: 4px solid #10b981; background: rgba(16, 185, 129, 0.05); }}
-        .card-sky {{ border-top: 4px solid #0ea5e9; background: rgba(14, 165, 233, 0.05); }}
-        .card-amber {{ border-top: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05); }}
-        .card-orange {{ border-top: 4px solid #f97316; background: rgba(249, 115, 22, 0.05); }}
-        .card-rose {{ border-top: 4px solid #f43f5e; background: rgba(244, 63, 94, 0.05); }}
-        
-        .custom-scrollbar::-webkit-scrollbar {{ width: 4px; }}
-        .custom-scrollbar::-webkit-scrollbar-thumb {{ background: #334155; border-radius: 10px; }}
+        body {{ font-family: 'Outfit', sans-serif; }}
+        .gradient-text {{ background: linear-gradient(135deg, #0ea5e9, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }}
     </style>
 </head>
 <body>
-    <header class="w-full glass sticky top-0 z-[100] px-8 py-5 border-b border-white/5">
+    <header class="w-full glass sticky top-0 z-[100] px-10 py-6 border-b border-white/5">
         <div class="max-w-[1400px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20"><i data-lucide="trending-up" class="text-black"></i></div>
-                <h1 class="text-2xl font-black uppercase tracking-tighter" onclick="window.location.href='/'" style="cursor:pointer">ECOTRON <span class="text-sky-500">TRADING</span></h1>
+            <div class="flex items-center gap-5">
+                <div class="w-12 h-12 bg-sky-500 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(14,165,233,0.3)]">
+                    <i data-lucide="trending-up" class="text-black w-7 h-7"></i>
+                </div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter cursor-pointer" onclick="window.location.href='/'">ECOTRON <span class="text-sky-500 text-glow-sky">TRADING</span></h1>
             </div>
-            <a href="/" class="text-xs font-black uppercase text-slate-500 hover:text-white transition-colors">Back to Terminal</a>
+            <a href="/" class="text-[11px] font-black uppercase text-slate-500 hover:text-sky-500 transition-colors tracking-widest bg-white/5 px-6 py-3 rounded-xl border border-white/5">Back to Terminal</a>
         </div>
     </header>
 
     <div class="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-10 px-6 mt-10 pb-20">
         <!-- Left Sidebar -->
-        <aside class="hidden lg:block w-[160px] flex-shrink-0 sticky top-[120px] h-fit">
-            <div class="ad-box" style="width: 160px; height: 600px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
+        <aside class="hidden lg:block w-[160px] flex-shrink-0 sticky top-[140px] h-fit space-y-10">
+            <div class="ad-native-container" style="height: 600px;">
+                <span class="ad-label">Neural Grid Insight</span>
                 <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
-            <div class="ad-box" style="width: 160px; height: 300px;">
-                <span class="ad-tag">SPONSORED</span>
+            <div class="ad-native-container" style="height: 250px;">
+                <span class="ad-label">Sponsored Feed</span>
                 <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 250, 'width' : 160, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
             </div>
@@ -572,8 +556,8 @@ async def get_blog_page(blog_id: str):
 
         <!-- Main Content -->
         <main class="flex-grow min-w-0 max-w-[1100px]">
-            <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
-                <span class="ad-tag">SPONSORED</span>
+            <div class="ad-native-container mx-auto mb-16" style="width: 468px; height: 60px;">
+                <span class="ad-label">Strategic Node Ad</span>
                 <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
             </div>

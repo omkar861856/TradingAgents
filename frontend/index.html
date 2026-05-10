@@ -23,98 +23,70 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #020203; color: #f8fafc; overflow-x: hidden; }
-        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
-        .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .app-container { max-width: 1800px; margin: 0 auto; display: flex; gap: 24px; padding: 0 24px; }
-        .ad-left { width: 160px; flex-shrink: 0; position: sticky; top: 100px; height: fit-content; }
-        .ad-right { width: 300px; flex-shrink: 0; position: sticky; top: 100px; height: fit-content; }
+        body { font-family: 'Outfit', sans-serif; }
+        .gradient-text { background: linear-gradient(135deg, #0ea5e9, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .app-container { max-width: 1800px; margin: 0 auto; display: flex; gap: 40px; padding: 0 40px; }
+        .ad-left { width: 160px; flex-shrink: 0; position: sticky; top: 120px; height: fit-content; }
+        .ad-right { width: 300px; flex-shrink: 0; position: sticky; top: 120px; height: fit-content; }
         .main-content { flex-grow: 1; min-width: 0; max-width: 1100px; }
-        
-        .ad-box { position: relative; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.4); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.03); }
-        .ad-tag { position: absolute; top: 4px; left: 6px; font-size: 8px; color: #475569; z-index: 10; font-weight: 800; letter-spacing: 0.1em; }
-
-        .prose-custom h1 { font-size: 3rem; font-weight: 900; margin-bottom: 1.5rem; color: #fff; letter-spacing: -0.05em; line-height: 1; }
-        .prose-custom h2 { font-size: 1.8rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; color: #38bdf8; }
-        .prose-custom p { margin-bottom: 1rem; line-height: 1.7; color: #cbd5e1; font-size: 0.95rem; }
-
-        .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
-        .blog-card { height: 450px; display: flex; flex-direction: column; overflow: hidden; }
-        .card-summary { flex-grow: 1; overflow-y: auto; padding-right: 8px; }
-        .card-summary::-webkit-scrollbar { width: 4px; }
-        .card-summary::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-
-        @keyframes pulse-slow { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-        .animate-pulse-slow { animation: pulse-slow 3s infinite; }
-
-        .notification-toast { transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
-        .notification-toast.active { transform: translateX(0); }
-
-        .neural-dino { width: 80px; height: 80px; position: relative; }
-        .dino-pulse { position: absolute; inset: 0; border: 4px solid #38bdf8; border-radius: 50%; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
-        @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
-
-        .share-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.05); color: #94a3b8; transition: all 0.2s; }
+        .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem; }
     </style>
 </head>
 <body class="min-h-screen">
     <!-- Header -->
-    <header class="w-full glass sticky top-0 z-[100] px-8 py-5 border-b border-white/5">
+    <header class="w-full glass sticky top-0 z-[100] px-10 py-6 border-b border-white/5">
         <div class="max-w-[1800px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20">
-                    <i data-lucide="trending-up" class="text-black w-6 h-6"></i>
+            <div class="flex items-center gap-5">
+                <div class="w-12 h-12 bg-sky-500 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(14,165,233,0.3)]">
+                    <i data-lucide="trending-up" class="text-black w-7 h-7"></i>
                 </div>
-                <h1 class="text-2xl font-black tracking-tighter uppercase cursor-pointer" onclick="switchView('dashboard')">ECOTRON <span class="text-sky-500">TRADING</span></h1>
+                <h1 class="text-3xl font-black tracking-tighter uppercase cursor-pointer" onclick="switchView('dashboard')">ECOTRON <span class="text-sky-500 text-glow-sky">TRADING</span></h1>
             </div>
-            <div id="active-task-indicator" class="hidden flex items-center gap-3 px-4 py-2 bg-sky-500/10 rounded-full border border-sky-500/20">
-                <div class="w-2 h-2 bg-sky-500 rounded-full animate-pulse"></div>
-                <span class="text-[10px] font-black uppercase text-sky-500 tracking-widest">Neural Agents Working...</span>
+            <div id="active-task-indicator" class="hidden flex items-center gap-4 px-6 py-3 bg-sky-500/10 rounded-2xl border border-sky-500/20 animate-pulse">
+                <div class="w-2.5 h-2.5 bg-sky-500 rounded-full"></div>
+                <span class="text-[11px] font-black uppercase text-sky-500 tracking-[0.2em]">Neural Nodes Active</span>
             </div>
         </div>
     </header>
 
     <div class="app-container mt-10 pb-20">
-        <!-- Left Ads -->
-        <aside class="ad-left hidden xl:block">
-            <div class="ad-box" style="width: 160px; height: 600px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
-                <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };</script>
-                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
+        <!-- Right Ads -->
+        <aside class="ad-right hidden lg:block space-y-8">
+            <div class="ad-native-container" style="height: 250px;">
+                <span class="ad-label">Neural Protocol Insight</span>
+                <script>atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };</script>
+                <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
             </div>
-            <div class="ad-box" style="width: 160px; height: 300px;">
-                <span class="ad-tag">SPONSORED</span>
-                <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 250, 'width' : 160, 'params' : {} };</script>
-                <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
+            <div class="ad-native-container" style="height: 600px;">
+                <span class="ad-label">Strategic Partner</span>
+                <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 300, 'params' : {} };</script>
+                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
         </aside>
 
         <!-- Main Column -->
         <main class="main-content">
             <!-- Hero Top Ad -->
-            <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
-                <span class="ad-tag">SPONSORED</span>
+            <div class="ad-native-container mx-auto mb-12" style="width: 468px; height: 60px;">
+                <span class="ad-label">Network Protocol Ad</span>
                 <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
             </div>
 
             <div id="view-dashboard" class="view-section space-y-12">
                 <!-- Full Width Search -->
-                <div class="glass p-12 rounded-[40px] border border-white/5 shadow-2xl relative overflow-hidden">
-                    <div id="search-container" class="relative z-10 space-y-8">
+                <div class="glass-card relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    <div id="search-container" class="relative z-10 space-y-10">
                         <div class="text-center">
-                            <h2 class="text-4xl font-black uppercase tracking-tighter mb-2">Neural Market <span class="text-sky-500">Search</span></h2>
-                            <p class="text-slate-500 text-xs font-bold uppercase tracking-[0.3em]">Deploy multi-agent expert systems for any ticker</p>
+                            <h2 class="text-5xl font-black uppercase tracking-tighter mb-3">Neural Market <span class="text-sky-500 text-glow-sky">Search</span></h2>
+                            <p class="text-slate-500 text-[11px] font-black uppercase tracking-[0.4em]">Deploy multi-agent expert systems for any ticker</p>
                         </div>
-                        <div class="flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
-                            <input id="ticker" type="text" placeholder="ENTER TICKER (E.G. NVDA, BTC, AAPL)" class="flex-grow bg-black/40 border border-white/10 rounded-2xl px-8 py-6 text-2xl font-black focus:outline-none focus:ring-2 focus:ring-sky-500/50 uppercase tracking-widest">
-                            <button id="analyze-btn" class="bg-sky-500 hover:bg-sky-400 text-black font-black px-12 py-6 rounded-2xl shadow-xl shadow-sky-500/20 uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all hover:scale-[1.02]">
+                        <div class="flex flex-col md:flex-row gap-5 max-w-4xl mx-auto">
+                            <input id="ticker" type="text" placeholder="ENTER TICKER (E.G. NVDA, BTC, AAPL)" class="input-neural flex-grow text-xl font-black uppercase tracking-widest py-6">
+                            <button id="analyze-btn" class="btn-primary flex items-center justify-center gap-3">
                                 <span>Initiate Neural Scan</span>
                                 <i data-lucide="zap" class="w-4 h-4"></i>
                             </button>
@@ -123,19 +95,22 @@
 
                     <!-- Processing State (Neural Dino) -->
                     <div id="processing-state" class="hidden absolute inset-0 z-20 glass flex flex-col items-center justify-center text-center p-12">
-                        <div class="neural-dino mb-8">
-                            <div class="dino-pulse"></div>
-                            <i data-lucide="brain-circuit" class="w-20 h-20 text-sky-500 relative z-10"></i>
+                        <div class="relative mb-8">
+                            <div class="absolute inset-0 bg-sky-500/20 blur-3xl rounded-full animate-pulse"></div>
+                            <i data-lucide="brain-circuit" class="w-24 h-24 text-sky-500 relative z-10"></i>
                         </div>
-                        <h3 class="text-2xl font-black uppercase tracking-tighter mb-4">Neural Synthesis in Progress</h3>
-                        <p class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">Our multi-agent network is currently debating technicals, sentiment, and fundamentals. <span class="text-sky-500 font-bold">Sit back, grab a coffee, or explore the feed below</span> while we finalize your intelligence report.</p>
+                        <h3 class="text-3xl font-black uppercase tracking-tighter mb-4 text-glow-sky">Neural Synthesis in Progress</h3>
+                        <p class="text-slate-400 text-sm max-w-lg mx-auto leading-relaxed font-medium">Our multi-agent network is currently debating technicals, sentiment, and fundamentals. <span class="text-sky-400 font-bold">Research reports finalize in 60-90 seconds.</span></p>
                     </div>
                 </div>
 
-                <div class="pt-8">
-                    <div class="flex justify-between items-end mb-8">
-                        <h2 class="text-2xl font-black uppercase tracking-tighter">Global Intelligence <span class="text-sky-500">Feed</span></h2>
-                        <p class="text-[10px] font-black text-slate-700 uppercase tracking-widest">Real-time Research Archive</p>
+                <div class="pt-10">
+                    <div class="flex justify-between items-end mb-10">
+                        <h2 class="text-3xl font-black uppercase tracking-tighter">Global Intelligence <span class="text-sky-500 text-glow-sky">Feed</span></h2>
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Real-time Research Node</span>
+                        </div>
                     </div>
                     <div id="blog-feed" class="feed-grid"></div>
                 </div>
@@ -183,9 +158,11 @@
         </div>
     </div>
 
-    <footer class="w-full glass py-20 mt-20 border-t border-white/5 flex flex-col items-center gap-12 text-center px-6">
-        <div class="ad-box" style="width: 728px; height: 90px;">
-            <span class="ad-tag">ADVERTISEMENT</span>
+    <footer class="w-full glass py-24 mt-20 border-t border-white/5 flex flex-col items-center gap-16 text-center px-10 relative overflow-hidden">
+        <div class="absolute inset-0 bg-sky-500/[0.02] blur-3xl rounded-full translate-y-1/2"></div>
+        
+        <div class="ad-native-container mx-auto" style="width: 728px; height: 90px;">
+            <span class="ad-label">Neural Grid Sponsor</span>
             <script>atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };</script>
             <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
         </div>
@@ -313,22 +290,22 @@
                     else if (decision.includes('SELL')) color = 'rose';
 
                     return `
-                    <div class="blog-card glass p-8 rounded-3xl border border-white/5 hover:border-sky-500/40 transition-all cursor-pointer group">
+                    <div class="blog-card glass-card group">
                         <div onclick="window.location.href='/blog/${b._id}'" class="flex-grow flex flex-col min-h-0">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="px-3 py-1 bg-slate-900 rounded-lg text-[10px] font-black text-sky-500 uppercase tracking-widest border border-white/5">${b.ticker}</span>
-                                <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
+                            <div class="flex justify-between items-center mb-6">
+                                <span class="px-3 py-1 bg-sky-500/10 rounded-lg text-[10px] font-black text-sky-500 uppercase tracking-widest border border-sky-500/20">${b.ticker}</span>
+                                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter opacity-60">${new Date(b.timestamp).toLocaleDateString()}</span>
                             </div>
-                            <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tight">${b.title}</h3>
-                            <div class="card-summary text-[11px] text-slate-400 prose-custom mb-6">${marked.parse(b.summary)}</div>
+                            <h3 class="text-xl font-black leading-tight mb-5 group-hover:text-sky-400 transition-colors uppercase tracking-tight line-clamp-2 h-[3.5rem]">${b.title}</h3>
+                            <div class="card-summary text-xs text-slate-400 prose-custom mb-6 leading-relaxed opacity-80">${marked.parse(b.summary)}</div>
                         </div>
                         <div class="flex items-center justify-between pt-6 border-t border-white/5 flex-shrink-0">
-                            <div class="flex gap-2">
-                                <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="share-btn hover:text-[#1DA1F2] transition-colors"><i class="fa-brands fa-twitter"></i></a>
-                                <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="share-btn hover:text-[#4267B2] transition-colors"><i class="fa-brands fa-facebook-f"></i></a>
-                                <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="share-btn hover:text-[#25D366] transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
+                            <div class="flex gap-3">
+                                <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="share-btn hover:bg-white/10 transition-all"><i class="fa-brands fa-twitter"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="share-btn hover:bg-white/10 transition-all"><i class="fa-brands fa-facebook-f"></i></a>
+                                <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="share-btn hover:bg-white/10 transition-all"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
-                            <span class="text-[10px] font-black uppercase text-${color}-400">${b.decision}</span>
+                            <span class="text-[10px] font-black uppercase text-${color}-400 px-3 py-1.5 bg-${color}-500/10 rounded-lg border border-${color}-500/20 tracking-[0.1em] text-glow-${color}">${b.decision}</span>
                         </div>
                     </div>`;
                 }).join('');
