@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: trading-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - trading-network
+    restart: always
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: trading-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - trading-network
+    restart: always
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: trading-api
+    environment:
+      - OLLAMA_HOST=http://trading-ollama:11434
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - XAI_API_KEY=${XAI_API_KEY}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+    volumes:
+      - trading_data:/app/data
+    networks:
+      - trading-network
+    restart: always
+
+  frontend:
+    image: nginx:alpine
+    container_name: trading-frontend
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    networks:
+      - trading-network
+    restart: always
+
+networks:
+  trading-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+  trading_data:
+  caddy_data:
+  caddy_config:

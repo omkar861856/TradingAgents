@@ -1,0 +1,17 @@
+ecotron.co.in {
+    # Frontend Proxy
+    handle {
+        reverse_proxy trading-frontend:80
+    }
+
+    # API Proxy
+    handle /analyze* {
+        reverse_proxy trading-api:8000
+    }
+
+    encode gzip
+}
+
+www.ecotron.co.in {
+    redir https://ecotron.co.in{uri}
+}

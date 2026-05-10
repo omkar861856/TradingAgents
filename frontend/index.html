@@ -8,162 +8,192 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        body { font-family: 'Inter', sans-serif; background: #050507; color: #f8fafc; overflow-x: hidden; }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
         .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        @keyframes pulse-slow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        .animate-pulse-slow { animation: pulse-slow 3s infinite; }
+        .ad-sidebar { width: 180px; flex-shrink: 0; }
+        .ad-sidebar-right { width: 340px; flex-shrink: 0; }
+        .main-app-center { flex-grow: 1; min-width: 0; }
+        .ad-container { position: relative; margin-bottom: 1rem; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.2); }
+        .ad-label { position: absolute; top: 2px; left: 2px; font-size: 8px; color: #475569; z-index: 10; pointer-events: none; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
+<body class="min-h-screen">
     <!-- Header -->
-    <header class="max-w-6xl mx-auto flex justify-between items-center mb-12">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-sky-500/20 rounded-lg">
-                <i data-lucide="trending-up" class="text-sky-400"></i>
+    <header class="w-full glass sticky top-0 z-50 px-8 py-4 mb-8">
+        <div class="max-w-[1800px] mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-sky-500/20 rounded-lg">
+                    <i data-lucide="trending-up" class="text-sky-400"></i>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight">Trading<span class="gradient-text">Agents</span></h1>
             </div>
-            <h1 class="text-2xl font-bold tracking-tight">Trading<span class="gradient-text">Agents</span></h1>
-        </div>
-        <div class="flex items-center gap-4">
-            <span class="text-xs px-2 py-1 rounded border border-sky-500/30 text-sky-400 font-medium">v0.2.4</span>
-            <div class="flex items-center gap-2 text-sm text-slate-400">
-                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                Ollama System Ready
+            <div class="flex items-center gap-6">
+                <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                    <a href="#" class="hover:text-white transition-colors">Dashboard</a>
+                    <a href="#" class="hover:text-white transition-colors">Strategy</a>
+                    <a href="#" class="hover:text-white transition-colors">Portfolio</a>
+                </nav>
+                <div class="flex items-center gap-2 text-xs text-slate-500">
+                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                    Llama 3 8B Active
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- Sidebar / Controls -->
-        <aside class="lg:col-span-4 space-y-6">
-            <div class="glass p-6 rounded-2xl">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i data-lucide="settings-2" class="w-5 h-5 text-sky-400"></i>
-                    Analysis Controls
-                </h2>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Ticker Symbol</label>
-                        <input id="ticker" type="text" placeholder="NVDA, AAPL, SPY" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all uppercase font-mono">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-slate-400 mb-1.5">Model Selection</label>
-                        <select id="model" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none transition-all">
-                            <option value="qwen3:latest">Qwen3 8B (Local)</option>
-                            <option value="glm-4.7-flash:latest">GLM 4.7 Flash (30B)</option>
-                            <option value="llama3.1:latest">Llama 3.1 8B</option>
-                        </select>
-                    </div>
-
-                    <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-sky-500/20 flex justify-center items-center gap-2">
-                        <span>Run Analysis</span>
-                        <i data-lucide="zap" class="w-4 h-4"></i>
-                    </button>
-                </div>
+    <div class="max-w-[1800px] mx-auto flex gap-6 px-4 md:px-8">
+        <!-- Left Column: Ads -->
+        <aside class="ad-sidebar hidden xl:flex flex-col gap-4">
+            <div class="ad-container" style="width: 160px; height: 600px;">
+                <span class="ad-label">ADVERTISEMENT</span>
+                <script>
+                    atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
+                </script>
+                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
-
-            <div class="glass p-6 rounded-2xl">
-                <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Agent Status</h3>
-                <div class="space-y-4" id="agent-status">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="flex items-center gap-2">
-                            <i data-lucide="bar-chart-3" class="w-4 h-4 text-slate-500"></i>
-                            Technical Analyst
-                        </span>
-                        <span class="text-slate-500">Idle</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="flex items-center gap-2">
-                            <i data-lucide="newspaper" class="w-4 h-4 text-slate-500"></i>
-                            News Analyst
-                        </span>
-                        <span class="text-slate-500">Idle</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="flex items-center gap-2">
-                            <i data-lucide="shield-check" class="w-4 h-4 text-slate-500"></i>
-                            Risk Manager
-                        </span>
-                        <span class="text-slate-500">Idle</span>
-                    </div>
-                </div>
+            <div class="ad-container" style="width: 160px; height: 300px;">
+                <span class="ad-label">ADVERTISEMENT</span>
+                <script>
+                    atOptions = { 'key' : '7f1e1c3d11870c7899ccce329cdd56e9', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };
+                </script>
+                <script src="https://developdomicile.com/7f1e1c3d11870c7899ccce329cdd56e9/invoke.js"></script>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <div class="lg:col-span-8 space-y-6">
-            <!-- Summary Card -->
-            <div id="result-summary" class="glass p-8 rounded-2xl hidden transition-all duration-500 opacity-0 transform translate-y-4">
-                <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <h2 id="result-ticker" class="text-4xl font-black mb-1">NVDA</h2>
-                        <p id="result-date" class="text-slate-400 text-sm">Analysis Date: 2024-05-10</p>
-                    </div>
-                    <div id="decision-badge" class="px-6 py-2 rounded-full font-bold text-lg">
-                        BUY
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700/50">
-                        <span class="text-xs text-slate-500 block mb-1">Final Decision</span>
-                        <p id="decision-text" class="text-sm leading-relaxed"></p>
-                    </div>
-                    <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700/50">
-                        <span class="text-xs text-slate-500 block mb-1">Primary Signals</span>
-                        <div id="signals" class="flex flex-wrap gap-2 mt-2"></div>
-                    </div>
-                </div>
+        <!-- Center Column: Main App -->
+        <main class="main-app-center">
+            <!-- Native Banner -->
+            <div class="ad-container w-full mb-8" style="min-height: 100px;">
+                <span class="ad-label">SPONSORED CONTENT</span>
+                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
+                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
+            </div>
 
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold flex items-center gap-2">
-                        <i data-lucide="file-text" class="w-5 h-5 text-sky-400"></i>
-                        Agent Reports
-                    </h3>
-                    <div class="grid grid-cols-1 gap-4" id="reports-container">
-                        <!-- Reports injected here -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- App Controls -->
+                <aside class="lg:col-span-5 space-y-6">
+                    <div class="glass p-6 rounded-2xl">
+                        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <i data-lucide="settings-2" class="w-5 h-5 text-sky-400"></i>
+                            Analysis Engine
+                        </h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-1.5">Ticker Symbol</label>
+                                <input id="ticker" type="text" placeholder="NVDA, TSLA, BTC" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all uppercase font-mono">
+                            </div>
+                            <div class="p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <span class="text-xs text-sky-400 font-medium">Local Intelligence Active: Llama 3 8B</span>
+                            </div>
+                            <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-sky-500/20 flex justify-center items-center gap-2">
+                                <span>Run Multi-Agent Research</span>
+                                <i data-lucide="zap" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Agent Status -->
+                    <div class="glass p-6 rounded-2xl">
+                        <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Neural Agents</h3>
+                        <div class="space-y-3" id="agent-status">
+                            <div class="flex items-center justify-between text-sm p-2 rounded hover:bg-slate-800/30 transition-colors">
+                                <span class="flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-sky-400"></i>Technical</span>
+                                <span class="text-xs text-slate-500">Ready</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm p-2 rounded hover:bg-slate-800/30 transition-colors">
+                                <span class="flex items-center gap-2"><i data-lucide="newspaper" class="w-4 h-4 text-sky-400"></i>Sentiment</span>
+                                <span class="text-xs text-slate-500">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Results Display -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div id="result-summary" class="glass p-8 rounded-2xl hidden opacity-0 transition-all duration-500">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h2 id="result-ticker" class="text-4xl font-black mb-1">NVDA</h2>
+                                <p id="result-date" class="text-slate-400 text-sm">Real-time Analysis</p>
+                            </div>
+                            <div id="decision-badge" class="px-6 py-2 rounded-full font-bold text-lg">BUY</div>
+                        </div>
+                        <div id="decision-text" class="p-4 bg-slate-900/80 rounded-xl border border-slate-700/50 text-sm leading-relaxed mb-6"></div>
+                        <div id="reports-container" class="space-y-4"></div>
+                    </div>
+
+                    <div id="empty-state" class="glass p-12 rounded-2xl flex flex-col items-center justify-center text-center min-h-[400px]">
+                        <div id="loading-spinner" class="hidden mb-6"><div class="w-12 h-12 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div></div>
+                        <i data-lucide="brain-circuit" class="w-16 h-16 text-slate-700 mb-6"></i>
+                        <h3 class="text-xl font-semibold mb-2">Awaiting Parameters</h3>
+                        <p class="text-slate-400 max-w-sm">System ready for localized inference on ecotron.co.in. Input a symbol to begin.</p>
                     </div>
                 </div>
             </div>
+        </main>
 
-            <!-- Empty State / Loading -->
-            <div id="empty-state" class="glass p-12 rounded-2xl flex flex-col items-center justify-center text-center min-h-[400px]">
-                <div id="loading-spinner" class="hidden mb-6 relative">
-                    <div class="w-16 h-16 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <i data-lucide="brain" class="w-6 h-6 text-sky-400 animate-pulse-slow"></i>
-                    </div>
-                </div>
-                <div id="idle-icon" class="mb-6 p-4 bg-slate-800/50 rounded-2xl">
-                    <i data-lucide="line-chart" class="w-12 h-12 text-slate-600"></i>
-                </div>
-                <h3 class="text-xl font-semibold mb-2">Ready for Analysis</h3>
-                <p class="text-slate-400 max-w-sm">Enter a ticker symbol and select a model to begin the multi-agent financial research process.</p>
+        <!-- Right Column: Ads -->
+        <aside class="ad-sidebar-right hidden lg:flex flex-col gap-6">
+            <div class="ad-container" style="width: 300px; height: 250px;">
+                <span class="ad-label">FEATURED AD</span>
+                <script>
+                    atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                </script>
+                <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
             </div>
+            <div class="ad-container" style="width: 320px; height: 50px;">
+                <span class="ad-label">AD</span>
+                <script>
+                    atOptions = { 'key' : 'f60abc3ad258484f0670ebbbace5b661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                </script>
+                <script src="https://developdomicile.com/f60abc3ad258484f0670ebbbace5b661/invoke.js"></script>
+            </div>
+            <div class="card glass p-6 rounded-2xl">
+                <h4 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-tighter">Market Pulse</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Latency</span><span class="text-sky-400">14ms</span></div>
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Memory</span><span class="text-sky-400">12.4GB / 16GB</span></div>
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Uptime</span><span class="text-green-500">99.9%</span></div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Bottom Ad Section -->
+    <footer class="w-full mt-12 py-12 border-t border-slate-800/50 flex flex-col items-center gap-8">
+        <div class="ad-container" style="width: 728px; height: 90px;">
+            <span class="ad-label">ADVERTISEMENT</span>
+            <script>
+                atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+            </script>
+            <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
         </div>
-    </main>
+        <div class="ad-container" style="width: 468px; height: 60px;">
+            <span class="ad-label">ADVERTISEMENT</span>
+            <script>
+                atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
+            </script>
+            <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
+        </div>
+        <p class="text-slate-600 text-xs mt-4">&copy; 2026 Ecotron Advanced Systems. Hosted on ecotron.co.in</p>
+    </footer>
 
     <script>
         lucide.createIcons();
-
         const analyzeBtn = document.getElementById('analyze-btn');
         const tickerInput = document.getElementById('ticker');
-        const modelSelect = document.getElementById('model');
         const emptyState = document.getElementById('empty-state');
         const loadingSpinner = document.getElementById('loading-spinner');
-        const idleIcon = document.getElementById('idle-icon');
         const resultSummary = document.getElementById('result-summary');
         
         analyzeBtn.addEventListener('click', async () => {
             const ticker = tickerInput.value.trim().toUpperCase();
-            if (!ticker) return alert('Please enter a ticker');
+            if (!ticker) return;
 
-            // UI State: Loading
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = `<span>Analysing...</span>`;
-            idleIcon.classList.add('hidden');
             loadingSpinner.classList.remove('hidden');
             resultSummary.classList.add('hidden');
             emptyState.classList.remove('hidden');
@@ -172,23 +202,20 @@
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                    body: JSON.stringify({ 
                         ticker: ticker,
                         llm_provider: 'ollama',
-                        deep_think_llm: modelSelect.value,
-                        quick_think_llm: modelSelect.value
+                        deep_think_llm: 'llama3:8b',
+                        quick_think_llm: 'llama3:8b'
                     })
                 });
-
                 const data = await response.json();
-                
-                // UI State: Success
                 displayResults(data);
             } catch (error) {
-                alert('Error: ' + error.message);
+                console.error(error);
             } finally {
                 analyzeBtn.disabled = false;
-                analyzeBtn.innerHTML = `<span>Run Analysis</span><i data-lucide="zap" class="w-4 h-4"></i>`;
+                analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
                 lucide.createIcons();
             }
         });
@@ -196,48 +223,24 @@
         function displayResults(data) {
             emptyState.classList.add('hidden');
             resultSummary.classList.remove('hidden');
-            setTimeout(() => {
-                resultSummary.classList.remove('opacity-0', 'translate-y-4');
-            }, 10);
-
+            setTimeout(() => { resultSummary.classList.remove('opacity-0'); }, 10);
             document.getElementById('result-ticker').innerText = data.ticker;
-            document.getElementById('result-date').innerText = `Analysis Date: ${data.date}`;
             document.getElementById('decision-text').innerText = data.final_trade_decision;
-
             const badge = document.getElementById('decision-badge');
             const decision = data.decision.toUpperCase();
             badge.innerText = decision;
-            
-            if (decision.includes('BUY')) {
-                badge.className = 'px-6 py-2 rounded-full font-bold text-lg bg-green-500/20 text-green-400 border border-green-500/30';
-            } else if (decision.includes('SELL')) {
-                badge.className = 'px-6 py-2 rounded-full font-bold text-lg bg-red-500/20 text-red-400 border border-red-500/30';
-            } else {
-                badge.className = 'px-6 py-2 rounded-full font-bold text-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
-            }
+            badge.className = decision.includes('BUY') ? 'px-6 py-2 rounded-full font-bold text-lg bg-green-500/20 text-green-400 border border-green-500/30' : 
+                            (decision.includes('SELL') ? 'px-6 py-2 rounded-full font-bold text-lg bg-red-500/20 text-red-400 border border-red-500/30' : 
+                            'px-6 py-2 rounded-full font-bold text-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30');
 
-            const reportsContainer = document.getElementById('reports-container');
-            reportsContainer.innerHTML = '';
-            
-            const reportIcons = {
-                market: 'bar-chart-3',
-                sentiment: 'smile',
-                news: 'newspaper',
-                fundamentals: 'landmark'
-            };
-
+            const container = document.getElementById('reports-container');
+            container.innerHTML = '';
             for (const [key, text] of Object.entries(data.reports)) {
                 if (!text) continue;
                 const div = document.createElement('div');
-                div.className = 'p-5 bg-slate-900/30 rounded-xl border border-slate-800 transition-hover hover:border-slate-700';
-                div.innerHTML = `
-                    <div class="flex items-center gap-2 mb-3 text-sky-400">
-                        <i data-lucide="${reportIcons[key] || 'file-text'}" class="w-4 h-4"></i>
-                        <span class="text-sm font-semibold capitalize">${key} Report</span>
-                    </div>
-                    <div class="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">${text}</div>
-                `;
-                reportsContainer.appendChild(div);
+                div.className = 'p-5 bg-slate-900/50 rounded-xl border border-slate-800';
+                div.innerHTML = `<div class="text-sky-400 text-xs font-bold uppercase mb-2">${key}</div><div class="text-slate-400 text-sm leading-relaxed">${text}</div>`;
+                container.appendChild(div);
             }
             lucide.createIcons();
         }

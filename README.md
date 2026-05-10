@@ -67,17 +67,39 @@ TradingAgents is a multi-agent trading framework that mirrors the dynamics of re
 Our framework decomposes complex trading tasks into specialized roles. This ensures the system achieves a robust, scalable approach to market analysis and decision-making.
 
 ### Analyst Team
-- Fundamentals Analyst: Evaluates company financials and performance metrics, identifying intrinsic values and potential red flags.
-- Sentiment Analyst: Analyzes social media and public sentiment using sentiment scoring algorithms to gauge short-term market mood.
-- News Analyst: Monitors global news and macroeconomic indicators, interpreting the impact of events on market conditions.
-- Technical Analyst: Utilizes technical indicators (like MACD and RSI) to detect trading patterns and forecast price movements.
+# TradingAgents | AI Financial Intelligence
 
-<p align="center">
-  <img src="assets/analyst.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
+A multi-agent financial research platform optimized for `ecotron.co.in`.
 
-### Researcher Team
-- Comprises both bullish and bearish researchers who critically assess the insights provided by the Analyst Team. Through structured debates, they balance potential gains against inherent risks.
+## 🚀 Deployment & CI/CD
+This project is configured for automated deployment to your Ubuntu server via GitHub Actions.
+
+### 🔑 GitHub Secrets Required
+To enable automated deployment, add the following secrets to your GitHub repository:
+- `SERVER_IP`: Your server's public IP.
+- `SERVER_USER`: SSH username (e.g., `root`).
+- `SSH_PRIVATE_KEY`: Your private SSH key.
+
+### 🏗️ Infrastructure
+The platform runs on Docker with the following stack:
+- **FastAPI**: Backend analysis engine.
+- **Vite/Tailwind**: Premium 3-column frontend.
+- **Ollama**: Local **Llama 3 8B** inference.
+
+## 💰 Monetization (Ad Layout)
+The UI features a high-conversion 3-column layout:
+- **Left Sidebar**: 160x600 & 160x300 banners.
+- **Right Sidebar**: 300x250 & 320x50 banners.
+- **Main Feed**: Native Banner integration.
+- **Footer**: 728x90 & 468x60 leaderboard banners.
+
+## 🧠 LLM Providers
+The system supports local Ollama (Llama 3 8B) as the primary engine. You can also configure external providers in your `.env`:
+- OpenAI, Google, Anthropic, xAI, DeepSeek, etc.
+
+---
+© 2026 Ecotron Advanced Systems
+ntial gains against inherent risks.
 
 <p align="center">
   <img src="assets/researcher.png" width="70%" style="display: inline-block; margin: 0 2%;">
