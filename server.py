@@ -396,6 +396,5 @@ async def user_detail(user_id: str, username: str = Depends(get_current_username
     return html_content
 
 if __name__ == "__main__":
-if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
