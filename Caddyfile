@@ -38,6 +38,14 @@ ecotron.co.in, www.ecotron.co.in {
         reverse_proxy api:8000
     }
 
+    handle /robots.txt {
+        reverse_proxy api:8000
+    }
+
+    handle /sitemap.xml {
+        reverse_proxy api:8000
+    }
+
     # Catch-all for React Frontend
     handle {
         reverse_proxy trading-frontend:80
