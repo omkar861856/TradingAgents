@@ -150,22 +150,15 @@ def get_graph(config_overrides: Optional[Dict[str, Any]] = None):
     if config_overrides:
         config.update(config_overrides)
     
-    # Ensure local ollama is used if provider is ollama
-    if config.get("llm_provider") == "ollama":
-        # Check for OLLAMA_HOST env var, default to http://ollama:11434 in docker
-        ollama_host = os.getenv("OLLAMA_HOST", "http://ollama:11434")
-        if not ollama_host.endswith("/v1"):
-            ollama_host = ollama_host.rstrip("/") + "/v1"
-        config["backend_url"] = ollama_host
 
     return TradingAgentsGraph(debug=True, config=config)
 
 class AnalysisRequest(BaseModel):
     ticker: str
     date: Optional[str] = None
-    llm_provider: Optional[str] = "ollama"
-    deep_think_llm: Optional[str] = "llama3.1:8b"
-    quick_think_llm: Optional[str] = "llama3.1:8b"
+    llm_provider: Optional[str] = "openai"
+    deep_think_llm: Optional[str] = "gpt-4o"
+    quick_think_llm: Optional[str] = "gpt-4o-mini"
     api_key: Optional[str] = None
     user_id: Optional[str] = "anonymous"
 
@@ -183,7 +176,6 @@ async def health():
         
     return {
         "status": "healthy", 
-        "ollama": os.getenv("OLLAMA_HOST"),
         "mongodb": mongo_status,
         "system_balance_low": os.getenv("SYSTEM_BALANCE_LOW", "false").lower() == "true"
     }

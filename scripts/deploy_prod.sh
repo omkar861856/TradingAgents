@@ -20,11 +20,5 @@ docker compose -f docker-compose.prod.yml down --remove-orphans
 echo "⚡ Starting services..."
 docker compose -f docker-compose.prod.yml up -d
 
-# 3. Initialize Ollama model
-echo "🧠 Initializing AI model (Llama 3.1 8B)..."
-echo "Waiting for Ollama to start..."
-sleep 15
-docker exec trading-ollama ollama pull llama3.1:8b
-
 echo "✅ Deployment Complete!"
 echo "🌍 Your site is live at https://ecotron.co.in"
