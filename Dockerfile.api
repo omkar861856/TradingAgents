@@ -25,7 +25,7 @@ RUN mkdir -p static && tailwindcss -i ./static/input.css -o ./static/dist.css --
 
 # Install dependencies
 RUN pip install -e .
-RUN pip install fastapi uvicorn python-dotenv motor slowapi
+RUN pip install fastapi uvicorn python-dotenv motor slowapi pymongo pandas
 
 # Run the API server
 CMD ["python", "server.py"]
