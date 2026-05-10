@@ -323,42 +323,7 @@
         }
 
         async function openBlog(id) {
-            const res = await fetch('/blogs');
-            const blogs = await res.json();
-            const b = blogs.find(x => x._id === id);
-            if (!b) return;
-
-            switchView('blog-detail');
-            const detail = document.getElementById('blog-detail-content');
-            detail.innerHTML = `
-                <div class="space-y-12">
-                    <div class="space-y-6">
-                        <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black tracking-widest uppercase">Research Sequence [${b.ticker}]</span>
-                        <h1 class="text-7xl md:text-8xl font-black tracking-tighter uppercase leading-none">${b.title}</h1>
-                        <div class="text-2xl text-slate-400 font-bold leading-tight max-w-4xl prose-custom">${marked.parse(b.summary)}</div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                        <div class="glass p-10 rounded-[40px] section-market space-y-6">
-                            <h3 class="text-2xl font-black uppercase tracking-tighter text-sky-400">Market Dynamics</h3>
-                            <div class="prose-custom">${marked.parse(b.content.market)}</div>
-                        </div>
-                        <div class="glass p-10 rounded-[40px] section-sentiment space-y-6">
-                            <h3 class="text-2xl font-black uppercase tracking-tighter text-amber-400">Sentiment Intelligence</h3>
-                            <div class="prose-custom">${marked.parse(b.content.sentiment || b.content.news)}</div>
-                        </div>
-                        <div class="glass p-10 rounded-[40px] section-fundamental space-y-6">
-                            <h3 class="text-2xl font-black uppercase tracking-tighter text-emerald-400">Fundamental Backbone</h3>
-                            <div class="prose-custom">${marked.parse(b.content.fundamentals)}</div>
-                        </div>
-                        <div class="glass p-10 rounded-[40px] section-verdict space-y-6">
-                            <h3 class="text-2xl font-black uppercase tracking-tighter text-indigo-400">Final Verdict</h3>
-                            <div class="prose-custom font-bold text-xl">${marked.parse(b.summary)}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            lucide.createIcons();
+            window.location.href = `/blog/${id}`;
         }
 
         const urlParams = new URLSearchParams(window.location.search);

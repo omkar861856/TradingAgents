@@ -410,27 +410,100 @@ async def get_blog_page(blog_id: str):
         if not blog:
             return "Blog not found", 404
             
-        # Simplified SSR for SEO crawlers - redirected to main app for users
+        # Rich SSR for indexing and standalone viewing
         html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>{blog['title']} | Ecotron Trading</title>
-            <meta name="description" content="{blog['summary']}">
-            <meta property="og:title" content="{blog['title']}">
-            <meta property="og:description" content="{blog['summary']}">
-            <script>window.location.href = '/?blog=' + '{blog_id}';</script>
-        </head>
-        <body>
-            <h1>{blog['title']}</h1>
-            <p>{blog['summary']}</p>
-            <div>{blog['content'].get('market', '')}</div>
-        </body>
-        </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{blog['title']} | Ecotron Neural Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {{ font-family: 'Inter', sans-serif; background: #020203; color: #f8fafc; overflow-x: hidden; }}
+        .glass {{ background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }}
+        .ad-box {{ position: relative; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.4); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.03); }}
+        .ad-tag {{ position: absolute; top: 4px; left: 6px; font-size: 8px; color: #475569; z-index: 10; font-weight: 800; letter-spacing: 0.1em; }}
+        .prose-custom h1 {{ font-size: 3rem; font-weight: 900; margin-bottom: 1.5rem; color: #fff; letter-spacing: -0.05em; }}
+        .prose-custom h2 {{ font-size: 1.8rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; color: #38bdf8; }}
+        .prose-custom p {{ margin-bottom: 1rem; line-height: 1.7; color: #cbd5e1; font-size: 0.95rem; }}
+        .prose-custom table {{ width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: rgba(255,255,255,0.02); }}
+        .prose-custom th {{ background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; text-align: left; }}
+        .prose-custom td {{ padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); }}
+    </style>
+</head>
+<body>
+    <header class="w-full glass px-8 py-5 border-b border-white/5">
+        <div class="max-w-[1400px] mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center"><i data-lucide="trending-up" class="text-black"></i></div>
+                <h1 class="text-2xl font-black uppercase" onclick="window.location.href='/'" style="cursor:pointer">ECOTRON <span class="text-sky-500">TRADING</span></h1>
+            </div>
+            <a href="/" class="text-xs font-black uppercase text-slate-500 hover:text-white">Back to Terminal</a>
+        </div>
+    </header>
+
+    <div class="max-w-[1400px] mx-auto flex gap-10 px-6 mt-10 pb-20">
+        <aside style="width:160px; flex-shrink:0;">
+            <div class="ad-box" style="width: 160px; height: 600px;">
+                <span class="ad-tag">ADVERTISEMENT</span>
+                <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {{}} }};</script>
+                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
+            </div>
+        </aside>
+
+        <main style="flex-grow:1; min-width:0; max-width:1100px;">
+            <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
+                <span class="ad-tag">SPONSORED</span>
+                <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {{}} }};</script>
+                <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
+            </div>
+
+            <div class="space-y-12 prose-custom">
+                <div>
+                    <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black uppercase">Intelligence Report [{blog['ticker']}]</span>
+                    <h1 class="text-7xl font-black tracking-tighter uppercase mt-6">{blog['title']}</h1>
+                    <div id="summary-content" class="text-2xl text-slate-400 font-bold leading-tight"></div>
+                </div>
+
+                <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{ 'emerald' if 'BUY' in blog['decision'] or 'BULL' in blog['decision'] else 'rose' if 'SELL' in blog['decision'] or 'BEAR' in blog['decision'] else 'sky' }-500">
+                    <div class="flex justify-between items-start mb-10">
+                        <h2 class="text-6xl font-black tracking-tighter m-0">{blog['ticker']}</h2>
+                        <div class="px-10 py-5 bg-white text-black rounded-3xl text-3xl font-black uppercase">{blog['decision']}</div>
+                    </div>
+                    <div id="verdict-content" class="text-xl text-slate-100 font-bold"></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="glass p-10 rounded-[40px] border-t-8 border-t-sky-500/50">
+                        <h3 class="text-2xl font-black uppercase text-sky-400">Market Dynamics</h3>
+                        <div id="market-content"></div>
+                    </div>
+                    <div class="glass p-10 rounded-[40px] border-t-8 border-t-amber-500/50">
+                        <h3 class="text-2xl font-black uppercase text-amber-400">Sentiment Intelligence</h3>
+                        <div id="sentiment-content"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('summary-content').innerHTML = marked.parse({repr(blog['summary'])});
+        document.getElementById('verdict-content').innerHTML = marked.parse({repr(blog['summary'])});
+        document.getElementById('market-content').innerHTML = marked.parse({repr(blog['content'].get('market', ''))});
+        document.getElementById('sentiment-content').innerHTML = marked.parse({repr(blog['content'].get('sentiment', blog['content'].get('news', '')))});
+    </script>
+</body>
+</html>
         """
         return html
-    except Exception:
-        return "Invalid ID", 400
+    except Exception as e:
+        return f"Error: {{str(e)}}", 400
 
 if __name__ == "__main__":
     import uvicorn
