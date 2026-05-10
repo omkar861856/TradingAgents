@@ -198,28 +198,44 @@ const NavLink = ({ label, active }) => (
 );
 
 const AdContainer = ({ height, width, label, adKey, className = "" }) => {
+  const iframeRef = React.useRef(null);
+
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = `https://developdomicile.com/${adKey}/invoke.js`;
-    script.async = true;
-    const atOptions = {
-      'key': adKey,
-      'format': 'iframe',
-      'height': parseInt(height),
-      'width': parseInt(width),
-      'params': {}
-    };
-    window.atOptions = atOptions;
-    document.body.appendChild(script);
-    return () => { try { document.body.removeChild(script); } catch(e) {} };
+    if (iframeRef.current) {
+      const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+      doc.open();
+      doc.write(`
+        <html>
+          <body style="margin:0; padding:0; overflow:hidden; background:transparent;">
+            <script type="text/javascript">
+              atOptions = {
+                'key' : '${adKey}',
+                'format' : 'iframe',
+                'height' : ${height.replace('px', '')},
+                'width' : ${width},
+                'params' : {}
+              };
+            </script>
+            <script type="text/javascript" src="//developdomicile.com/${adKey}/invoke.js"></script>
+          </body>
+        </html>
+      `);
+      doc.close();
+    }
   }, [adKey, height, width]);
 
   return (
     <div className={`ad-native-container ${className}`} style={{ height, width: width + 'px' }}>
       <span className="ad-label">{label}</span>
-      <div id={`ad-${adKey}`} className="flex items-center justify-center w-full h-full text-[10px] text-slate-800 uppercase font-black tracking-widest">
-        Neural Ad Space
-      </div>
+      <iframe
+        ref={iframeRef}
+        title={`ad-${adKey}`}
+        width={width}
+        height={height.replace('px', '')}
+        frameBorder="0"
+        scrolling="no"
+        style={{ border: 'none', overflow: 'hidden', background: 'transparent' }}
+      ></iframe>
     </div>
   );
 };

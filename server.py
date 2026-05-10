@@ -49,15 +49,12 @@ async def security_headers(request: Request, call_next):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
 
-
-
 # MongoDB setup
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/tradingagents")
 mongo_client = AsyncIOMotorClient(MONGO_URI)
 db = mongo_client.get_default_database()
 activity_collection = db.activity
 blogs_collection = db.blogs
-
 
 if os.path.exists("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -141,16 +138,12 @@ def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
 
 # Global task storage and executor
 _tasks: Dict[str, Any] = {}
-_graph = None
 executor = ThreadPoolExecutor(max_workers=4)
 
 def get_graph(config_overrides: Optional[Dict[str, Any]] = None):
-    global _graph
     config = DEFAULT_CONFIG.copy()
     if config_overrides:
         config.update(config_overrides)
-    
-
     return TradingAgentsGraph(debug=True, config=config)
 
 class AnalysisRequest(BaseModel):
@@ -183,7 +176,6 @@ async def health():
 @app.post("/analyze")
 @limiter.limit("5/minute")
 async def analyze(request: AnalysisRequest, req: Request, background_tasks: BackgroundTasks):
-    # Basic Sanitization
     ticker = request.ticker.strip().upper()
     if not ticker.isalnum() or len(ticker) > 10:
         raise HTTPException(status_code=400, detail="Invalid ticker")
@@ -196,20 +188,15 @@ async def analyze(request: AnalysisRequest, req: Request, background_tasks: Back
         "result": None
     }
     
-    # Default to OpenAI as requested
     request.llm_provider = "openai"
     request.deep_think_llm = "gpt-4o"
     request.quick_think_llm = "gpt-4o"
     
-    # Use environment key if not provided in request (though request field will be hidden in UI)
     if not request.api_key:
         request.api_key = os.getenv("OPENAI_API_KEY")
 
     background_tasks.add_task(run_analysis_task, task_id, request)
-    
-    # Log activity to MongoDB
     background_tasks.add_task(log_activity, request, task_id)
-    
     return {"task_id": task_id}
 
 async def log_activity(request: AnalysisRequest, task_id: str):
@@ -239,14 +226,11 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
         }
         
         if request.api_key:
-            # Pass api_key to both llms if provided
             config_overrides["api_key"] = request.api_key
         
         graph = get_graph(config_overrides)
-        
         _tasks[task_id]["logs"].append("Coordinating expert analysts (Technical, Sentiment, News)...")
         
-        # Run blocking graph propagation in executor to keep FastAPI responsive
         loop = asyncio.get_event_loop()
         final_state, decision = await loop.run_in_executor(
             executor, 
@@ -267,9 +251,7 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
             },
             "final_trade_decision": final_state.get("final_trade_decision")
         }
-        _tasks[task_id]["result"] = result
-
-        # Generate Dynamic Blog
+        
         blog_post = {
             "ticker": request.ticker,
             "title": f"Intelligence Report: Why {request.ticker} is a {result['decision']} today",
@@ -278,11 +260,13 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
             "decision": result["decision"],
             "timestamp": datetime.now(),
             "user_id": request.user_id,
-            "metrics": {
-                "alpha": 85 + (len(result["reports"]["market"]) % 15),
-                "sentiment": 60 + (len(result["reports"]["sentiment"]) % 30),
-                "fundamental": 50 + (len(result["reports"]["fundamentals"]) % 40)
-            },
+            "agent_status": [
+                {"team": "Analyst Team", "agents": ["Market Analyst", "Social Analyst", "News Analyst", "Fundamentals Analyst"]},
+                {"team": "Research Team", "agents": ["Bull Researcher", "Bear Researcher", "Research Manager"]},
+                {"team": "Trading Team", "agents": ["Trader"]},
+                {"team": "Risk Management", "agents": ["Risky Analyst", "Neutral Analyst", "Safe Analyst"]},
+                {"team": "Portfolio Management", "agents": ["Portfolio Manager"]}
+            ],
             "citation": """@misc{xiao2025tradingagentsmultiagentsllmfinancial,
       title={TradingAgents: Multi-Agents LLM Financial Trading Framework}, 
       author={Yijia Xiao and Edward Sun and Di Luo and Wei Wang},
@@ -291,25 +275,13 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
       archivePrefix={arXiv},
       primaryClass={q-fin.TR},
       url={https://arxiv.org/abs/2412.20138}, 
-}""",
-            "agent_status": [
-                {"team": "Analyst Team", "agents": ["Market Analyst", "Social Analyst", "News Analyst", "Fundamentals Analyst"]},
-                {"team": "Research Team", "agents": ["Bull Researcher", "Bear Researcher", "Research Manager"]},
-                {"team": "Trading Team", "agents": ["Trader"]},
-                {"team": "Risk Management", "agents": ["Risky Analyst", "Neutral Analyst", "Safe Analyst"]},
-                {"team": "Portfolio Management", "agents": ["Portfolio Manager"]}
-            ]
+}"""
         }
         res = await blogs_collection.insert_one(blog_post)
         result["blog_id"] = str(res.inserted_id)
-        
-        # Update Task Result with Blog Info
-        result["blog_id"] = str(blog_post["_id"])
         _tasks[task_id]["result"] = result
         _tasks[task_id]["status"] = "completed"
-        _tasks[task_id]["logs"].append("Blog generated and published to Neural Feed.")
         
-        # Update MongoDB activity
         await activity_collection.update_one(
             {"task_id": task_id},
             {"$set": {"status": "completed", "completed_at": datetime.now()}}
@@ -318,8 +290,6 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
         logger.error(f"Task {task_id} failed: {str(e)}")
         _tasks[task_id]["status"] = "failed"
         _tasks[task_id]["error"] = str(e)
-        
-        # Update MongoDB activity with failure
         await activity_collection.update_one(
             {"task_id": task_id},
             {"$set": {"status": "failed", "error": str(e), "failed_at": datetime.now()}}
@@ -390,20 +360,11 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
                 <h1 style="color: #38bdf8; margin: 0;">Ecotron Neural Logs <span class="badge">PRO</span></h1>
                 <div style="color: #64748b; font-size: 12px;">Authenticated: {username}</div>
             </div>
-            <p style="color: #94a3b8; margin-bottom: 30px;">Unique analysts identified by browser fingerprinting.</p>
             <table>
                 <thead>
-                    <tr>
-                        <th>User Fingerprint</th>
-                        <th>Last Active</th>
-                        <th style="text-align: center;">Activity Volume</th>
-                        <th>Latest Asset</th>
-                        <th style="text-align: right;">Action</th>
-                    </tr>
+                    <tr><th>User Fingerprint</th><th>Last Active</th><th style="text-align: center;">Activity Volume</th><th>Latest Asset</th><th style="text-align: right;">Action</th></tr>
                 </thead>
-                <tbody>
-                    {"".join(users_html) if users_html else '<tr><td colspan="5" style="padding: 40px; text-align: center; color: #475569;">No user activity recorded yet.</td></tr>'}
-                </tbody>
+                <tbody>{"".join(users_html) if users_html else '<tr><td colspan="5" style="padding: 40px; text-align: center; color: #475569;">No user activity recorded yet.</td></tr>'}</tbody>
             </table>
         </body>
     </html>
@@ -426,53 +387,19 @@ async def user_detail(user_id: str, username: str = Depends(get_current_username
 
     html_content = f"""
     <html>
-        <head>
-            <title>User History | {user_id}</title>
-            <style>
-                body {{ font-family: sans-serif; background: #050507; color: #f8fafc; padding: 40px; }}
-                .back {{ color: #38bdf8; text-decoration: none; font-size: 14px; margin-bottom: 20px; display: inline-block; }}
-                table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; }}
-                th {{ text-align: left; background: #1e293b; padding: 15px 12px; color: #94a3b8; font-size: 11px; text-transform: uppercase; }}
-            </style>
-        </head>
-        <body>
-            <a href="/admin" class="back">&larr; Back to Users</a>
-            <h1 style="color: #38bdf8; margin-top: 10px;">Activity Report</h1>
-            <p style="font-family: monospace; color: #64748b; font-size: 12px; margin-bottom: 30px;">ID: {user_id}</p>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Ticker</th>
-                        <th>Status</th>
-                        <th>Task ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {"".join(history_html)}
-                </tbody>
-            </table>
-        </body>
+        <head><title>User History | {user_id}</title><style>body {{ font-family: sans-serif; background: #050507; color: #f8fafc; padding: 40px; }} .back {{ color: #38bdf8; text-decoration: none; font-size: 14px; margin-bottom: 20px; display: inline-block; }} table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; }} th {{ text-align: left; background: #1e293b; padding: 15px 12px; color: #94a3b8; font-size: 11px; text-transform: uppercase; }}</style></head>
+        <body><a href="/admin" class="back">&larr; Back to Users</a><h1 style="color: #38bdf8; margin-top: 10px;">Activity Report</h1><p style="font-family: monospace; color: #64748b; font-size: 12px; margin-bottom: 30px;">ID: {user_id}</p><table><thead><tr><th>Timestamp</th><th>Ticker</th><th>Status</th><th>Task ID</th></tr></thead><tbody>{"".join(history_html)}</tbody></table></body>
     </html>
     """
     return html_content
 
 @app.get("/sitemap.xml")
 async def get_sitemap():
-    urls = [
-        "<url><loc>https://ecotron.co.in/</loc><priority>1.0</priority></url>",
-        "<url><loc>https://ecotron.co.in/admin</loc><priority>0.1</priority></url>"
-    ]
-    
+    urls = ["<url><loc>https://ecotron.co.in/</loc><priority>1.0</priority></url>"]
     cursor = blogs_collection.find({}, {"_id": 1})
     async for blog in cursor:
         urls.append(f"<url><loc>https://ecotron.co.in/blog/{blog['_id']}</loc><priority>0.8</priority></url>")
-        
-    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    {"".join(urls)}
-</urlset>"""
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{"".join(urls)}</urlset>"""
     return Response(content=xml, media_type="application/xml")
 
 @app.get("/blog/{blog_id}", response_class=HTMLResponse)
@@ -480,47 +407,33 @@ async def get_blog_page(blog_id: str):
     from bson import ObjectId
     try:
         blog = await blogs_collection.find_one({"_id": ObjectId(blog_id)})
-        if not blog:
-            return "Blog not found", 404
-            
-        # Color spectrum logic
+        if not blog: return "Blog not found", 404
         decision = blog['decision'].upper()
-        color_map = {
-            "BUY": "emerald",
-            "OVERWEIGHT": "sky",
-            "HOLD": "amber",
-            "UNDERWEIGHT": "orange",
-            "SELL": "rose"
-        }
+        color_map = {"BUY": "emerald", "OVERWEIGHT": "sky", "HOLD": "amber", "UNDERWEIGHT": "orange", "SELL": "rose"}
         active_color = "sky"
         for key, val in color_map.items():
             if key in decision:
                 active_color = val
                 break
-
-        # Rich SSR for indexing and standalone viewing
+        
         html = f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{blog['title']} | Ecotron Neural Intelligence</title>    <!-- Popunder Ad -->
+    <title>{blog['title']} | Ecotron Neural Intelligence</title>
     <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
-    
     <link href="/static/dist.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body {{ font-family: 'Outfit', sans-serif; }}
-        .gradient-text {{ background: linear-gradient(135deg, #0ea5e9, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }}
-    </style>
+    <style>body {{ font-family: 'Outfit', sans-serif; }}</style>
 </head>
 <body>
     <header class="w-full glass sticky top-0 z-[100] px-10 py-6 border-b border-white/5">
-        <div class="max-w-[1400px] mx-auto flex justify-between items-center">
+        <div class="max-w-[1800px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-5">
                 <div class="w-12 h-12 bg-sky-500 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(14,165,233,0.3)]">
                     <i data-lucide="trending-up" class="text-black w-7 h-7"></i>
@@ -531,173 +444,123 @@ async def get_blog_page(blog_id: str):
         </div>
     </header>
 
-    <div class="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-10 px-6 mt-10 pb-20">
-        <!-- Left Sidebar -->
-        <aside class="hidden lg:block w-[160px] flex-shrink-0 sticky top-[140px] h-fit space-y-10">
-            <div class="ad-native-container" style="height: 600px;">
-                <span class="ad-label">Neural Grid Insight</span>
-                <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {{}} }};</script>
-                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
-            </div>
-            <div class="ad-native-container" style="height: 250px;">
-                <span class="ad-label">Sponsored Feed</span>
-                <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 250, 'width' : 160, 'params' : {{}} }};</script>
-                <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
-            </div>
-        </aside>
+    <div class="max-w-[1800px] mx-auto w-full px-6 py-12">
+        <div class="main-layout items-start">
+            <aside class="space-y-6 hidden xl:block sticky top-32">
+                <div class="ad-native-container" style="height: 600px; width: 300px;">
+                    <span class="ad-label">Neural Network Sponsor</span>
+                    <script type="text/javascript">atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 300, 'params' : {{}} }};</script>
+                    <script type="text/javascript" src="//developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
+                </div>
+            </aside>
 
-        <!-- Main Content -->
-        <main class="flex-grow min-w-0 max-w-[1100px]">
-            <div class="ad-native-container mx-auto mb-16" style="width: 468px; height: 60px;">
-                <span class="ad-label">Strategic Node Ad</span>
-                <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {{}} }};</script>
-                <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
-            </div>
-
-            <div class="space-y-12 prose-custom">
-                <div>
-                    <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black uppercase tracking-widest">Intelligence Report [{blog['ticker']}]</span>
-                    <h1 class="text-7xl font-black tracking-tighter uppercase mt-6 leading-none">{blog['title']}</h1>
-                    <div id="summary-content" class="text-2xl text-slate-400 font-bold leading-tight mt-6"></div>
+            <main class="tool-section space-y-16">
+                <div class="ad-native-container mx-auto mb-10" style="width: 728px; height: 90px;">
+                    <span class="ad-label">Strategic Node Ad</span>
+                    <script type="text/javascript">atOptions = {{ 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {{}} }};</script>
+                    <script type="text/javascript" src="//developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
                 </div>
 
-                <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{active_color}-500 shadow-2xl relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-10 relative z-10">
-                        <div>
-                            <h2 class="text-6xl font-black tracking-tighter m-0 leading-none">{blog['ticker']}</h2>
-                            <div class="flex gap-4 mt-8">
-                                <a href="https://twitter.com/intent/tweet?text={blog['title']}&url=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#1DA1F2]/10 text-[#1DA1F2] rounded-xl hover:bg-[#1DA1F2] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-twitter"></i></a>
-                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#4267B2]/10 text-[#4267B2] rounded-xl hover:bg-[#4267B2] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-facebook-f"></i></a>
-                                <a href="https://api.whatsapp.com/send?text={blog['title']}%20https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#25D366]/10 text-[#25D366] rounded-xl hover:bg-[#25D366] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-whatsapp"></i></a>
+                <div class="space-y-12">
+                    <div class="space-y-6 text-center">
+                        <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border border-sky-500/20">Research Intelligence Report [{blog['ticker']}]</span>
+                        <h1 class="text-7xl font-black tracking-tighter uppercase leading-none">{blog['title']}</h1>
+                        <div id="summary-content" class="text-xl text-slate-400 font-bold leading-relaxed mt-10 max-w-4xl mx-auto"></div>
+                    </div>
+
+                    <div class="glass-card p-12 border-l-[16px] border-l-{active_color}-500 shadow-2xl relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-12 relative z-10">
+                            <div>
+                                <h2 class="text-7xl font-black tracking-tighter m-0 leading-none">{blog['ticker']}</h2>
+                                <div class="flex gap-4 mt-10">
+                                    <a href="#" class="w-12 h-12 flex items-center justify-center bg-white/5 text-slate-400 rounded-2xl hover:text-sky-400 border border-white/5 transition-all"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="#" class="w-12 h-12 flex items-center justify-center bg-white/5 text-slate-400 rounded-2xl hover:text-sky-400 border border-white/5 transition-all"><i class="fa-brands fa-facebook-f"></i></a>
+                                </div>
+                            </div>
+                            <div class="px-10 py-5 bg-{active_color}-500 text-black rounded-3xl text-3xl font-black uppercase shadow-xl shadow-{active_color}-500/30">{blog['decision']}</div>
+                        </div>
+                        <div id="verdict-content" class="text-xl text-slate-200 font-medium relative z-10 leading-relaxed"></div>
+                    </div>
+
+                    <div class="pt-16">
+                        <h2 class="text-3xl font-black uppercase tracking-tighter mb-12 flex items-center gap-4"><i data-lucide="layers" class="text-sky-500 w-8 h-8"></i> Neural synthesis mapping</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div class="glass p-10 rounded-[2.5rem] border border-white/5 space-y-6">
+                                <h3 class="text-xl font-black uppercase text-sky-400 m-0 tracking-[0.2em]">Market Analysis</h3>
+                                <div id="market-content" class="text-sm opacity-80 leading-relaxed max-h-96 overflow-y-auto custom-scrollbar"></div>
+                            </div>
+                            <div class="glass p-10 rounded-[2.5rem] border border-white/5 space-y-6">
+                                <h3 class="text-xl font-black uppercase text-amber-400 m-0 tracking-[0.2em]">Social & Sentiment</h3>
+                                <div id="sentiment-content" class="text-sm opacity-80 leading-relaxed max-h-96 overflow-y-auto custom-scrollbar"></div>
+                            </div>
+                            <div class="glass p-10 rounded-[2.5rem] border border-white/5 space-y-6">
+                                <h3 class="text-xl font-black uppercase text-emerald-400 m-0 tracking-[0.2em]">Fundamentals</h3>
+                                <div id="fundamentals-content" class="text-sm opacity-80 leading-relaxed max-h-96 overflow-y-auto custom-scrollbar"></div>
+                            </div>
+                            <div class="glass p-10 rounded-[2.5rem] border border-white/5 space-y-6">
+                                <h3 class="text-xl font-black uppercase text-rose-400 m-0 tracking-[0.2em]">Risk Assessment</h3>
+                                <div id="risk-content" class="text-sm opacity-80 leading-relaxed max-h-96 overflow-y-auto custom-scrollbar"></div>
                             </div>
                         </div>
-                        <div class="px-10 py-5 bg-{active_color}-500 text-black rounded-3xl text-3xl font-black uppercase shadow-xl shadow-{active_color}-500/30">{blog['decision']}</div>
                     </div>
-                    <div id="verdict-content" class="text-xl text-slate-100 font-bold relative z-10 leading-relaxed"></div>
-                </div>
 
-                <div class="pt-12">
-                    <h2 class="text-3xl font-black uppercase tracking-tighter mb-10 flex items-center gap-4">
-                        <i data-lucide="layers" class="text-sky-500"></i> Analyst Synthesis
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="glass p-8 rounded-3xl card-sky space-y-4">
-                            <h3 class="text-xl font-black uppercase text-sky-400 m-0">Market Analysis</h3>
-                            <div id="market-content" class="text-sm opacity-80 leading-relaxed max-h-80 overflow-y-auto custom-scrollbar"></div>
-                        </div>
-                        <div class="glass p-8 rounded-3xl card-amber space-y-4">
-                            <h3 class="text-xl font-black uppercase text-amber-400 m-0">Social & Sentiment</h3>
-                            <div id="sentiment-content" class="text-sm opacity-80 leading-relaxed max-h-80 overflow-y-auto custom-scrollbar"></div>
-                        </div>
-                        <div class="glass p-8 rounded-3xl card-emerald space-y-4">
-                            <h3 class="text-xl font-black uppercase text-emerald-400 m-0">Fundamentals</h3>
-                            <div id="fundamentals-content" class="text-sm opacity-80 leading-relaxed max-h-80 overflow-y-auto custom-scrollbar"></div>
-                        </div>
-                        <div class="glass p-8 rounded-3xl card-rose space-y-4">
-                            <h3 class="text-xl font-black uppercase text-rose-400 m-0">Risk Assessment</h3>
-                            <div id="risk-content" class="text-sm opacity-80 leading-relaxed max-h-80 overflow-y-auto custom-scrollbar"></div>
-                        </div>
+                    <div class="glass-card p-12 border border-white/5">
+                        <h3 class="text-2xl font-black uppercase text-slate-500 mb-10 tracking-[0.3em]">Neural Agent Network Status</h3>
+                        <table class="w-full text-left">
+                            <thead><tr class="text-slate-600 uppercase text-[10px] font-black border-b border-white/5"><th class="pb-6 px-4">Deployment Team</th><th class="pb-6 px-4">Neural Agents</th><th class="pb-6 px-4">Verification</th></tr></thead>
+                            <tbody class="text-slate-300">
+                                { "".join([f"<tr class='border-b border-white/[0.02]'><td class='py-5 px-4 font-bold text-sky-500'>{team['team']}</td><td class='py-5 px-4 text-xs font-medium'>{', '.join(team['agents'])}</td><td class='py-5 px-4'><span class='text-emerald-500 font-black uppercase text-[10px] bg-emerald-500/10 px-3 py-1 rounded-full'>[SYNTHESIZED]</span></td></tr>" for team in blog.get('agent_status', [])]) }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-10 glass rounded-[40px] border-dashed border-2 border-white/5">
+                        <h3 class="text-xs font-black uppercase text-slate-500 mb-4">Academic Citation</h3>
+                        <pre class="text-[10px] text-slate-600 font-mono overflow-x-auto p-6 bg-black/40 rounded-2xl">{blog.get('citation', '')}</pre>
+                    </div>
+
+                    <div class="flex justify-center pt-10">
+                        <a href="https://wa.me/919321089065" target="_blank" class="flex items-center gap-4 px-8 py-4 bg-[#25D366]/10 text-[#25D366] rounded-full border border-[#25D366]/20 hover:bg-[#25D366] hover:text-white transition-all group">
+                            <i class="fa-brands fa-whatsapp text-2xl"></i>
+                            <div class="text-left"><p class="text-[10px] font-black uppercase tracking-widest opacity-60">Neural Support</p><p class="text-sm font-bold">Chat with Ecotron Engineers</p></div>
+                        </a>
                     </div>
                 </div>
+            </main>
 
-                <div class="glass p-10 rounded-[40px] border border-white/5">
-                    <h3 class="text-2xl font-black uppercase text-slate-500 mb-8">Neural Agent Network Status</h3>
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="text-slate-500 uppercase text-[10px] font-black border-bottom border-white/5">
-                                <th class="pb-4">Team</th>
-                                <th class="pb-4">Agent</th>
-                                <th class="pb-4">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-slate-300">
-                            { "".join([f"<tr><td class='py-3 font-bold text-sky-500'>{team['team']}</td><td class='py-3'>{', '.join(team['agents'])}</td><td class='py-3'><span class='text-emerald-500 font-black uppercase text-[10px]'>[COMPLETED]</span></td></tr>" for team in blog.get('agent_status', [])]) }
-                        </tbody>
-                    </table>
+            <aside class="space-y-6 hidden lg:block sticky top-32">
+                <div class="ad-native-container" style="height: 250px; width: 300px;">
+                    <span class="ad-label">Partner Intelligence</span>
+                    <script type="text/javascript">atOptions = {{ 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {{}} }};</script>
+                    <script type="text/javascript" src="//developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
                 </div>
-
-                <div class="p-10 glass rounded-[40px] border-dashed border-2 border-white/5">
-                    <h3 class="text-xs font-black uppercase text-slate-500 mb-4">Academic Citation</h3>
-                    <pre class="text-[10px] text-slate-600 font-mono overflow-x-auto p-6 bg-black/40 rounded-2xl">
-{blog.get('citation', '')}
-                    </pre>
-                </div>
-
-                <div class="flex justify-center pt-10">
-                    <a href="https://wa.me/919321089065" target="_blank" class="flex items-center gap-4 px-8 py-4 bg-[#25D366]/10 text-[#25D366] rounded-full border border-[#25D366]/20 hover:bg-[#25D366] hover:text-white transition-all group">
-                        <i class="fa-brands fa-whatsapp text-2xl"></i>
-                        <div class="text-left">
-                            <p class="text-[10px] font-black uppercase tracking-widest opacity-60">Neural Support</p>
-                            <p class="text-sm font-bold">Chat with Ecotron Engineers</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <!-- Right Sidebar -->
-        <aside class="hidden xl:block w-[300px] flex-shrink-0 sticky top-[120px] h-fit">
-            <div class="ad-box" style="width: 300px; height: 250px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
-                <script>atOptions = {{ 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {{}} }};</script>
-                <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
-            </div>
-            
-            <!-- Native Banner -->
-            <div class="ad-box p-4" style="width: 300px; min-height: 400px;">
-                <span class="ad-tag">RECOMMENDED</span>
-                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
-                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
-            </div>
-
-            <!-- Smartlink Button -->
-            <a href="https://developdomicile.com/a6rpd16c?key=8db16496ba8519d14e25e11f38876bc0" target="_blank" class="w-full flex items-center justify-between p-6 glass rounded-2xl border-l-4 border-sky-500 hover:bg-sky-500/10 transition-all group mb-6">
-                <div>
-                    <p class="text-[10px] font-black uppercase text-sky-500 tracking-widest mb-1">PRO ACCESS</p>
-                    <p class="text-xs font-bold text-white">Unlock Institutional Feed</p>
-                </div>
-                <i data-lucide="external-link" class="w-4 h-4 text-slate-600 group-hover:text-sky-500 transition-colors"></i>
-            </a>
-
-            <div class="ad-box" style="width: 300px; height: 600px;">
-                <span class="ad-tag">SPONSORED</span>
-                <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 300, 'params' : {{}} }};</script>
-                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
-            </div>
-        </aside>
+            </aside>
+        </div>
     </div>
 
-            <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">&copy; 2026 Ecotron Advanced Trading Systems</p>
+    <footer class="w-full glass py-32 mt-20 border-t border-white/5 flex flex-col items-center gap-20 text-center px-10 relative overflow-hidden">
+        <div class="absolute inset-0 bg-sky-500/[0.03] blur-[150px] rounded-full translate-y-1/2"></div>
+        <div class="ad-native-container" style="height: 90px; width: 728px;">
+            <span class="ad-label">Infrastructure Sponsor</span>
+            <script type="text/javascript">atOptions = {{ 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {{}} }};</script>
+            <script type="text/javascript" src="//developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
         </div>
+        <p class="text-slate-600 text-[10px] font-black uppercase tracking-[0.5em]">&copy; 2026 Ecotron Advanced Trading Systems. Proprietary multi-agent frameworks.</p>
     </footer>
 
-    <!-- Notification Toast -->
-    <div id="notification-toast" class="fixed bottom-10 right-10 z-[300] glass p-6 rounded-3xl border-l-8 border-l-emerald-500 shadow-2xl notification-toast w-[400px]" style="transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); display: none;">
-        <div class="flex items-start gap-4">
-            <div class="w-12 h-12 bg-emerald-500/20 text-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                <i data-lucide="check-circle" class="w-6 h-6"></i>
-            </div>
-            <div class="flex-grow">
-                <h4 class="text-sm font-black uppercase text-white mb-1">Intelligence Scan Complete</h4>
-                <p id="toast-message" class="text-xs text-slate-400 leading-relaxed mb-4">Research report for <span class="text-white font-bold" id="toast-ticker">BTC</span> is now available in the feed.</p>
-                <button id="toast-view-btn" class="w-full bg-emerald-500 text-black font-black py-2 rounded-xl text-[10px] uppercase tracking-widest hover:bg-emerald-400 transition-colors">View Report Now</button>
-            </div>
-            <button onclick="hideToast()" class="text-slate-600 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-    </div>
-
     <script>
-        window.blogData = {{
-            summary: {repr(blog['summary'])},
-            market: {repr(blog['content'].get('market', ''))},
-            sentiment: {repr(blog['content'].get('sentiment', blog['content'].get('news', '')))},
-            fundamentals: {repr(blog['content'].get('fundamentals', ''))}
-        }};
+        lucide.createIcons();
+        const blogData = {json.dumps({'summary': blog['summary'], 'content': blog['content']})};
+        document.getElementById('summary-content').innerHTML = marked.parse(blogData.summary || "");
+        document.getElementById('verdict-content').innerHTML = marked.parse(blogData.content.get('verdict', blogData.content.get('news', "")) || "");
+        document.getElementById('market-content').innerHTML = marked.parse(blogData.content.market || "");
+        document.getElementById('sentiment-content').innerHTML = marked.parse(blogData.content.news || "");
+        document.getElementById('fundamentals-content').innerHTML = marked.parse(blogData.content.fundamentals || "");
+        document.getElementById('risk-content').innerHTML = marked.parse(blogData.content.risk || "Neural analysis indicates standard volatility parameters.");
     </script>
-    <script src="/static/blog_script.js"></script>
 </body>
 </html>
-        """
+"""
         return html
     except Exception as e:
         return f"Error: {str(e)}", 400
