@@ -3,7 +3,16 @@ ecotron.co.in, www.ecotron.co.in {
     reverse_proxy trading-frontend:80
 
     # API Proxy (preserve path)
-    handle /analyze* /status* {
+    handle /analyze* {
+        reverse_proxy api:8000 {
+            transport http {
+                read_timeout 600s
+                write_timeout 600s
+            }
+        }
+    }
+
+    handle /status* {
         reverse_proxy api:8000 {
             transport http {
                 read_timeout 600s
