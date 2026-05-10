@@ -34,6 +34,9 @@ services:
     depends_on:
       ollama:
         condition: service_healthy
+    networks:
+      - default
+      - ecotron-network
     restart: always
 
   # Frontend Dashboard
@@ -46,7 +49,15 @@ services:
       - "3001:80"
     depends_on:
       - api
+    networks:
+      - default
+      - ecotron-network
     restart: always
+
+networks:
+  ecotron-network:
+    external: true
+    name: ecotron_ecotron-network
 
 volumes:
   ollama_data:
