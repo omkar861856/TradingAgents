@@ -1,25 +1,40 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-outfit: "Outfit", sans-serif;
+}
 
 @layer base {
   body {
-    @apply bg-[#050508] text-slate-200 antialiased;
-    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+    background-color: #050508;
+    color: #e2e8f0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-outfit);
+    overflow-x: hidden;
   }
 }
 
 @layer components {
   .glass {
-    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.05];
+    background-color: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
   
   .glass-card {
-    @apply glass rounded-[2.5rem] p-8 transition-all duration-500 hover:border-sky-500/30 hover:bg-white/[0.05];
+    background-color: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 2rem;
+    padding: 2rem;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
-  .neural-gradient {
-    @apply bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700;
+  
+  .glass-card:hover {
+    border-color: rgba(14, 165, 233, 0.3);
+    background-color: rgba(255, 255, 255, 0.05);
+    transform: translateY(-4px);
   }
 
   .text-glow-sky {
@@ -27,19 +42,94 @@
   }
 
   .btn-primary {
-    @apply bg-sky-500 text-black font-black uppercase tracking-widest text-[11px] px-8 py-4 rounded-2xl transition-all hover:bg-sky-400 hover:shadow-[0_0_30px_rgba(14,165,233,0.3)] active:scale-95;
+    background-color: #0ea5e9;
+    color: black;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 11px;
+    padding: 1.25rem 2.5rem;
+    border-radius: 1.25rem;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 40px rgba(14, 165, 233, 0.1);
+  }
+  
+  .btn-primary:hover {
+    background-color: #38bdf8;
+    box-shadow: 0 0 40px rgba(14, 165, 233, 0.3);
+    transform: translateY(-2px);
   }
 
   .input-neural {
-    @apply bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/50 transition-all placeholder:text-slate-600;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    padding: 1.25rem 2rem;
+    font-size: 1rem;
+    transition: all 0.3s;
+    outline: none;
+    color: white;
+    width: 100%;
+  }
+  
+  .input-neural:focus {
+    border-color: rgba(14, 165, 233, 0.5);
+    background-color: rgba(0, 0, 0, 0.8);
   }
 
   .ad-native-container {
-    @apply glass border-dashed border-white/10 rounded-3xl overflow-hidden relative grayscale hover:grayscale-0 transition-all duration-700;
+    background-color: rgba(255, 255, 255, 0.01);
+    backdrop-filter: blur(8px);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    overflow: hidden;
+    position: relative;
+    filter: grayscale(100%) brightness(0.8);
+    transition: all 0.8s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ad-native-container:hover {
+    filter: grayscale(0%) brightness(1);
+    border-color: rgba(14, 165, 233, 0.3);
   }
   
   .ad-label {
-    @apply absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[8px] font-black text-slate-500 uppercase tracking-tighter border border-white/5 z-10;
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.4rem;
+    font-size: 8px;
+    font-weight: 900;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 10;
+  }
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr 300px;
+  gap: 2.5rem;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem;
   }
 }
 
@@ -47,8 +137,9 @@
   width: 5px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
 }

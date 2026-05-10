@@ -407,7 +407,9 @@ async def get_blog_page(blog_id: str):
     from bson import ObjectId
     try:
         blog = await blogs_collection.find_one({"_id": ObjectId(blog_id)})
-        if not blog: return "Blog not found", 404
+        if not blog:
+            return HTMLResponse(content="Blog not found", status_code=404)
+            
         decision = blog['decision'].upper()
         color_map = {"BUY": "emerald", "OVERWEIGHT": "sky", "HOLD": "amber", "UNDERWEIGHT": "orange", "SELL": "rose"}
         active_color = "sky"
@@ -416,6 +418,19 @@ async def get_blog_page(blog_id: str):
                 active_color = val
                 break
         
+        # Prepare agent status rows safely
+        agent_rows = ""
+        for team in blog.get('agent_status', []):
+            team_name = team['team']
+            agents = ", ".join(team['agents'])
+            agent_rows += f"""
+                <tr class='border-b border-white/[0.02]'>
+                    <td class='py-5 px-4 font-bold text-sky-500'>{team_name}</td>
+                    <td class='py-5 px-4 text-xs font-medium'>{agents}</td>
+                    <td class='py-5 px-4'><span class='text-emerald-500 font-black uppercase text-[10px] bg-emerald-500/10 px-3 py-1 rounded-full'>[SYNTHESIZED]</span></td>
+                </tr>
+            """
+
         html = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -509,7 +524,7 @@ async def get_blog_page(blog_id: str):
                         <table class="w-full text-left">
                             <thead><tr class="text-slate-600 uppercase text-[10px] font-black border-b border-white/5"><th class="pb-6 px-4">Deployment Team</th><th class="pb-6 px-4">Neural Agents</th><th class="pb-6 px-4">Verification</th></tr></thead>
                             <tbody class="text-slate-300">
-                                { "".join([f"<tr class='border-b border-white/[0.02]'><td class='py-5 px-4 font-bold text-sky-500'>{team['team']}</td><td class='py-5 px-4 text-xs font-medium'>{', '.join(team['agents'])}</td><td class='py-5 px-4'><span class='text-emerald-500 font-black uppercase text-[10px] bg-emerald-500/10 px-3 py-1 rounded-full'>[SYNTHESIZED]</span></td></tr>" for team in blog.get('agent_status', [])]) }
+                                {agent_rows}
                             </tbody>
                         </table>
                     </div>
@@ -550,27 +565,23 @@ async def get_blog_page(blog_id: str):
 
     <script>
         lucide.createIcons();
-        const blogData = {json.dumps({'summary': blog['summary'], 'content': blog['content']})};
-        document.getElementById('summary-content').innerHTML = marked.parse(blogData.summary || "");
-        document.getElementById('verdict-content').innerHTML = marked.parse(blogData.content.get('verdict', blogData.content.get('news', "")) || "");
-        document.getElementById('market-content').innerHTML = marked.parse(blogData.content.market || "");
-        document.getElementById('sentiment-content').innerHTML = marked.parse(blogData.content.news || "");
-        document.getElementById('fundamentals-content').innerHTML = marked.parse(blogData.content.fundamentals || "");
-        document.getElementById('risk-content').innerHTML = marked.parse(blogData.content.risk || "Neural analysis indicates standard volatility parameters.");
+        const bRaw = {json.dumps({'summary': blog['summary'], 'content': blog['content']})};
+        document.getElementById('summary-content').innerHTML = marked.parse(bRaw.summary || "");
+        document.getElementById('verdict-content').innerHTML = marked.parse(bRaw.content.get('verdict', bRaw.content.get('news', "")) || "");
+        document.getElementById('market-content').innerHTML = marked.parse(bRaw.content.market || "");
+        document.getElementById('sentiment-content').innerHTML = marked.parse(bRaw.content.news || "");
+        document.getElementById('fundamentals-content').innerHTML = marked.parse(bRaw.content.fundamentals || "");
+        document.getElementById('risk-content').innerHTML = marked.parse(bRaw.content.risk || "Neural analysis indicates standard volatility parameters.");
     </script>
 </body>
 </html>
 """
-        return html
+        return HTMLResponse(content=html)
     except Exception as e:
-        return f"Error: {str(e)}", 400
+        logger.error(f"Error rendering blog page: {e}")
+        return HTMLResponse(content=f"Error: {str(e)}", status_code=400)
 
 if __name__ == "__main__":
     import uvicorn
-    try:
-        logger.info("Starting API server...")
-        uvicorn.run(app, host="0.0.0.0", port=8000)
-    except Exception as e:
-        logger.critical(f"API Server crashed during startup: {e}")
-        import traceback
-        traceback.print_exc()
+    logger.info("Starting API server...")
+    uvicorn.run(app, host="0.0.0.0", port=8000)
