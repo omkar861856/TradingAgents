@@ -12,7 +12,11 @@ git reset --hard origin/main
 echo "📦 Building production containers..."
 docker compose -f docker-compose.prod.yml build --no-cache
 
-# 2. Spin up the stack
+# 2. Spin down and clean up to avoid conflicts
+echo "🧹 Cleaning up old containers..."
+docker compose -f docker-compose.prod.yml down --remove-orphans
+
+# 3. Spin up the stack
 echo "⚡ Starting services..."
 docker compose -f docker-compose.prod.yml up -d
 
