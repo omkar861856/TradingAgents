@@ -487,11 +487,20 @@
                         analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
                     } else if (data.status === 'failed') {
                         clearInterval(pollInterval);
-                        alert(`Analysis failed: ${data.error}`);
+                        // Show error in UI instead of alert
+                        emptyState.innerHTML = `
+                            <i data-lucide="alert-triangle" class="w-16 h-16 text-red-500 mb-6"></i>
+                            <h3 class="text-xl font-semibold mb-2 text-red-400">Analysis Failed</h3>
+                            <p class="text-slate-400 max-w-sm mb-6">${data.error}</p>
+                            <button onclick="location.reload()" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs transition-all">Try Again</button>
+                        `;
+                        lucide.createIcons();
                         resetUI();
                     }
                 } catch (e) {
                     console.error("Polling error:", e);
+                    clearInterval(pollInterval);
+                    resetUI();
                 }
             }, 2000);
         }

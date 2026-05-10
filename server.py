@@ -134,7 +134,7 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
         
         final_state, decision = graph.propagate(request.ticker, trade_date)
         
-        _tasks[task_id]["result"] = {
+        result = {
             "ticker": request.ticker,
             "date": trade_date,
             "decision": decision,
@@ -146,6 +146,7 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
             },
             "final_trade_decision": final_state.get("final_trade_decision")
         }
+        _tasks[task_id]["result"] = result
 
         # Generate Dynamic Blog
         blog_post = {
