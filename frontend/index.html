@@ -291,10 +291,10 @@
                         </div>
                         <div class="flex items-center justify-between pt-6 border-t border-white/5">
                             <div class="flex gap-2">
-                                <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="share-btn"><i data-lucide="twitter" class="w-3.5 h-3.5"></i></a>
-                                <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="share-btn"><i data-lucide="facebook" class="w-3.5 h-3.5"></i></a>
-                                <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="share-btn"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></a>
-                                <button onclick="copyLink('${b._id}')" class="share-btn"><i data-lucide="link" class="w-3.5 h-3.5"></i></button>
+                                <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="share-btn bg-[#1DA1F2]/10 text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white transition-all"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="share-btn bg-[#4267B2]/10 text-[#4267B2] hover:bg-[#4267B2] hover:text-white transition-all"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+                                <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="share-btn bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all"><i data-lucide="message-circle" class="w-4 h-4"></i></a>
+                                <button onclick="copyLink('${b._id}')" class="share-btn bg-slate-800 text-slate-400 hover:bg-sky-500 hover:text-black transition-all"><i data-lucide="link" class="w-4 h-4"></i></button>
                             </div>
                             <span class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision}</span>
                         </div>

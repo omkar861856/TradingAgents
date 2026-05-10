@@ -492,9 +492,9 @@ async def get_blog_page(blog_id: str):
                         <div>
                             <h2 class="text-6xl font-black tracking-tighter m-0">{blog['ticker']}</h2>
                             <div class="flex gap-4 mt-6">
-                                <a href="https://twitter.com/intent/tweet?text={blog['title']}&url=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="p-3 bg-white/5 rounded-xl hover:bg-sky-500 hover:text-black transition-all"><i data-lucide="twitter"></i></a>
-                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="p-3 bg-white/5 rounded-xl hover:bg-sky-500 hover:text-black transition-all"><i data-lucide="facebook"></i></a>
-                                <a href="https://api.whatsapp.com/send?text={blog['title']}%20https://ecotron.co.in/blog/{blog_id}" target="_blank" class="p-3 bg-white/5 rounded-xl hover:bg-sky-500 hover:text-black transition-all"><i data-lucide="message-circle"></i></a>
+                                <a href="https://twitter.com/intent/tweet?text={blog['title']}&url=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#1DA1F2]/10 text-[#1DA1F2] rounded-xl hover:bg-[#1DA1F2] hover:text-white transition-all shadow-lg"><i data-lucide="twitter"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#4267B2]/10 text-[#4267B2] rounded-xl hover:bg-[#4267B2] hover:text-white transition-all shadow-lg"><i data-lucide="facebook"></i></a>
+                                <a href="https://api.whatsapp.com/send?text={blog['title']}%20https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#25D366]/10 text-[#25D366] rounded-xl hover:bg-[#25D366] hover:text-white transition-all shadow-lg"><i data-lucide="message-circle"></i></a>
                             </div>
                         </div>
                         <div class="px-10 py-5 bg-white text-black rounded-3xl text-3xl font-black uppercase">{blog['decision']}</div>
