@@ -67,7 +67,17 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy"}
+    mongo_status = "connected"
+    try:
+        await mongo_client.admin.command('ping')
+    except Exception:
+        mongo_status = "disconnected"
+        
+    return {
+        "status": "healthy", 
+        "ollama": os.getenv("OLLAMA_HOST"),
+        "mongodb": mongo_status
+    }
 
 @app.post("/analyze")
 async def analyze(request: AnalysisRequest, background_tasks: BackgroundTasks):
