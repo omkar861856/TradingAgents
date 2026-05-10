@@ -40,6 +40,53 @@ async def startup_db_client():
     try:
         await mongo_client.admin.command('ping')
         logger.info("Successfully connected to MongoDB.")
+        
+        # Seed initial blogs if empty
+        if await blogs_collection.count_documents({}) == 0:
+            initial_blogs = [
+                {
+                    "ticker": "ECOTRON",
+                    "title": "Introducing Ecotron Trading: The Future of AI-Driven Market Intelligence",
+                    "summary": "Ecotron Trading is a revolutionary multi-agent framework that mirrors the dynamics of real-world trading firms using advanced LLMs.",
+                    "content": {
+                        "market": "Our framework decomposes complex trading tasks into specialized roles: fundamental analysts, sentiment experts, and technical analysts.",
+                        "fundamentals": "By leveraging GPT-4o, Ecotron provides institutional-grade research and analysis for retail traders.",
+                        "news": "Stay ahead of the market with real-time news synthesis and multi-agent debate protocols."
+                    },
+                    "decision": "BULLISH",
+                    "timestamp": datetime.now() - timedelta(days=2),
+                    "user_id": "system_admin"
+                },
+                {
+                    "ticker": "TECH",
+                    "title": "How Multi-Agent Systems Mirror Real-World Trading Firms",
+                    "summary": "Discover how Ecotron uses a swarm of specialized agents to evaluate market conditions and inform high-conviction trading decisions.",
+                    "content": {
+                        "market": "The Analyst Team provides raw data processing, while the Risk Management team ensures capital preservation.",
+                        "sentiment": "Sentiment agents scour social media and news to gauge the 'wisdom of the crowd' with pinpoint accuracy.",
+                        "fundamentals": "The Portfolio Manager makes the final call, ensuring a balanced and researched approach to every trade."
+                    },
+                    "decision": "NEUTRAL",
+                    "timestamp": datetime.now() - timedelta(days=1),
+                    "user_id": "system_admin"
+                },
+                {
+                    "ticker": "STRATEGY",
+                    "title": "Optimizing Your Strategy with Neural Intelligence",
+                    "summary": "Learn how to configure Ecotron's neural weights to match your personal risk profile and trading style.",
+                    "content": {
+                        "market": "The Strategy view allows you to adjust agent weights, prioritizing technical indicators or news sentiment as needed.",
+                        "news": "Neural Intelligence Active: Our system is constantly learning from market movements to refine its predictive capabilities.",
+                        "fundamentals": "Integrated risk protocols like the Kelly Criterion help you size positions for long-term growth."
+                    },
+                    "decision": "BUY",
+                    "timestamp": datetime.now(),
+                    "user_id": "system_admin"
+                }
+            ]
+            await blogs_collection.insert_many(initial_blogs)
+            logger.info("Seeded initial blogs.")
+            
     except Exception as e:
         logger.error(f"Could not connect to MongoDB: {e}")
 
