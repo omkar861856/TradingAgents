@@ -147,7 +147,8 @@ async def health():
     return {
         "status": "healthy", 
         "ollama": os.getenv("OLLAMA_HOST"),
-        "mongodb": mongo_status
+        "mongodb": mongo_status,
+        "system_balance_low": os.getenv("SYSTEM_BALANCE_LOW", "false").lower() == "true"
     }
 
 @app.post("/analyze")
