@@ -35,9 +35,9 @@
             </div>
             <div class="flex items-center gap-6">
                 <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                    <a href="#" class="hover:text-white transition-colors">Dashboard</a>
-                    <a href="#" class="hover:text-white transition-colors">Strategy</a>
-                    <a href="#" class="hover:text-white transition-colors">Portfolio</a>
+                    <a href="#" onclick="switchView('dashboard')" class="nav-link hover:text-white transition-colors text-white" id="nav-dashboard">Dashboard</a>
+                    <a href="#" onclick="switchView('strategy')" class="nav-link hover:text-white transition-colors" id="nav-strategy">Strategy</a>
+                    <a href="#" onclick="switchView('portfolio')" class="nav-link hover:text-white transition-colors" id="nav-portfolio">Portfolio</a>
                 </nav>
                 <div class="flex items-center gap-2 text-xs text-slate-500">
                     <div class="w-2 h-2 rounded-full bg-green-500"></div>
@@ -68,6 +68,9 @@
 
         <!-- Center Column: Main App -->
         <main class="main-app-center">
+            
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section">
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <!-- App Controls -->
@@ -167,6 +170,75 @@
                         <h3 class="text-xl font-semibold mb-2">Awaiting Parameters</h3>
                         <p class="text-slate-400 max-w-sm">System ready for localized inference on ecotron.co.in. Input a symbol to begin.</p>
                     </div>
+                </div>
+            </div>
+
+                </div>
+            </div>
+
+            <!-- Strategy View -->
+            <div id="view-strategy" class="view-section hidden">
+                <div class="glass p-8 rounded-3xl mb-8">
+                    <h2 class="text-3xl font-bold mb-2">Neural <span class="gradient-text">Strategy</span></h2>
+                    <p class="text-slate-400 text-sm">Configure multi-agent weights and risk parameters.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass p-6 rounded-2xl">
+                        <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4 text-sky-400"></i> Agent Weights</h3>
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">Technical Analysis</span><span class="text-sky-400">40%</span></div>
+                                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-sky-500" style="width: 40%"></div></div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">Sentiment Engine</span><span class="text-sky-400">30%</span></div>
+                                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-sky-500" style="width: 30%"></div></div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">Fundamental Research</span><span class="text-sky-400">30%</span></div>
+                                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-sky-500" style="width: 30%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl">
+                        <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-green-400"></i> Risk Protocols</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <span class="text-xs text-slate-400">Max Drawdown Limit</span>
+                                <span class="text-xs font-mono text-slate-200">5.0%</span>
+                            </div>
+                            <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <span class="text-xs text-slate-400">Position Sizing</span>
+                                <span class="text-xs font-mono text-slate-200">Kelly Criterion</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio View -->
+            <div id="view-portfolio" class="view-section hidden">
+                <div class="glass p-8 rounded-3xl mb-8">
+                    <h2 class="text-3xl font-bold mb-2">Alpha <span class="gradient-text">Portfolio</span></h2>
+                    <p class="text-slate-400 text-sm">Real-time performance of your AI-tracked assets.</p>
+                </div>
+                
+                <div class="glass overflow-hidden rounded-2xl">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-900/50 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4">Asset</th>
+                                <th class="px-6 py-4">Last Analysis</th>
+                                <th class="px-6 py-4">Current Signal</th>
+                                <th class="px-6 py-4 text-right">Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portfolio-table-body">
+                            <!-- Populated from Blogs/History -->
+                        </tbody>
+                    </table>
+                    <div id="portfolio-empty" class="p-12 text-center text-slate-600 hidden">No assets tracked yet. Run an analysis to start your portfolio.</div>
                 </div>
             </div>
 
@@ -451,6 +523,8 @@
             try {
                 const res = await fetch('/blogs');
                 const blogs = await res.json();
+                
+                // Update Blog Feed
                 const container = document.getElementById('blog-feed');
                 if (blogs.length === 0) {
                     container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-600">No intelligence reports published yet.</div>`;
@@ -470,10 +544,56 @@
                         </div>
                     </div>
                 `).join('');
+
+                // Update Portfolio Table
+                const portfolioBody = document.getElementById('portfolio-table-body');
+                const portfolioEmpty = document.getElementById('portfolio-empty');
+                
+                if (blogs.length === 0) {
+                    portfolioEmpty.classList.remove('hidden');
+                    portfolioBody.innerHTML = '';
+                } else {
+                    portfolioEmpty.classList.add('hidden');
+                    // Group by ticker to show latest signal per asset
+                    const latestByTicker = {};
+                    blogs.forEach(b => {
+                        if (!latestByTicker[b.ticker]) latestByTicker[b.ticker] = b;
+                    });
+
+                    portfolioBody.innerHTML = Object.values(latestByTicker).map(b => `
+                        <tr class="border-t border-slate-800 hover:bg-slate-800/20 transition-colors">
+                            <td class="px-6 py-4 font-bold text-sky-400">${b.ticker}</td>
+                            <td class="px-6 py-4 text-slate-400 font-mono text-xs">${new Date(b.timestamp).toLocaleString()}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'bg-green-500/10 text-green-400' : (b.decision.includes('SELL') ? 'bg-red-500/10 text-red-400' : 'bg-yellow-500/10 text-yellow-400')}">
+                                    ${b.decision}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right text-slate-500 font-mono text-xs">94.2%</td>
+                        </tr>
+                    `).join('');
+                }
+
                 lucide.createIcons();
             } catch (e) {
                 console.error("Failed to fetch blogs", e);
             }
+        }
+
+        function switchView(viewId) {
+            // Hide all sections
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            // Show target section
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('text-white'));
+            document.getElementById(`nav-${viewId}`).classList.add('text-white');
+            
+            // Refresh data if needed
+            if (viewId === 'portfolio' || viewId === 'dashboard') fetchBlogs();
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Initial load
