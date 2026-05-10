@@ -50,6 +50,7 @@ class AnalysisRequest(BaseModel):
     llm_provider: Optional[str] = "ollama"
     deep_think_llm: Optional[str] = "llama3.1:8b"
     quick_think_llm: Optional[str] = "llama3.1:8b"
+    api_key: Optional[str] = None
 
 @app.get("/")
 async def root():
@@ -83,6 +84,10 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
             "deep_think_llm": request.deep_think_llm,
             "quick_think_llm": request.quick_think_llm,
         }
+        
+        if request.api_key:
+            # Pass api_key to both llms if provided
+            config_overrides["api_key"] = request.api_key
         
         graph = get_graph(config_overrides)
         

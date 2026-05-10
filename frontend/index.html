@@ -83,10 +83,28 @@
                                 <label class="block text-sm font-medium text-slate-400 mb-1.5">Ticker Symbol</label>
                                 <input id="ticker" type="text" placeholder="NVDA, TSLA, BTC" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all uppercase font-mono">
                             </div>
-                            <div class="p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl flex items-center gap-3">
-                                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                <span class="text-xs text-sky-400 font-medium">Local Intelligence Active: Llama 3.1 8B</span>
+                            
+                            <div class="space-y-3 pt-2 border-t border-slate-800">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-400 mb-1.5">Intelligence Provider</label>
+                                    <select id="provider" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all text-sm">
+                                        <option value="ollama">Ollama (Local - Llama 3.1)</option>
+                                        <option value="openai">OpenAI (Fast - GPT-4o)</option>
+                                        <option value="google">Google (Fast - Gemini 2.0)</option>
+                                    </select>
+                                </div>
+                                <div id="api-key-group" class="hidden">
+                                    <label class="block text-sm font-medium text-slate-400 mb-1.5">Personal API Key</label>
+                                    <input id="api-key" type="password" placeholder="sk-..." class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all text-sm font-mono">
+                                    <p class="text-[10px] text-slate-500 mt-1">Key is sent securely for this session only.</p>
+                                </div>
                             </div>
+
+                            <div id="local-status" class="p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <span class="text-xs text-sky-400 font-medium">Ready for localized inference</span>
+                            </div>
+
                             <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-sky-500/20 flex justify-center items-center gap-2">
                                 <span>Run Multi-Agent Research</span>
                                 <i data-lucide="zap" class="w-4 h-4"></i>
@@ -249,9 +267,26 @@
             }
         }
 
+        const providerSelect = document.getElementById('provider');
+        const apiKeyGroup = document.getElementById('api-key-group');
+        const apiKeyInput = document.getElementById('api-key');
+
+        providerSelect.addEventListener('change', () => {
+            const val = providerSelect.value;
+            apiKeyGroup.classList.toggle('hidden', val === 'ollama');
+        });
+
         analyzeBtn.addEventListener('click', async () => {
             const ticker = tickerInput.value.trim().toUpperCase();
             if (!ticker) return;
+
+            const provider = providerSelect.value;
+            const apiKey = apiKeyInput.value.trim();
+
+            if (provider !== 'ollama' && !apiKey) {
+                alert(`Please enter your ${provider} API key for fast cloud inference.`);
+                return;
+            }
 
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = `<span>Initializing...</span>`;
@@ -262,15 +297,23 @@
             logsDiv.innerHTML = '';
             updateProgress('reset');
             
+            // Map models based on provider
+            const modelMap = {
+                'ollama': 'llama3.1:8b',
+                'openai': 'gpt-4o',
+                'google': 'gemini-2.0-flash'
+            };
+
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         ticker: ticker,
-                        llm_provider: 'ollama',
-                        deep_think_llm: 'llama3.1:8b',
-                        quick_think_llm: 'llama3.1:8b'
+                        llm_provider: provider,
+                        deep_think_llm: modelMap[provider],
+                        quick_think_llm: modelMap[provider],
+                        api_key: apiKey || null
                     })
                 });
                 
