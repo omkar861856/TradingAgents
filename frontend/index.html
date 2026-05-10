@@ -100,17 +100,9 @@
                             </div>
                             
                             <div class="space-y-3 pt-2 border-t border-slate-800">
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-400 mb-1.5">Intelligence Provider</label>
-                                    <select id="provider" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all text-sm">
-                                        <option value="google" selected>Google (Fast - Gemini 2.0)</option>
-                                        <option value="openai">OpenAI (Fast - GPT-4o)</option>
-                                    </select>
-                                </div>
-                                <div id="api-key-group">
-                                    <label class="block text-sm font-medium text-slate-400 mb-1.5">Personal API Key</label>
-                                    <input id="api-key" type="password" placeholder="sk-..." class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all text-sm font-mono">
-                                    <p class="text-[10px] text-slate-500 mt-1">Key is sent securely for this session only.</p>
+                                <div class="flex items-center justify-between text-xs p-2 bg-slate-900/50 rounded-xl border border-slate-800">
+                                    <span class="text-slate-400">Model Source</span>
+                                    <span class="font-bold text-sky-400">OpenAI GPT-4o</span>
                                 </div>
                             </div>
 
@@ -383,9 +375,6 @@
             }
         }
 
-        const providerSelect = document.getElementById('provider');
-        const apiKeyInput = document.getElementById('api-key');
-
         // Fingerprinting / User ID setup
         let userId = localStorage.getItem('trading_user_id');
         if (!userId) {
@@ -393,27 +382,9 @@
             localStorage.setItem('trading_user_id', userId);
         }
 
-        // Load saved keys
-        const savedProvider = localStorage.getItem('trading_provider');
-        const savedKey = localStorage.getItem('trading_api_key');
-        if (savedProvider) providerSelect.value = savedProvider;
-        if (savedKey) apiKeyInput.value = savedKey;
-
         analyzeBtn.addEventListener('click', async () => {
             const ticker = tickerInput.value.trim().toUpperCase();
             if (!ticker) return;
-
-            const provider = providerSelect.value;
-            const apiKey = apiKeyInput.value.trim();
-
-            if (!apiKey) {
-                alert(`Please enter your ${provider} API key for fast cloud inference.`);
-                return;
-            }
-
-            // Save for next time
-            localStorage.setItem('trading_provider', provider);
-            localStorage.setItem('trading_api_key', apiKey);
 
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = `<span>Initializing...</span>`;
@@ -424,23 +395,15 @@
             logsDiv.innerHTML = '';
             updateProgress('reset');
             
-            // Map models based on provider
-            const modelMap = {
-                'ollama': 'llama3.1:8b',
-                'openai': 'gpt-4o',
-                'google': 'gemini-2.0-flash'
-            };
-
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         ticker: ticker,
-                        llm_provider: provider,
-                        deep_think_llm: modelMap[provider],
-                        quick_think_llm: modelMap[provider],
-                        api_key: apiKey || null,
+                        llm_provider: 'openai',
+                        deep_think_llm: 'gpt-4o',
+                        quick_think_llm: 'gpt-4o',
                         user_id: userId
                     })
                 });

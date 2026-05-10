@@ -1,12 +1,15 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 import os
 import json
-from datetime import datetime
+import secrets
+from datetime import datetime, timedelta
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.default_config import DEFAULT_CONFIG
 
@@ -31,6 +34,19 @@ mongo_client = AsyncIOMotorClient(MONGO_URI)
 db = mongo_client.get_default_database()
 activity_collection = db.activity
 blogs_collection = db.blogs
+
+security = HTTPBasic()
+
+def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, "admin")
+    correct_password = secrets.compare_digest(credentials.password, "admin")
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
 
 # Global task storage
 _tasks: Dict[str, Any] = {}
@@ -89,6 +105,15 @@ async def analyze(request: AnalysisRequest, background_tasks: BackgroundTasks):
         "result": None
     }
     
+    # Default to OpenAI as requested
+    request.llm_provider = "openai"
+    request.deep_think_llm = "gpt-4o"
+    request.quick_think_llm = "gpt-4o"
+    
+    # Use environment key if not provided in request (though request field will be hidden in UI)
+    if not request.api_key:
+        request.api_key = os.getenv("OPENAI_API_KEY")
+
     background_tasks.add_task(run_analysis_task, task_id, request)
     
     # Log activity to MongoDB
@@ -201,6 +226,53 @@ async def get_status(task_id: str):
     if task_id not in _tasks:
         raise HTTPException(status_code=404, detail="Task not found")
     return _tasks[task_id]
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_dashboard(username: str = Depends(get_current_username)):
+    cursor = activity_collection.find().sort("timestamp", -1).limit(100)
+    activities = []
+    async for doc in cursor:
+        activities.append(f"""
+            <tr style="border-bottom: 1px solid #334155;">
+                <td style="padding: 12px;">{doc.get('timestamp')}</td>
+                <td style="padding: 12px;">{doc.get('user_id')}</td>
+                <td style="padding: 12px; font-weight: bold; color: #38bdf8;">{doc.get('ticker')}</td>
+                <td style="padding: 12px;">{doc.get('provider')}</td>
+                <td style="padding: 12px;"><span style="background: #1e293b; padding: 4px 8px; border-radius: 4px;">{doc.get('status')}</span></td>
+            </tr>
+        """)
+    
+    html_content = f"""
+    <html>
+        <head>
+            <title>Ecotron Admin</title>
+            <style>
+                body {{ font-family: sans-serif; background: #050507; color: #f8fafc; padding: 40px; }}
+                table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; }}
+                th {{ text-align: left; background: #1e293b; padding: 12px; color: #94a3b8; font-size: 12px; text-transform: uppercase; }}
+            </style>
+        </head>
+        <body>
+            <h1 style="color: #38bdf8;">Ecotron Neural Logs (MongoDB)</h1>
+            <p>Authenticated as: {{username}}</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User Fingerprint</th>
+                        <th>Ticker</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {"".join(activities)}
+                </tbody>
+            </table>
+        </body>
+    </html>
+    """
+    return html_content
 
 if __name__ == "__main__":
     import uvicorn
