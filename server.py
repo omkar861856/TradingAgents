@@ -711,60 +711,14 @@ async def get_blog_page(blog_id: str):
     </div>
 
     <script>
-        lucide.createIcons();
-        const setHtml = (id, content) => {{
-            const el = document.getElementById(id);
-            if (el) el.innerHTML = marked.parse(content || '');
+        window.blogData = {{
+            summary: {repr(blog['summary'])},
+            market: {repr(blog['content'].get('market', ''))},
+            sentiment: {repr(blog['content'].get('sentiment', blog['content'].get('news', '')))},
+            fundamentals: {repr(blog['content'].get('fundamentals', ''))}
         }};
-        
-        setHtml('summary-content', {repr(blog['summary'])});
-        setHtml('verdict-content', {repr(blog['summary'])});
-        setHtml('market-content', {repr(blog['content'].get('market', ''))});
-        setHtml('sentiment-content', {repr(blog['content'].get('sentiment', blog['content'].get('news', '')))});
-        setHtml('fundamentals-content', {repr(blog['content'].get('fundamentals', ''))});
-        setHtml('risk-content', {repr(blog['summary'])});
-
-        // Global Task Poller for Blog Pages
-        let activeTaskId = localStorage.getItem('active_task_id');
-        const taskIndicator = document.getElementById('active-task-indicator');
-        const notificationToast = document.getElementById('notification-toast');
-        const toastTicker = document.getElementById('toast-ticker');
-        const toastViewBtn = document.getElementById('toast-view-btn');
-
-        function showToast(ticker, blogId) {{
-            toastTicker.innerText = ticker;
-            toastViewBtn.onclick = () => window.location.href = '/blog/' + blogId;
-            notificationToast.style.display = 'block';
-            setTimeout(() => notificationToast.style.transform = 'translateX(0)', 100);
-            setTimeout(hideToast, 10000);
-        }}
-
-        function hideToast() {{
-            notificationToast.style.transform = 'translateX(120%)';
-            setTimeout(() => notificationToast.style.display = 'none', 500);
-        }}
-
-        if (activeTaskId) {{
-            if (taskIndicator) taskIndicator.classList.remove('hidden');
-            const interval = setInterval(async () => {{
-                try {{
-                    const res = await fetch('/status/' + activeTaskId);
-                    const data = await res.json();
-                    if (data.status === 'completed') {{
-                        clearInterval(interval);
-                        localStorage.removeItem('active_task_id');
-                        if (taskIndicator) taskIndicator.classList.add('hidden');
-                        showToast(localStorage.getItem('active_task_ticker'), data.result.blog_id);
-                    }} else if (data.status === 'failed') {{
-                        clearInterval(interval);
-                        localStorage.removeItem('active_task_id');
-                        if (taskIndicator) taskIndicator.classList.add('hidden');
-                    }}
-                    // Polling catch block
-                }} catch (e) {{}}
-            }}, 5000);
-        }}
     </script>
+    <script src="/static/blog_script.js"></script>
 </body>
 </html>
         """
