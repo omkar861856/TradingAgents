@@ -760,6 +760,7 @@ async def get_blog_page(blog_id: str):
                         localStorage.removeItem('active_task_id');
                         if (taskIndicator) taskIndicator.classList.add('hidden');
                     }}
+                    // Polling catch block
                 }} catch (e) {{}}
             }}, 5000);
         }}
