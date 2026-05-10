@@ -733,7 +733,7 @@ async def get_blog_page(blog_id: str):
 
         function showToast(ticker, blogId) {{
             toastTicker.innerText = ticker;
-            toastViewBtn.onclick = () => window.location.href = `/blog/${{blogId}}`;
+            toastViewBtn.onclick = () => window.location.href = '/blog/' + blogId;
             notificationToast.style.display = 'block';
             setTimeout(() => notificationToast.style.transform = 'translateX(0)', 100);
             setTimeout(hideToast, 10000);
@@ -748,7 +748,7 @@ async def get_blog_page(blog_id: str):
             if (taskIndicator) taskIndicator.classList.remove('hidden');
             const interval = setInterval(async () => {{
                 try {{
-                    const res = await fetch(`/status/${{activeTaskId}}`);
+                    const res = await fetch('/status/' + activeTaskId);
                     const data = await res.json();
                     if (data.status === 'completed') {{
                         clearInterval(interval);
