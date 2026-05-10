@@ -2,9 +2,9 @@ ecotron.co.in, www.ecotron.co.in {
     # Main App Proxy
     reverse_proxy trading-frontend:80
 
-    # API Proxy (handled by specific path)
-    handle_path /analyze* {
-        reverse_proxy trading-api:8000
+    # API Proxy (preserve path)
+    handle /analyze* {
+        reverse_proxy api:8000
     }
 
     encode gzip

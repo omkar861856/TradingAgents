@@ -188,6 +188,47 @@
         const loadingSpinner = document.getElementById('loading-spinner');
         const resultSummary = document.getElementById('result-summary');
         
+        function updateProgress(step, status = 'loading') {
+            const container = document.getElementById('agent-status');
+            const steps = {
+                'tech': { label: 'Technical Analyst', icon: 'bar-chart-3' },
+                'sent': { label: 'Sentiment Analyst', icon: 'smile' },
+                'news': { label: 'News Researcher', icon: 'newspaper' },
+                'risk': { label: 'Risk Manager', icon: 'shield-alert' },
+                'final': { label: 'Portfolio Manager', icon: 'briefcase' }
+            };
+            
+            if (step === 'reset') {
+                container.innerHTML = Object.entries(steps).map(([key, val]) => `
+                    <div id="status-${key}" class="flex items-center justify-between text-sm p-2 rounded opacity-50 transition-all">
+                        <span class="flex items-center gap-2"><i data-lucide="${val.icon}" class="w-4 h-4 text-slate-500"></i>${val.label}</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-600">Waiting</span>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+                return;
+            }
+
+            const el = document.getElementById(`status-${step}`);
+            if (!el) return;
+            el.classList.remove('opacity-50');
+            const statusEl = el.querySelector('span:last-child');
+            const iconEl = el.querySelector('i');
+            
+            if (status === 'active') {
+                el.classList.add('bg-sky-500/10');
+                statusEl.innerText = 'Analyzing...';
+                statusEl.className = 'text-[10px] uppercase font-bold text-sky-400 animate-pulse';
+                iconEl.className = 'w-4 h-4 text-sky-400';
+            } else if (status === 'done') {
+                el.classList.remove('bg-sky-500/10');
+                el.classList.add('bg-green-500/5');
+                statusEl.innerText = 'Completed';
+                statusEl.className = 'text-[10px] uppercase font-bold text-green-500';
+                iconEl.className = 'w-4 h-4 text-green-500';
+            }
+        }
+
         analyzeBtn.addEventListener('click', async () => {
             const ticker = tickerInput.value.trim().toUpperCase();
             if (!ticker) return;
@@ -197,6 +238,19 @@
             loadingSpinner.classList.remove('hidden');
             resultSummary.classList.add('hidden');
             emptyState.classList.remove('hidden');
+            updateProgress('reset');
+            
+            const steps = ['tech', 'sent', 'news', 'risk', 'final'];
+            let currentStep = 0;
+            const progressInterval = setInterval(() => {
+                if (currentStep > 0) updateProgress(steps[currentStep-1], 'done');
+                if (currentStep < steps.length) {
+                    updateProgress(steps[currentStep], 'active');
+                    currentStep++;
+                } else {
+                    clearInterval(progressInterval);
+                }
+            }, 3000);
 
             try {
                 const response = await fetch('/analyze', {
@@ -209,10 +263,15 @@
                         quick_think_llm: 'llama3:8b'
                     })
                 });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
+                clearInterval(progressInterval);
+                steps.forEach(s => updateProgress(s, 'done'));
                 displayResults(data);
             } catch (error) {
                 console.error(error);
+                clearInterval(progressInterval);
+                alert("Analysis failed. This usually happens if the backend is starting up or Ollama is busy. Please try again in a few seconds.");
             } finally {
                 analyzeBtn.disabled = false;
                 analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
@@ -238,8 +297,8 @@
             for (const [key, text] of Object.entries(data.reports)) {
                 if (!text) continue;
                 const div = document.createElement('div');
-                div.className = 'p-5 bg-slate-900/50 rounded-xl border border-slate-800';
-                div.innerHTML = `<div class="text-sky-400 text-xs font-bold uppercase mb-2">${key}</div><div class="text-slate-400 text-sm leading-relaxed">${text}</div>`;
+                div.className = 'p-5 bg-slate-900/50 rounded-xl border border-slate-800 transition-all hover:border-sky-500/50';
+                div.innerHTML = `<div class="text-sky-400 text-xs font-bold uppercase mb-2 flex items-center gap-2"><i data-lucide="check-circle" class="w-3 h-3"></i>${key} Report</div><div class="text-slate-400 text-sm leading-relaxed">${text}</div>`;
                 container.appendChild(div);
             }
             lucide.createIcons();
