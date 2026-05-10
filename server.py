@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
+from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 import os
 import json
@@ -23,6 +24,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# MongoDB setup
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/tradingagents")
+mongo_client = AsyncIOMotorClient(MONGO_URI)
+db = mongo_client.get_default_database()
+activity_collection = db.activity
 
 # Global task storage
 _tasks: Dict[str, Any] = {}
@@ -51,6 +58,7 @@ class AnalysisRequest(BaseModel):
     deep_think_llm: Optional[str] = "llama3.1:8b"
     quick_think_llm: Optional[str] = "llama3.1:8b"
     api_key: Optional[str] = None
+    user_id: Optional[str] = "anonymous"
 
 @app.get("/")
 async def root():
@@ -71,7 +79,25 @@ async def analyze(request: AnalysisRequest, background_tasks: BackgroundTasks):
     }
     
     background_tasks.add_task(run_analysis_task, task_id, request)
+    
+    # Log activity to MongoDB
+    background_tasks.add_task(log_activity, request, task_id)
+    
     return {"task_id": task_id}
+
+async def log_activity(request: AnalysisRequest, task_id: str):
+    try:
+        activity_doc = {
+            "task_id": task_id,
+            "user_id": request.user_id,
+            "ticker": request.ticker,
+            "provider": request.llm_provider,
+            "timestamp": datetime.now(),
+            "status": "started"
+        }
+        await activity_collection.insert_one(activity_doc)
+    except Exception as e:
+        logger.error(f"Failed to log activity to MongoDB: {e}")
 
 async def run_analysis_task(task_id: str, request: AnalysisRequest):
     try:
@@ -111,10 +137,22 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
         }
         _tasks[task_id]["status"] = "completed"
         _tasks[task_id]["logs"].append("Analysis finalized. Generating signal...")
+        
+        # Update MongoDB activity
+        await activity_collection.update_one(
+            {"task_id": task_id},
+            {"$set": {"status": "completed", "completed_at": datetime.now()}}
+        )
     except Exception as e:
         logger.error(f"Task {task_id} failed: {str(e)}")
         _tasks[task_id]["status"] = "failed"
         _tasks[task_id]["error"] = str(e)
+        
+        # Update MongoDB activity with failure
+        await activity_collection.update_one(
+            {"task_id": task_id},
+            {"$set": {"status": "failed", "error": str(e), "failed_at": datetime.now()}}
+        )
 
 @app.get("/status/{task_id}")
 async def get_status(task_id: str):

@@ -36,6 +36,7 @@ services:
     container_name: trading-api
     environment:
       - OLLAMA_HOST=http://trading-ollama:11434
+      - MONGO_URI=mongodb://mongodb:27017/tradingagents
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
@@ -49,11 +50,22 @@ services:
     depends_on:
       ollama:
         condition: service_healthy
+      mongodb:
+        condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - trading-network
+    restart: always
+
+  mongodb:
+    image: mongo:latest
+    container_name: trading-mongodb
+    volumes:
+      - mongo_data:/data/db
     networks:
       - trading-network
     restart: always
@@ -74,5 +86,6 @@ networks:
 volumes:
   ollama_data:
   trading_data:
+  mongo_data:
   caddy_data:
   caddy_config:
