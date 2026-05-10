@@ -233,7 +233,7 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
         blog_post = {
             "ticker": request.ticker,
             "title": f"Intelligence Report: Why {request.ticker} is a {result['decision']} today",
-            "summary": result["final_trade_decision"][:250] + "...",
+            "summary": result["final_trade_decision"],
             "content": result["reports"],
             "decision": result["decision"],
             "timestamp": datetime.now(),

@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background: #020203; color: #f8fafc; overflow-x: hidden; }
@@ -66,9 +65,14 @@
         <!-- Left Ads -->
         <aside class="ad-left hidden xl:block">
             <div class="ad-box" style="width: 160px; height: 600px;">
-                <span class="ad-tag">SPONSORED</span>
+                <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
+            </div>
+            <div class="ad-box" style="width: 160px; height: 300px;">
+                <span class="ad-tag">ADVERTISEMENT</span>
+                <script>atOptions = { 'key' : '7f1e1c3d11870c7899ccce329cdd56e9', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };</script>
+                <script src="https://developdomicile.com/7f1e1c3d11870c7899ccce329cdd56e9/invoke.js"></script>
             </div>
         </aside>
 
@@ -76,9 +80,20 @@
         <main class="main-content">
             <!-- Hero Top Ad -->
             <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
+                <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
+            </div>
+
+            <!-- Support Banner -->
+            <div class="mb-10 p-6 glass rounded-2xl border-l-4 border-l-sky-500 shadow-xl flex items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-sky-500/10 rounded-xl"><i data-lucide="heart" class="text-sky-400 w-6 h-6"></i></div>
+                    <div>
+                        <h4 class="text-xs font-black uppercase tracking-widest text-white">Neural Intelligence Support</h4>
+                        <p class="text-[11px] text-slate-400 leading-tight">Clicking ads helps maintain our high-performance GPU clusters for free public use.</p>
+                    </div>
+                </div>
             </div>
 
             <div id="view-dashboard" class="view-section space-y-12">
@@ -87,7 +102,7 @@
                     <div class="lg:col-span-5 space-y-6">
                         <div class="glass p-8 rounded-3xl border border-white/5 shadow-2xl space-y-8">
                             <h2 class="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-                                <i data-lucide="zap" class="text-sky-500"></i> Neural Core
+                                <i data-lucide="zap" class="text-sky-500"></i> Enter Ticker
                             </h2>
                             <div class="space-y-4">
                                 <input id="ticker" type="text" placeholder="BTC, NVDA, TSLA" class="w-full bg-slate-900 border border-white/5 rounded-2xl px-6 py-5 text-xl font-bold focus:outline-none focus:ring-2 focus:ring-sky-500/50 uppercase">
@@ -95,16 +110,6 @@
                                     <span>Initiate Analysis</span>
                                     <i data-lucide="activity" class="w-4 h-4"></i>
                                 </button>
-                            </div>
-                        </div>
-
-                        <div class="glass p-6 rounded-3xl">
-                            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Neural Health</h3>
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl text-xs font-bold">
-                                    <span class="flex items-center gap-3"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i> Protocols</span>
-                                    <span class="text-[10px] text-emerald-400">SECURE</span>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -152,21 +157,49 @@
         <!-- Right Ads -->
         <aside class="ad-right hidden lg:block">
             <div class="ad-box" style="width: 300px; height: 250px;">
-                <span class="ad-tag">SPONSORED</span>
+                <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };</script>
                 <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
+            </div>
+            <div class="ad-box" style="width: 320px; height: 50px;">
+                <span class="ad-tag">ADVERTISEMENT</span>
+                <script>atOptions = { 'key' : 'f60abc3ad258484f0670ebbbace5b661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };</script>
+                <script src="https://developdomicile.com/f60abc3ad258484f0670ebbbace5b661/invoke.js"></script>
+            </div>
+            <div class="ad-box w-full" style="min-height: 200px;">
+                <span class="ad-tag">SPONSORED</span>
+                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
+                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
             </div>
         </aside>
     </div>
 
     <!-- Footer Ad -->
-    <footer class="w-full glass py-12 mt-20 border-t border-white/5 flex flex-col items-center">
+    <footer class="w-full glass py-12 mt-20 border-t border-white/5 flex flex-col items-center gap-8">
         <div class="ad-box" style="width: 728px; height: 90px;">
             <span class="ad-tag">ADVERTISEMENT</span>
             <script>atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };</script>
             <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
         </div>
+        <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">&copy; 2026 Ecotron Advanced Trading Systems</p>
     </footer>
+
+    <!-- Research Initiation Popup -->
+    <div id="research-popup" class="fixed inset-0 z-[200] flex items-center justify-center p-6 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="document.getElementById('research-popup').classList.add('hidden')"></div>
+        <div class="glass max-w-md w-full p-10 rounded-[40px] border border-white/10 relative z-10 text-center space-y-6 animate-fade">
+            <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i data-lucide="coffee" class="w-10 h-10 text-sky-400"></i>
+            </div>
+            <h3 class="text-2xl font-black uppercase tracking-tighter text-white">Sit Back & Relax</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+                Our neural agents are now synthesizing your request. Grab a coffee or explore the featured ads—it directly helps us fund the high-performance GPU clusters that power this intelligence.
+            </p>
+            <button onclick="document.getElementById('research-popup').classList.add('hidden')" class="w-full py-4 bg-sky-500 hover:bg-sky-400 text-black font-black rounded-2xl uppercase tracking-widest text-[10px] transition-all">
+                Understood, Proceed
+            </button>
+        </div>
+    </div>
 
     <script>
         const analyzeBtn = document.getElementById('analyze-btn');
@@ -278,7 +311,11 @@
                             <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
                         </div>
                         <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tight line-clamp-2">${b.title}</h3>
-                        <div class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision} SIGNAL</div>
+                        <div class="text-[11px] text-slate-400 prose-custom mb-6">${marked.parse(b.summary)}</div>
+                        <div class="flex items-center justify-between pt-6 border-t border-white/5">
+                            <span class="text-[10px] font-black uppercase text-slate-600">ANALYST CORE</span>
+                            <span class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision}</span>
+                        </div>
                     </div>
                 `).join('');
                 lucide.createIcons();
@@ -301,11 +338,6 @@
                         <div class="text-2xl text-slate-400 font-bold leading-tight max-w-4xl prose-custom">${marked.parse(b.summary)}</div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <div class="glass p-10 rounded-[40px] space-y-6"><canvas id="alphaChart"></canvas></div>
-                        <div class="glass p-10 rounded-[40px] space-y-6"><canvas id="sentimentChart"></canvas></div>
-                    </div>
-
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
                         <div class="glass p-10 rounded-[40px] section-market space-y-6">
                             <h3 class="text-2xl font-black uppercase tracking-tighter text-sky-400">Market Dynamics</h3>
@@ -326,33 +358,6 @@
                     </div>
                 </div>
             `;
-            
-            setTimeout(() => {
-                new Chart(document.getElementById('alphaChart'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Alpha', 'Noise'],
-                        datasets: [{
-                            data: [b.metrics?.alpha || 85, 100 - (b.metrics?.alpha || 85)],
-                            backgroundColor: ['#38bdf8', '#1e293b'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { plugins: { legend: { display: false } }, cutout: '80%' }
-                });
-                new Chart(document.getElementById('sentimentChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: ['Positive', 'Neutral', 'Negative'],
-                        datasets: [{
-                            data: [b.metrics?.sentiment || 70, 20, 10],
-                            backgroundColor: ['#10b981', '#64748b', '#ef4444']
-                        }]
-                    },
-                    options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-                });
-            }, 100);
-            
             lucide.createIcons();
         }
 
@@ -360,21 +365,5 @@
         const blogId = urlParams.get('blog');
         if (blogId) openBlog(blogId); else fetchBlogs();
     </script>
-    <!-- Research Initiation Popup -->
-    <div id="research-popup" class="fixed inset-0 z-[200] flex items-center justify-center p-6 hidden">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="document.getElementById('research-popup').classList.add('hidden')"></div>
-        <div class="glass max-w-md w-full p-10 rounded-[40px] border border-white/10 relative z-10 text-center space-y-6 animate-fade">
-            <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i data-lucide="coffee" class="w-10 h-10 text-sky-400"></i>
-            </div>
-            <h3 class="text-2xl font-black uppercase tracking-tighter text-white">Sit Back & Relax</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-                Our neural agents are now synthesizing your request. Grab a coffee or explore the featured ads—it directly helps us fund the high-performance GPU clusters that power this intelligence.
-            </p>
-            <button onclick="document.getElementById('research-popup').classList.add('hidden')" class="w-full py-4 bg-sky-500 hover:bg-sky-400 text-black font-black rounded-2xl uppercase tracking-widest text-[10px] transition-all">
-                Understood, Proceed
-            </button>
-        </div>
-    </div>
 </body>
 </html>
