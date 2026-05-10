@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Zap, BrainCircuit, CheckCircle, X, Share2, Twitter, Facebook, MessageSquare } from 'lucide-react';
+import { TrendingUp, Zap, BrainCircuit, CheckCircle, X, Share2, Send, MessageSquare } from 'lucide-react';
 import { marked } from 'marked';
 
 const App = () => {
@@ -217,8 +217,8 @@ const BlogCard = ({ blog }) => {
       <div className="text-xs text-slate-400 mb-6 leading-relaxed opacity-80 line-clamp-4" dangerouslySetInnerHTML={{ __html: marked.parse(blog.summary) }} />
       <div className="flex items-center justify-between pt-6 border-t border-white/5">
         <div className="flex gap-3">
-          <ShareBtn icon={<Twitter className="w-4 h-4" />} />
-          <ShareBtn icon={<Facebook className="w-4 h-4" />} />
+          <ShareBtn icon={<Send className="w-4 h-4" />} />
+          <ShareBtn icon={<Share2 className="w-4 h-4" />} />
           <ShareBtn icon={<MessageSquare className="w-4 h-4" />} />
         </div>
         <span className={`text-[10px] font-black uppercase text-${color}-400 px-3 py-1.5 bg-${color}-500/10 rounded-lg border border-${color}-500/20 tracking-[0.1em]`}>
