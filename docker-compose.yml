@@ -1,35 +1,53 @@
-services:
-  tradingagents:
-    build: .
-    env_file:
-      - .env
-    volumes:
-      - tradingagents_data:/home/appuser/.tradingagents
-    tty: true
-    stdin_open: true
+version: '3.8'
 
+services:
+  # Ollama for local LLM inference
   ollama:
     image: ollama/ollama:latest
+    container_name: trading-ollama
     volumes:
       - ollama_data:/root/.ollama
-    profiles:
-      - ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
 
-  tradingagents-ollama:
-    build: .
-    env_file:
-      - .env
+  # Backend API using FastAPI
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: trading-api
     environment:
-      - LLM_PROVIDER=ollama
+      - OLLAMA_HOST=http://ollama:11434
+      - TRADINGAGENTS_CACHE_DIR=/app/data/cache
+      - TRADINGAGENTS_RESULTS_DIR=/app/data/results
     volumes:
-      - tradingagents_data:/home/appuser/.tradingagents
+      - .:/app
+      - trading_data:/app/data
+    ports:
+      - "8000:8000"
     depends_on:
-      - ollama
-    tty: true
-    stdin_open: true
-    profiles:
-      - ollama
+      ollama:
+        condition: service_healthy
+    restart: always
+
+  # Frontend Dashboard
+  frontend:
+    image: nginx:alpine
+    container_name: trading-frontend
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    ports:
+      - "3001:80"
+    depends_on:
+      - api
+    restart: always
 
 volumes:
-  tradingagents_data:
   ollama_data:
+  trading_data:

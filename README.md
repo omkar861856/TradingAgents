@@ -119,17 +119,31 @@ Install the package and its dependencies:
 pip install .
 ```
 
-### Docker
+### Docker & Web Dashboard
 
-Alternatively, run with Docker:
+For the best experience, use the new Dockerized Web Dashboard:
+
 ```bash
-cp .env.example .env  # add your API keys
-docker compose run --rm tradingagents
+# 1. Start the stack (Ollama, API, and Frontend)
+docker-compose up -d
+
+# 2. Setup Ollama models (run once)
+./scripts/setup_ollama.sh
+
+# 3. Access the Dashboard
+# Open http://localhost:3001 in your browser
 ```
 
-For local models with Ollama:
+The Web Dashboard features:
+- **Interactive Ticker Analysis**: Single-click multi-agent research.
+*   **Local Inference**: Powered by Ollama (Qwen3, GLM-4.7).
+- **Beautiful UI**: Modern, glassmorphic design for professional analytics.
+- **Persistent Storage**: Analysis logs and model weights are saved in Docker volumes.
+
+### Local models with Ollama:
 ```bash
-docker compose --profile ollama run --rm tradingagents-ollama
+docker-compose up -d ollama
+./scripts/setup_ollama.sh
 ```
 
 ### Required APIs
