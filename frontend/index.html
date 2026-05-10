@@ -7,13 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background: #020203; color: #f8fafc; overflow-x: hidden; }
         .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
         .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Layout */
         .app-container { max-width: 1800px; margin: 0 auto; display: flex; gap: 24px; padding: 0 24px; }
         .ad-left { width: 160px; flex-shrink: 0; position: sticky; top: 100px; height: fit-content; }
         .ad-right { width: 300px; flex-shrink: 0; position: sticky; top: 100px; height: fit-content; }
@@ -22,31 +22,32 @@
         .ad-box { position: relative; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.4); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.03); }
         .ad-tag { position: absolute; top: 4px; left: 6px; font-size: 8px; color: #475569; z-index: 10; font-weight: 800; letter-spacing: 0.1em; }
 
-        /* Typography Formatting */
-        .prose-custom h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1.5rem; color: #fff; letter-spacing: -0.05em; line-height: 1; }
+        .prose-custom h1 { font-size: 3rem; font-weight: 900; margin-bottom: 1.5rem; color: #fff; letter-spacing: -0.05em; line-height: 1; }
         .prose-custom h2 { font-size: 1.8rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; color: #38bdf8; }
         .prose-custom h3 { font-size: 1.3rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #94a3b8; }
         .prose-custom p { margin-bottom: 1rem; line-height: 1.7; color: #cbd5e1; font-size: 0.95rem; }
         .prose-custom ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: #94a3b8; }
         .prose-custom li { margin-bottom: 0.5rem; }
-        .prose-custom strong { color: #f1f5f9; font-weight: 700; }
-        
         .prose-custom table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: rgba(255,255,255,0.02); border-radius: 12px; overflow: hidden; }
-        .prose-custom th { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .prose-custom th { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
         .prose-custom td { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8; }
+
+        .section-market { border-top: 8px solid #38bdf8; background: rgba(56, 189, 248, 0.02); }
+        .section-sentiment { border-top: 8px solid #fbbf24; background: rgba(251, 191, 36, 0.02); }
+        .section-fundamental { border-top: 8px solid #10b981; background: rgba(16, 185, 129, 0.02); }
+        .section-verdict { border-top: 8px solid #818cf8; background: rgba(129, 140, 248, 0.05); }
 
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
-        
-        .nav-link { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; transition: all 0.3s; }
-        .nav-link.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+        .nav-link { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; transition: all 0.3s; cursor: pointer; }
+        .nav-link.active { color: #38bdf8; }
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Top Header -->
+    <!-- Header -->
     <header class="w-full glass sticky top-0 z-[100] px-8 py-5 border-b border-white/5">
         <div class="max-w-[1800px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
@@ -56,7 +57,7 @@
                 <h1 class="text-2xl font-black tracking-tighter uppercase">ECOTRON <span class="text-sky-500">TRADING</span></h1>
             </div>
             <nav class="flex gap-10">
-                <a href="#" onclick="switchView('dashboard')" class="nav-link active" id="nav-dashboard">Dashboard</a>
+                <a onclick="switchView('dashboard')" class="nav-link active" id="nav-dashboard">Dashboard</a>
             </nav>
         </div>
     </header>
@@ -65,14 +66,9 @@
         <!-- Left Ads -->
         <aside class="ad-left hidden xl:block">
             <div class="ad-box" style="width: 160px; height: 600px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
+                <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
-            </div>
-            <div class="ad-box" style="width: 160px; height: 300px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
-                <script>atOptions = { 'key' : '7f1e1c3d11870c7899ccce329cdd56e9', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };</script>
-                <script src="https://developdomicile.com/7f1e1c3d11870c7899ccce329cdd56e9/invoke.js"></script>
             </div>
         </aside>
 
@@ -80,81 +76,64 @@
         <main class="main-content">
             <!-- Hero Top Ad -->
             <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
-                <span class="ad-tag">SPONSORED</span>
+                <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
             </div>
 
-            <!-- Support Banner -->
-            <div class="mb-10 p-6 glass rounded-2xl border-l-4 border-l-sky-500 shadow-xl flex items-center justify-between gap-6">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-sky-500/10 rounded-xl"><i data-lucide="heart" class="text-sky-400 w-6 h-6"></i></div>
-                    <div>
-                        <h4 class="text-xs font-black uppercase tracking-widest text-white">Neural Intelligence Support</h4>
-                        <p class="text-[11px] text-slate-400 leading-tight">Clicking ads helps maintain our high-performance GPU clusters for free public use.</p>
-                    </div>
-                </div>
-            </div>
-
             <div id="view-dashboard" class="view-section space-y-12">
-                <!-- Dashboard Content -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <!-- Left Engine -->
+                    <!-- Engine -->
                     <div class="lg:col-span-5 space-y-6">
                         <div class="glass p-8 rounded-3xl border border-white/5 shadow-2xl space-y-8">
                             <h2 class="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-                                <i data-lucide="settings" class="text-sky-500"></i> Analysis Engine
+                                <i data-lucide="zap" class="text-sky-500"></i> Neural Core
                             </h2>
                             <div class="space-y-4">
-                                <div>
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Asset Identifier</label>
-                                    <input id="ticker" type="text" placeholder="BTC, NVDA, TSLA" class="w-full bg-slate-900 border border-white/5 rounded-2xl px-6 py-5 text-xl font-bold focus:outline-none focus:ring-2 focus:ring-sky-500/50 uppercase tracking-tighter">
-                                </div>
-                                <div id="user-key-section" class="hidden animate-fade">
-                                    <input id="api-key" type="password" placeholder="OpenAI Key (sk-...)" class="w-full bg-slate-900 border border-white/5 rounded-2xl px-5 py-4 text-xs font-mono">
-                                </div>
-                                <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-black font-black py-5 rounded-2xl shadow-xl shadow-sky-500/20 uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-transform hover:scale-[1.02]">
-                                    <span>Initiate Neural Scan</span>
-                                    <i data-lucide="zap" class="w-4 h-4"></i>
+                                <input id="ticker" type="text" placeholder="BTC, NVDA, TSLA" class="w-full bg-slate-900 border border-white/5 rounded-2xl px-6 py-5 text-xl font-bold focus:outline-none focus:ring-2 focus:ring-sky-500/50 uppercase">
+                                <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-black font-black py-5 rounded-2xl shadow-xl shadow-sky-500/20 uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all hover:scale-[1.02]">
+                                    <span>Initiate Analysis</span>
+                                    <i data-lucide="activity" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Status Monitor -->
-                        <div class="glass p-6 rounded-3xl space-y-4">
-                            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Analysts</h3>
+                        <div class="glass p-6 rounded-3xl">
+                            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Neural Health</h3>
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl text-xs font-bold">
-                                    <span class="flex items-center gap-3"><i data-lucide="cpu" class="w-4 h-4 text-sky-500"></i> Technical Core</span>
-                                    <span class="text-[10px] text-sky-400">ONLINE</span>
-                                </div>
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl text-xs font-bold">
-                                    <span class="flex items-center gap-3"><i data-lucide="message-square" class="w-4 h-4 text-sky-500"></i> Sentiment Hub</span>
-                                    <span class="text-[10px] text-sky-400">ONLINE</span>
+                                    <span class="flex items-center gap-3"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i> Protocols</span>
+                                    <span class="text-[10px] text-emerald-400">SECURE</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Results -->
+                    <!-- Results -->
                     <div class="lg:col-span-7">
                         <div id="empty-state" class="glass h-[400px] rounded-3xl flex flex-col items-center justify-center text-center p-10 border-2 border-dashed border-white/5">
-                            <i id="brain-icon" data-lucide="activity" class="w-16 h-16 text-slate-800 mb-6"></i>
+                            <i id="brain-icon" data-lucide="brain-circuit" class="w-16 h-16 text-slate-800 mb-6"></i>
                             <div id="loading-spinner" class="hidden w-16 h-16 border-4 border-sky-500/10 border-t-sky-500 rounded-full animate-spin"></div>
-                            <p class="text-xs font-bold text-slate-600 uppercase tracking-widest">Awaiting Neural Sequence</p>
+                            <p class="text-xs font-bold text-slate-600 uppercase tracking-widest mt-4">Neural Stream Offline</p>
                         </div>
 
                         <div id="result-summary" class="hidden space-y-8 animate-fade">
-                            <!-- Infographics -->
+                            <!-- Summary Infographic -->
                         </div>
                         
+                        <div id="navigation-bridge" class="hidden animate-fade">
+                            <button id="view-report-btn" class="w-full bg-white text-black font-black py-4 rounded-2xl uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-sky-400 transition-colors">
+                                View Full Intelligence Report
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
                         <div id="log-container" class="hidden mt-8 glass p-6 rounded-3xl">
                             <div id="logs" class="space-y-1.5 font-mono text-[10px] text-slate-500 max-h-40 overflow-y-auto custom-scrollbar"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Intelligence Feed -->
                 <div class="pt-12 border-t border-white/5">
                     <h2 class="text-2xl font-black uppercase tracking-tighter mb-8">Intelligence <span class="text-sky-500">Feed</span></h2>
                     <div id="blog-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -164,7 +143,7 @@
             <!-- Detail View -->
             <div id="view-blog-detail" class="view-section hidden animate-fade">
                 <button onclick="switchView('dashboard')" class="mb-10 flex items-center gap-3 text-xs font-black text-slate-500 hover:text-sky-500 transition-colors uppercase tracking-widest">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Feed
                 </button>
                 <div id="blog-detail-content" class="prose-custom pb-20"></div>
             </div>
@@ -173,45 +152,33 @@
         <!-- Right Ads -->
         <aside class="ad-right hidden lg:block">
             <div class="ad-box" style="width: 300px; height: 250px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
+                <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };</script>
                 <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
-            </div>
-            <div class="ad-box" style="width: 320px; height: 50px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
-                <script>atOptions = { 'key' : 'f60abc3ad258484f0670ebbbace5b661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };</script>
-                <script src="https://developdomicile.com/f60abc3ad258484f0670ebbbace5b661/invoke.js"></script>
-            </div>
-            <div class="ad-box w-full" style="min-height: 200px;">
-                <span class="ad-tag">SPONSORED</span>
-                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
-                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
             </div>
         </aside>
     </div>
 
-    <!-- Bottom Ad Footer -->
-    <footer class="w-full glass py-12 mt-20 border-t border-white/5 flex flex-col items-center gap-8">
+    <!-- Footer Ad -->
+    <footer class="w-full glass py-12 mt-20 border-t border-white/5 flex flex-col items-center">
         <div class="ad-box" style="width: 728px; height: 90px;">
             <span class="ad-tag">ADVERTISEMENT</span>
             <script>atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };</script>
             <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
         </div>
-        <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">&copy; 2026 Ecotron Advanced Trading Systems. Hosted on ecotron.co.in</p>
     </footer>
 
     <script>
-        // Core Logic
         const analyzeBtn = document.getElementById('analyze-btn');
         const tickerInput = document.getElementById('ticker');
         const emptyState = document.getElementById('empty-state');
         const resultSummary = document.getElementById('result-summary');
+        const navBridge = document.getElementById('navigation-bridge');
+        const viewReportBtn = document.getElementById('view-report-btn');
         const logsDiv = document.getElementById('logs');
         const logContainer = document.getElementById('log-container');
-        const brainIcon = document.getElementById('brain-icon');
         const loadingSpinner = document.getElementById('loading-spinner');
-        const userKeySection = document.getElementById('user-key-section');
-        const apiKeyInput = document.getElementById('api-key');
+        const brainIcon = document.getElementById('brain-icon');
 
         let userId = localStorage.getItem('trading_user_id') || 'u_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('trading_user_id', userId);
@@ -219,29 +186,20 @@
         function switchView(id) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-' + id).classList.remove('hidden');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
             if (id === 'dashboard') fetchBlogs();
-        }
-
-        async function checkBalance() {
-            try {
-                const res = await fetch('/health');
-                const data = await res.json();
-                if (data.system_balance_low) userKeySection.classList.remove('hidden');
-            } catch (e) {}
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         analyzeBtn.addEventListener('click', async () => {
             const ticker = tickerInput.value.trim().toUpperCase();
             if (!ticker) return;
-
+            
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = `<span>Synthesizing...</span>`;
             brainIcon.classList.add('hidden');
             loadingSpinner.classList.remove('hidden');
             resultSummary.classList.add('hidden');
+            navBridge.classList.add('hidden');
             logContainer.classList.add('hidden');
             logsDiv.innerHTML = '';
 
@@ -249,48 +207,35 @@
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        ticker, 
-                        user_id: userId,
-                        api_key: apiKeyInput.value.trim() || null
-                    })
+                    body: JSON.stringify({ ticker, user_id: userId })
                 });
                 const { task_id } = await response.json();
                 pollStatus(task_id);
-            } catch (e) {
-                alert("Core Sync Error");
-                resetUI();
-            }
+            } catch (e) { resetUI(); }
         });
 
         async function pollStatus(taskId) {
             const interval = setInterval(async () => {
                 const res = await fetch(`/status/${taskId}`);
                 const data = await res.json();
-                
-                if (data.logs) {
-                    logsDiv.innerHTML = data.logs.map(l => `<div class="flex gap-2"><span>[LOG]</span><span>${l}</span></div>`).join('');
-                }
-
+                if (data.logs) logsDiv.innerHTML = data.logs.map(l => `<div class="flex gap-2"><span>•</span><span>${l}</span></div>`).join('');
                 if (data.status === 'completed') {
                     clearInterval(interval);
                     resetUI();
                     renderInfographics(data.result, 'result-summary');
                     resultSummary.classList.remove('hidden');
+                    navBridge.classList.remove('hidden');
                     emptyState.classList.add('hidden');
                     logContainer.classList.remove('hidden');
+                    viewReportBtn.onclick = () => openBlog(data.result.blog_id);
                     fetchBlogs();
-                } else if (data.status === 'failed') {
-                    clearInterval(interval);
-                    alert("Sequence Failed: " + data.error);
-                    resetUI();
                 }
             }, 2000);
         }
 
         function resetUI() {
             analyzeBtn.disabled = false;
-            analyzeBtn.innerHTML = `<span>Initiate Neural Scan</span><i data-lucide="zap" class="w-4 h-4"></i>`;
+            analyzeBtn.innerHTML = `<span>Initiate Analysis</span><i data-lucide="activity" class="w-4 h-4"></i>`;
             loadingSpinner.classList.add('hidden');
             brainIcon.classList.remove('hidden');
             lucide.createIcons();
@@ -303,34 +248,19 @@
             
             container.innerHTML = `
                 <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-${color}-500 shadow-2xl relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-12 relative z-10">
+                    <div class="flex justify-between items-start mb-10 relative z-10">
                         <div>
                             <h2 class="text-7xl font-black tracking-tighter mb-2 leading-none">${data.ticker}</h2>
-                            <p class="text-slate-500 text-xs font-black uppercase tracking-widest">Neural Multi-Agent Report</p>
+                            <p class="text-slate-500 text-xs font-black uppercase tracking-widest">Neural Consensus Signal</p>
                         </div>
-                        <div class="px-12 py-6 bg-${color}-500 text-black rounded-3xl text-4xl font-black uppercase tracking-tighter shadow-xl shadow-${color}-500/30">${data.decision}</div>
+                        <div class="px-12 py-6 bg-${color}-500 text-black rounded-3xl text-4xl font-black uppercase shadow-xl shadow-${color}-500/30">${data.decision}</div>
                     </div>
-                    
-                    <div class="space-y-12 relative z-10">
-                        <div class="p-8 bg-white/5 rounded-3xl border border-white/5">
-                            <h3 class="text-[10px] font-black text-sky-400 uppercase tracking-widest mb-4">Master Thesis</h3>
-                            <div class="text-xl text-slate-100 font-bold leading-tight prose-custom">${marked.parse(data.final_trade_decision || data.summary)}</div>
-                        </div>
-
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            ${renderStat('Alpha', '88%', 'award')}
-                            ${renderStat('Volatility', 'Low', 'shield')}
-                            ${renderStat('Volume', 'Heavy', 'bar-chart')}
-                            ${renderStat('Score', '96', 'star')}
-                        </div>
+                    <div class="p-8 bg-white/5 rounded-3xl border border-white/5 relative z-10">
+                        <div class="text-xl text-slate-100 font-bold leading-tight prose-custom">${marked.parse(data.final_trade_decision || data.summary || '')}</div>
                     </div>
                 </div>
             `;
             lucide.createIcons();
-        }
-
-        function renderStat(lbl, val, icon) {
-            return `<div class="glass p-5 rounded-2xl text-center"><i data-lucide="${icon}" class="w-4 h-4 text-slate-500 mx-auto mb-3"></i><div class="text-[9px] font-black text-slate-500 uppercase mb-1">${lbl}</div><div class="text-sm font-black text-white">${val}</div></div>`;
         }
 
         async function fetchBlogs() {
@@ -345,11 +275,7 @@
                             <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
                         </div>
                         <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tight line-clamp-2">${b.title}</h3>
-                        <div class="text-xs text-slate-500 leading-relaxed line-clamp-3 mb-6 prose-custom">${marked.parse(b.summary)}</div>
-                        <div class="flex items-center justify-between pt-6 border-t border-white/5">
-                            <span class="text-[10px] font-black uppercase text-slate-600">ANALYST CORE</span>
-                            <span class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision}</span>
-                        </div>
+                        <div class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision} SIGNAL</div>
                     </div>
                 `).join('');
                 lucide.createIcons();
@@ -368,38 +294,68 @@
                 <div class="space-y-12">
                     <div class="space-y-6">
                         <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black tracking-widest uppercase">Research Sequence [${b.ticker}]</span>
-                        <h1 class="text-7xl md:text-9xl font-black tracking-tighter leading-[0.85] uppercase">${b.title}</h1>
+                        <h1 class="text-7xl md:text-8xl font-black tracking-tighter uppercase leading-none">${b.title}</h1>
                         <div class="text-2xl text-slate-400 font-bold leading-tight max-w-4xl prose-custom">${marked.parse(b.summary)}</div>
                     </div>
 
-                    <div id="blog-visual"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="glass p-10 rounded-[40px] space-y-6"><canvas id="alphaChart"></canvas></div>
+                        <div class="glass p-10 rounded-[40px] space-y-6"><canvas id="sentimentChart"></canvas></div>
+                    </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                        <div class="glass p-10 rounded-[40px] border-t-8 border-t-sky-500/50 space-y-6">
-                            <h3 class="text-2xl font-black uppercase tracking-tighter text-sky-400">Market Vector</h3>
+                        <div class="glass p-10 rounded-[40px] section-market space-y-6">
+                            <h3 class="text-2xl font-black uppercase tracking-tighter text-sky-400">Market Dynamics</h3>
                             <div class="prose-custom">${marked.parse(b.content.market)}</div>
                         </div>
-                        <div class="glass p-10 rounded-[40px] border-t-8 border-t-amber-500/50 space-y-6">
+                        <div class="glass p-10 rounded-[40px] section-sentiment space-y-6">
                             <h3 class="text-2xl font-black uppercase tracking-tighter text-amber-400">Sentiment Intelligence</h3>
                             <div class="prose-custom">${marked.parse(b.content.sentiment || b.content.news)}</div>
                         </div>
-                        <div class="glass p-10 rounded-[40px] border-t-8 border-t-emerald-500/50 space-y-6">
+                        <div class="glass p-10 rounded-[40px] section-fundamental space-y-6">
                             <h3 class="text-2xl font-black uppercase tracking-tighter text-emerald-400">Fundamental Backbone</h3>
                             <div class="prose-custom">${marked.parse(b.content.fundamentals)}</div>
                         </div>
-                        <div class="glass p-10 rounded-[40px] border-t-8 border-t-indigo-500/50 space-y-6 bg-indigo-500/5">
+                        <div class="glass p-10 rounded-[40px] section-verdict space-y-6">
                             <h3 class="text-2xl font-black uppercase tracking-tighter text-indigo-400">Final Verdict</h3>
-                            <div class="text-xl font-bold text-slate-200 prose-custom">${marked.parse(b.summary)}</div>
+                            <div class="prose-custom font-bold text-xl">${marked.parse(b.summary)}</div>
                         </div>
                     </div>
                 </div>
             `;
-            renderInfographics({ticker: b.ticker, decision: b.decision, summary: b.summary}, 'blog-visual');
+            
+            setTimeout(() => {
+                new Chart(document.getElementById('alphaChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Alpha', 'Noise'],
+                        datasets: [{
+                            data: [b.metrics?.alpha || 85, 100 - (b.metrics?.alpha || 85)],
+                            backgroundColor: ['#38bdf8', '#1e293b'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { plugins: { legend: { display: false } }, cutout: '80%' }
+                });
+                new Chart(document.getElementById('sentimentChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Positive', 'Neutral', 'Negative'],
+                        datasets: [{
+                            data: [b.metrics?.sentiment || 70, 20, 10],
+                            backgroundColor: ['#10b981', '#64748b', '#ef4444']
+                        }]
+                    },
+                    options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+                });
+            }, 100);
+            
             lucide.createIcons();
         }
 
-        checkBalance();
-        fetchBlogs();
+        const urlParams = new URLSearchParams(window.location.search);
+        const blogId = urlParams.get('blog');
+        if (blogId) openBlog(blogId); else fetchBlogs();
     </script>
 </body>
 </html>
