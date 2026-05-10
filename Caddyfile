@@ -4,7 +4,12 @@ ecotron.co.in, www.ecotron.co.in {
 
     # API Proxy (preserve path)
     handle /analyze* {
-        reverse_proxy api:8000
+        reverse_proxy api:8000 {
+            transport http {
+                read_timeout 600s
+                write_timeout 600s
+            }
+        }
     }
 
     encode gzip

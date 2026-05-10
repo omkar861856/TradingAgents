@@ -20,6 +20,11 @@ services:
     container_name: trading-ollama
     volumes:
       - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - trading-network
     restart: always
@@ -30,7 +35,7 @@ services:
       dockerfile: Dockerfile.api
     container_name: trading-api
     environment:
-      - OLLAMA_HOST=http://trading-ollama:11434
+      - OLLAMA_HOST=http://ollama:11434
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
@@ -38,6 +43,9 @@ services:
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
     volumes:
       - trading_data:/app/data
+    depends_on:
+      ollama:
+        condition: service_healthy
     networks:
       - trading-network
     restart: always
