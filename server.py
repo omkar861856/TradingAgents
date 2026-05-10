@@ -12,6 +12,10 @@ import secrets
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from starlette.requests import Request
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.default_config import DEFAULT_CONFIG
 
@@ -21,14 +25,28 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="TradingAgents API")
 
+# Rate limiting
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
 
 # MongoDB setup
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/tradingagents")
@@ -169,7 +187,13 @@ async def health():
     }
 
 @app.post("/analyze")
-async def analyze(request: AnalysisRequest, background_tasks: BackgroundTasks):
+@limiter.limit("5/minute")
+async def analyze(request: AnalysisRequest, req: Request, background_tasks: BackgroundTasks):
+    # Basic Sanitization
+    ticker = request.ticker.strip().upper()
+    if not ticker.isalnum() or len(ticker) > 10:
+        raise HTTPException(status_code=400, detail="Invalid ticker")
+    
     task_id = f"task_{datetime.now().strftime('%H%M%S%f')}"
     _tasks[task_id] = {
         "status": "pending",
@@ -535,6 +559,21 @@ async def get_blog_page(blog_id: str):
                 <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 250, 'width' : 160, 'params' : {{}} }};</script>
                 <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
+            </div>
+        </aside>
+
+        <main class="flex-grow min-w-0 max-w-[1100px]">
+            <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
+                <span class="ad-tag">SPONSORED</span>
+                <script>atOptions = {{ 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {{}} }};</script>
+                <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
+            </div>
+
+            <div class="space-y-12 prose-custom">
+                <div>
+                    <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-xs font-black uppercase">Intelligence Report [{blog['ticker']}]</span>
+                    <h1 class="text-7xl font-black tracking-tighter uppercase mt-6">{blog['title']}</h1>
+                    <div id="summary-content" class="text-2xl text-slate-400 font-bold leading-tight"></div>
                 </div>
 
                 <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{active_color}-500">
@@ -610,6 +649,19 @@ async def get_blog_page(blog_id: str):
                 </div>
             </div>
         </main>
+
+        <aside class="hidden xl:block w-[300px] flex-shrink-0 sticky top-[120px] h-fit">
+            <div class="ad-box" style="width: 300px; height: 250px;">
+                <span class="ad-tag">ADVERTISEMENT</span>
+                <script>atOptions = {{ 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {{}} }};</script>
+                <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
+            </div>
+            <div class="ad-box" style="width: 300px; height: 600px; margin-top: 20px;">
+                <span class="ad-tag">SPONSORED</span>
+                <script>atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 300, 'params' : {{}} }};</script>
+                <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
+            </div>
+        </aside>
     </div>
 
     <script>
