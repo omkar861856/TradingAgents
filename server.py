@@ -773,4 +773,10 @@ async def get_blog_page(blog_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    try:
+        logger.info("Starting API server...")
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+    except Exception as e:
+        logger.critical(f"API Server crashed during startup: {e}")
+        import traceback
+        traceback.print_exc()

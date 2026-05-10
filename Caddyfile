@@ -1,4 +1,7 @@
 ecotron.co.in, www.ecotron.co.in {
+    # Main App Proxy
+    reverse_proxy trading-frontend:80
+
     # API Proxy (preserve path)
     handle /analyze* {
         reverse_proxy api:8000 {
@@ -36,11 +39,6 @@ ecotron.co.in, www.ecotron.co.in {
 
     handle /static* {
         reverse_proxy api:8000
-    }
-
-    # Main App Proxy (Catch-all)
-    handle {
-        reverse_proxy trading-frontend:80
     }
 
     encode gzip
