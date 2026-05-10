@@ -402,6 +402,23 @@ async def user_detail(user_id: str, username: str = Depends(get_current_username
     """
     return html_content
 
+@app.get("/sitemap.xml")
+async def get_sitemap():
+    urls = [
+        "<url><loc>https://ecotron.co.in/</loc><priority>1.0</priority></url>",
+        "<url><loc>https://ecotron.co.in/admin</loc><priority>0.1</priority></url>"
+    ]
+    
+    cursor = blogs_collection.find({}, {"_id": 1})
+    async for blog in cursor:
+        urls.append(f"<url><loc>https://ecotron.co.in/blog/{blog['_id']}</loc><priority>0.8</priority></url>")
+        
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    {"".join(urls)}
+</urlset>"""
+    return Response(content=xml, media_type="application/xml")
+
 @app.get("/blog/{blog_id}", response_class=HTMLResponse)
 async def get_blog_page(blog_id: str):
     from bson import ObjectId
