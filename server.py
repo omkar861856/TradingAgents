@@ -54,6 +54,10 @@ class AnalysisRequest(BaseModel):
 async def root():
     return {"message": "TradingAgents API is running"}
 
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
 @app.post("/analyze")
 async def analyze(request: AnalysisRequest):
     try:
