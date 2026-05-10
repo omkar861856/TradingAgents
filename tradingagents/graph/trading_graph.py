@@ -132,6 +132,11 @@ class TradingAgentsGraph:
     def _get_provider_kwargs(self) -> Dict[str, Any]:
         """Get provider-specific kwargs for LLM client creation."""
         kwargs = {}
+        
+        # Pass api_key if provided in config (e.g. from server request)
+        if "api_key" in self.config:
+            kwargs["api_key"] = self.config["api_key"]
+
         provider = self.config.get("llm_provider", "").lower()
 
         if provider == "google":

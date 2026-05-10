@@ -269,6 +269,12 @@
         const providerSelect = document.getElementById('provider');
         const apiKeyInput = document.getElementById('api-key');
 
+        // Load saved keys
+        const savedProvider = localStorage.getItem('trading_provider');
+        const savedKey = localStorage.getItem('trading_api_key');
+        if (savedProvider) providerSelect.value = savedProvider;
+        if (savedKey) apiKeyInput.value = savedKey;
+
         analyzeBtn.addEventListener('click', async () => {
             const ticker = tickerInput.value.trim().toUpperCase();
             if (!ticker) return;
@@ -276,10 +282,14 @@
             const provider = providerSelect.value;
             const apiKey = apiKeyInput.value.trim();
 
-            if (provider !== 'ollama' && !apiKey) {
+            if (!apiKey) {
                 alert(`Please enter your ${provider} API key for fast cloud inference.`);
                 return;
             }
+
+            // Save for next time
+            localStorage.setItem('trading_provider', provider);
+            localStorage.setItem('trading_api_key', apiKey);
 
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = `<span>Initializing...</span>`;
