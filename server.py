@@ -24,7 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global graph instance (lazy initialized)
+# Global task storage
+_tasks: Dict[str, Any] = {}
 _graph = None
 
 def get_graph(config_overrides: Optional[Dict[str, Any]] = None):
@@ -59,10 +60,24 @@ async def health():
     return {"status": "healthy"}
 
 @app.post("/analyze")
-async def analyze(request: AnalysisRequest):
+async def analyze(request: AnalysisRequest, background_tasks: BackgroundTasks):
+    task_id = f"task_{datetime.now().strftime('%H%M%S%f')}"
+    _tasks[task_id] = {
+        "status": "pending",
+        "ticker": request.ticker,
+        "logs": ["Initializing research agents..."],
+        "result": None
+    }
+    
+    background_tasks.add_task(run_analysis_task, task_id, request)
+    return {"task_id": task_id}
+
+async def run_analysis_task(task_id: str, request: AnalysisRequest):
     try:
-        trade_date = request.date or datetime.now().strftime("%Y-%m-%d")
+        _tasks[task_id]["status"] = "processing"
+        _tasks[task_id]["logs"].append(f"Fetching market data for {request.ticker}...")
         
+        trade_date = request.date or datetime.now().strftime("%Y-%m-%d")
         config_overrides = {
             "llm_provider": request.llm_provider,
             "deep_think_llm": request.deep_think_llm,
@@ -71,13 +86,13 @@ async def analyze(request: AnalysisRequest):
         
         graph = get_graph(config_overrides)
         
-        # In a real app, we'd use WebSockets to stream events.
-        # For now, we'll run it and return the final result.
-        # We can add a "stream" endpoint later.
+        _tasks[task_id]["logs"].append("Coordinating expert analysts (Technical, Sentiment, News)...")
+        # In a more complex setup, we'd hook into the graph to get real-time node logs.
+        # For now, we simulate the sequence to keep the UI alive.
         
         final_state, decision = graph.propagate(request.ticker, trade_date)
         
-        return {
+        _tasks[task_id]["result"] = {
             "ticker": request.ticker,
             "date": trade_date,
             "decision": decision,
@@ -89,9 +104,18 @@ async def analyze(request: AnalysisRequest):
             },
             "final_trade_decision": final_state.get("final_trade_decision")
         }
+        _tasks[task_id]["status"] = "completed"
+        _tasks[task_id]["logs"].append("Analysis finalized. Generating signal...")
     except Exception as e:
-        logger.error(f"Analysis failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Task {task_id} failed: {str(e)}")
+        _tasks[task_id]["status"] = "failed"
+        _tasks[task_id]["error"] = str(e)
+
+@app.get("/status/{task_id}")
+async def get_status(task_id: str):
+    if task_id not in _tasks:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return _tasks[task_id]
 
 if __name__ == "__main__":
     import uvicorn

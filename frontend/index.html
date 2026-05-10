@@ -112,6 +112,16 @@
 
                 <!-- Results Display -->
                 <div class="lg:col-span-7 space-y-6">
+                    <!-- Neural Log Stream -->
+                    <div id="log-container" class="glass p-6 rounded-2xl hidden mb-6">
+                        <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i data-lucide="terminal" class="w-4 h-4"></i>
+                            Neural Log Stream
+                        </h3>
+                        <div id="logs" class="space-y-2 font-mono text-[11px] text-sky-300/70 max-h-[200px] overflow-y-auto custom-scrollbar">
+                        </div>
+                    </div>
+
                     <div id="result-summary" class="glass p-8 rounded-2xl hidden opacity-0 transition-all duration-500">
                         <div class="flex justify-between items-start mb-6">
                             <div>
@@ -187,7 +197,17 @@
         const emptyState = document.getElementById('empty-state');
         const loadingSpinner = document.getElementById('loading-spinner');
         const resultSummary = document.getElementById('result-summary');
+        const logContainer = document.getElementById('log-container');
+        const logsDiv = document.getElementById('logs');
         
+        function addLog(msg) {
+            const div = document.createElement('div');
+            div.className = 'flex gap-2';
+            div.innerHTML = `<span class="text-slate-600">[${new Date().toLocaleTimeString()}]</span><span>${msg}</span>`;
+            logsDiv.appendChild(div);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
         function updateProgress(step, status = 'loading') {
             const container = document.getElementById('agent-status');
             const steps = {
@@ -234,24 +254,14 @@
             if (!ticker) return;
 
             analyzeBtn.disabled = true;
-            analyzeBtn.innerHTML = `<span>Analysing...</span>`;
+            analyzeBtn.innerHTML = `<span>Initializing...</span>`;
             loadingSpinner.classList.remove('hidden');
             resultSummary.classList.add('hidden');
+            logContainer.classList.remove('hidden');
             emptyState.classList.remove('hidden');
+            logsDiv.innerHTML = '';
             updateProgress('reset');
             
-            const steps = ['tech', 'sent', 'news', 'risk', 'final'];
-            let currentStep = 0;
-            const progressInterval = setInterval(() => {
-                if (currentStep > 0) updateProgress(steps[currentStep-1], 'done');
-                if (currentStep < steps.length) {
-                    updateProgress(steps[currentStep], 'active');
-                    currentStep++;
-                } else {
-                    clearInterval(progressInterval);
-                }
-            }, 3000);
-
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
@@ -263,24 +273,67 @@
                         quick_think_llm: 'llama3.1:8b'
                     })
                 });
+                
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                clearInterval(progressInterval);
-                steps.forEach(s => updateProgress(s, 'done'));
-                displayResults(data);
+                const { task_id } = await response.json();
+                
+                pollStatus(task_id);
             } catch (error) {
                 console.error(error);
-                clearInterval(progressInterval);
-                alert("Analysis failed. This usually happens if the backend is starting up or Ollama is busy. Please try again in a few seconds.");
-            } finally {
-                analyzeBtn.disabled = false;
-                analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
-                lucide.createIcons();
+                alert("Failed to start analysis. Please try again.");
+                resetUI();
             }
         });
 
+        async function pollStatus(taskId) {
+            const pollInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/status/${taskId}`);
+                    const data = await res.json();
+                    
+                    // Update logs
+                    if (data.logs) {
+                        logsDiv.innerHTML = '';
+                        data.logs.forEach(msg => addLog(msg));
+                    }
+
+                    // Update UI progress (simulated based on log count for visual feedback)
+                    const logCount = data.logs.length;
+                    if (logCount >= 1) updateProgress('tech', 'active');
+                    if (logCount >= 2) updateProgress('tech', 'done');
+                    if (logCount >= 2) updateProgress('sent', 'active');
+                    if (logCount >= 3) updateProgress('sent', 'done');
+                    if (logCount >= 3) updateProgress('news', 'active');
+                    if (logCount >= 4) updateProgress('news', 'done');
+                    if (logCount >= 4) updateProgress('risk', 'active');
+
+                    if (data.status === 'completed') {
+                        clearInterval(pollInterval);
+                        ['risk', 'final'].forEach(s => updateProgress(s, 'done'));
+                        displayResults(data.result);
+                        analyzeBtn.disabled = false;
+                        analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
+                    } else if (data.status === 'failed') {
+                        clearInterval(pollInterval);
+                        alert(`Analysis failed: ${data.error}`);
+                        resetUI();
+                    }
+                } catch (e) {
+                    console.error("Polling error:", e);
+                }
+            }, 2000);
+        }
+
+        function resetUI() {
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
+            loadingSpinner.classList.add('hidden');
+            logContainer.classList.add('hidden');
+        }
+
         function displayResults(data) {
             emptyState.classList.add('hidden');
+            logContainer.classList.add('hidden');
             resultSummary.classList.remove('hidden');
             setTimeout(() => { resultSummary.classList.remove('opacity-0'); }, 10);
             document.getElementById('result-ticker').innerText = data.ticker;
