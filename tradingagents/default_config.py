@@ -12,9 +12,9 @@ DEFAULT_CONFIG = {
     # Pending entries are never pruned. None disables rotation entirely.
     "memory_log_max_entries": None,
     # LLM settings
-    "llm_provider": "ollama",
-    "deep_think_llm": "llama3.1:8b",
-    "quick_think_llm": "llama3.1:8b",
+    "llm_provider": "openai",
+    "deep_think_llm": "gpt-4o",
+    "quick_think_llm": "gpt-4o-mini",
     "max_tokens": 4096,
     "temperature": 0.1,
     # When None, each provider's client falls back to its own default endpoint

@@ -21,7 +21,7 @@ ecotron.co.in, www.ecotron.co.in {
         reverse_proxy api:8000
     }
 
-    handle /blog/* {
+    handle /api/blog-data* {
         reverse_proxy api:8000
     }
 

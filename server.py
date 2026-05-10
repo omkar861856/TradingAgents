@@ -13,10 +13,16 @@ import secrets
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
+from bson import ObjectId
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.default_config import DEFAULT_CONFIG
 
@@ -50,7 +56,10 @@ async def security_headers(request: Request, call_next):
     return response
 
 # MongoDB setup
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/tradingagents")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/tradingagents")
+# Check if running inside Docker (simple check)
+if os.path.exists("/.dockerenv") or os.getenv("DOCKER_CONTAINER"):
+    MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/tradingagents")
 mongo_client = AsyncIOMotorClient(MONGO_URI)
 db = mongo_client.get_default_database()
 activity_collection = db.activity
@@ -88,33 +97,11 @@ async def startup_db_client():
                     },
                     "decision": "BULLISH",
                     "timestamp": datetime.now() - timedelta(days=2),
-                    "user_id": "system_admin"
-                },
-                {
-                    "ticker": "TECH",
-                    "title": "How Multi-Agent Systems Mirror Real-World Trading Firms",
-                    "summary": "Discover how Ecotron uses a swarm of specialized agents to evaluate market conditions and inform high-conviction trading decisions.",
-                    "content": {
-                        "market": "The Analyst Team provides raw data processing, while the Risk Management team ensures capital preservation.",
-                        "sentiment": "Sentiment agents scour social media and news to gauge the 'wisdom of the crowd' with pinpoint accuracy.",
-                        "fundamentals": "The Portfolio Manager makes the final call, ensuring a balanced and researched approach to every trade."
-                    },
-                    "decision": "NEUTRAL",
-                    "timestamp": datetime.now() - timedelta(days=1),
-                    "user_id": "system_admin"
-                },
-                {
-                    "ticker": "STRATEGY",
-                    "title": "Optimizing Your Strategy with Neural Intelligence",
-                    "summary": "Learn how to configure Ecotron's neural weights to match your personal risk profile and trading style.",
-                    "content": {
-                        "market": "The Strategy view allows you to adjust agent weights, prioritizing technical indicators or news sentiment as needed.",
-                        "news": "Neural Intelligence Active: Our system is constantly learning from market movements to refine its predictive capabilities.",
-                        "fundamentals": "Integrated risk protocols like the Kelly Criterion help you size positions for long-term growth."
-                    },
-                    "decision": "BUY",
-                    "timestamp": datetime.now(),
-                    "user_id": "system_admin"
+                    "user_id": "system_admin",
+                    "agent_status": [
+                        {"team": "Analyst Team", "agents": ["Market Analyst", "Social Analyst"]},
+                        {"team": "Trading Team", "agents": ["Trader"]}
+                    ]
                 }
             ]
             await blogs_collection.insert_many(initial_blogs)
@@ -155,10 +142,6 @@ class AnalysisRequest(BaseModel):
     api_key: Optional[str] = None
     user_id: Optional[str] = "anonymous"
 
-@app.get("/")
-async def root():
-    return {"message": "TradingAgents API is running"}
-
 @app.get("/health")
 async def health():
     mongo_status = "connected"
@@ -175,28 +158,28 @@ async def health():
 
 @app.post("/analyze")
 @limiter.limit("5/minute")
-async def analyze(request: AnalysisRequest, req: Request, background_tasks: BackgroundTasks):
-    ticker = request.ticker.strip().upper()
+async def analyze(request: Request, data: AnalysisRequest, background_tasks: BackgroundTasks):
+    ticker = data.ticker.strip().upper()
     if not ticker.isalnum() or len(ticker) > 10:
         raise HTTPException(status_code=400, detail="Invalid ticker")
     
     task_id = f"task_{datetime.now().strftime('%H%M%S%f')}"
     _tasks[task_id] = {
         "status": "pending",
-        "ticker": request.ticker,
+        "ticker": data.ticker,
         "logs": ["Initializing research agents..."],
         "result": None
     }
     
-    request.llm_provider = "openai"
-    request.deep_think_llm = "gpt-4o"
-    request.quick_think_llm = "gpt-4o"
+    data.llm_provider = "openai"
+    data.deep_think_llm = "gpt-4o"
+    data.quick_think_llm = "gpt-4o"
     
-    if not request.api_key:
-        request.api_key = os.getenv("OPENAI_API_KEY")
+    if not data.api_key:
+        data.api_key = os.getenv("OPENAI_API_KEY")
 
-    background_tasks.add_task(run_analysis_task, task_id, request)
-    background_tasks.add_task(log_activity, request, task_id)
+    background_tasks.add_task(run_analysis_task, task_id, data)
+    background_tasks.add_task(log_activity, data, task_id)
     return {"task_id": task_id}
 
 async def log_activity(request: AnalysisRequest, task_id: str):
@@ -287,7 +270,7 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
             {"$set": {"status": "completed", "completed_at": datetime.now()}}
         )
     except Exception as e:
-        logger.error(f"Task {task_id} failed: {str(e)}")
+        logger.error(f"Task {task_id} failed with exception: {str(e)}", exc_info=True)
         _tasks[task_id]["status"] = "failed"
         _tasks[task_id]["error"] = str(e)
         await activity_collection.update_one(
@@ -314,6 +297,19 @@ async def get_status(task_id: str):
     if task_id not in _tasks:
         raise HTTPException(status_code=404, detail="Task not found")
     return _tasks[task_id]
+
+@app.get("/api/blog-data/{blog_id}")
+async def get_blog_data(blog_id: str):
+    try:
+        doc = await blogs_collection.find_one({"_id": ObjectId(blog_id)})
+        if not doc:
+            raise HTTPException(status_code=404, detail="Blog not found")
+        doc["_id"] = str(doc["_id"])
+        doc["timestamp"] = doc["timestamp"].isoformat()
+        return doc
+    except Exception as e:
+        logger.error(f"Failed to fetch blog data: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(username: str = Depends(get_current_username)):
@@ -369,7 +365,7 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
         </body>
     </html>
     """
-    return html_content
+    return HTMLResponse(content=html_content)
 
 @app.get("/admin/user/{user_id}", response_class=HTMLResponse)
 async def user_detail(user_id: str, username: str = Depends(get_current_username)):
@@ -391,195 +387,41 @@ async def user_detail(user_id: str, username: str = Depends(get_current_username
         <body><a href="/admin" class="back">&larr; Back to Users</a><h1 style="color: #38bdf8; margin-top: 10px;">Activity Report</h1><p style="font-family: monospace; color: #64748b; font-size: 12px; margin-bottom: 30px;">ID: {user_id}</p><table><thead><tr><th>Timestamp</th><th>Ticker</th><th>Status</th><th>Task ID</th></tr></thead><tbody>{"".join(history_html)}</tbody></table></body>
     </html>
     """
-    return html_content
+    return HTMLResponse(content=html_content)
+
+@app.get("/robots.txt")
+async def get_robots():
+    content = "User-agent: *\nDisallow: /admin\nSitemap: https://ecotron.co.in/sitemap.xml"
+    return Response(content=content, media_type="text/plain")
 
 @app.get("/sitemap.xml")
 async def get_sitemap():
-    urls = ["<url><loc>https://ecotron.co.in/</loc><priority>1.0</priority></url>"]
-    cursor = blogs_collection.find({}, {"_id": 1})
+    # Exclude admin and internal paths
+    urls = [
+        "<url><loc>https://ecotron.co.in/</loc><lastmod>2026-05-10</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>"
+    ]
+    cursor = blogs_collection.find({}, {"_id": 1, "timestamp": 1})
     async for blog in cursor:
-        urls.append(f"<url><loc>https://ecotron.co.in/blog/{blog['_id']}</loc><priority>0.8</priority></url>")
-    xml = f"""<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{"".join(urls)}</urlset>"""
+        lastmod = blog["timestamp"].strftime("%Y-%m-%d")
+        urls.append(f"<url><loc>https://ecotron.co.in/blog/{blog['_id']}</loc><lastmod>{lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>")
+    
+    xml = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{"".join(urls)}</urlset>'
     return Response(content=xml, media_type="application/xml")
 
-@app.get("/blog/{blog_id}", response_class=HTMLResponse)
-async def get_blog_page(blog_id: str):
-    from bson import ObjectId
-    try:
-        blog = await blogs_collection.find_one({"_id": ObjectId(blog_id)})
-        if not blog:
-            return HTMLResponse(content="Blog not found", status_code=404)
-            
-        decision = blog['decision'].upper()
-        color_map = {"BUY": "emerald", "OVERWEIGHT": "sky", "HOLD": "amber", "UNDERWEIGHT": "orange", "SELL": "rose"}
-        active_color = "sky"
-        for key, val in color_map.items():
-            if key in decision:
-                active_color = val
-                break
+@app.get("/{path:path}")
+async def catch_all(request: Request, path: str):
+    if path.startswith("api/") or path.startswith("static/") or "." in path:
+        return Response(status_code=404)
+    
+    index_path = os.path.join("frontend", "dist", "index.html")
+    if not os.path.exists(index_path):
+        index_path = os.path.join("static", "index.html")
         
-        # Prepare agent status rows safely
-        agent_rows = ""
-        for team in blog.get('agent_status', []):
-            team_name = team['team']
-            agents = ", ".join(team['agents'])
-            agent_rows += f"""
-                <tr class='border-b border-white/[0.02]'>
-                    <td class='py-5 px-4 font-bold text-sky-500'>{team_name}</td>
-                    <td class='py-5 px-4 text-xs font-medium'>{agents}</td>
-                    <td class='py-5 px-4'><span class='text-emerald-500 font-black uppercase text-[10px] bg-emerald-500/10 px-3 py-1 rounded-full'>[SYNTHESIZED]</span></td>
-                </tr>
-            """
-
-        html = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{blog['title']} | Ecotron Neural Intelligence</title>
-    <script src="https://developdomicile.com/df/82/c8/df82c8c994f99d184cf5b5fe083c54df.js"></script>
-    <link href="/static/dist.css" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>body {{ font-family: 'Outfit', sans-serif; }}</style>
-</head>
-<body>
-    <header class="w-full glass sticky top-0 z-[100] px-10 py-6 border-b border-white/5">
-        <div class="max-w-[1800px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-5">
-                <div class="w-12 h-12 bg-sky-500 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(14,165,233,0.3)]">
-                    <i data-lucide="trending-up" class="text-black w-7 h-7"></i>
-                </div>
-                <h1 class="text-3xl font-black uppercase tracking-tighter cursor-pointer" onclick="window.location.href='/'">ECOTRON <span class="text-sky-500 text-glow-sky">TRADING</span></h1>
-            </div>
-            <a href="/" class="text-[11px] font-black uppercase text-slate-500 hover:text-sky-500 transition-colors tracking-widest bg-white/5 px-6 py-3 rounded-xl border border-white/5">Back to Terminal</a>
-        </div>
-    </header>
-
-    <div class="max-w-[1800px] mx-auto w-full px-6 py-12">
-        <div class="main-layout items-start">
-            <aside class="space-y-6 hidden xl:block sticky top-32">
-                <div class="ad-native-container" style="height: 600px; width: 300px;">
-                    <span class="ad-label">Neural Network Sponsor</span>
-                    <script type="text/javascript">atOptions = {{ 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 300, 'params' : {{}} }};</script>
-                    <script type="text/javascript" src="//developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
-                </div>
-            </aside>
-
-            <main class="tool-section space-y-16">
-                <div class="ad-native-container mx-auto mb-10" style="width: 728px; height: 90px;">
-                    <span class="ad-label">Strategic Node Ad</span>
-                    <script type="text/javascript">atOptions = {{ 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {{}} }};</script>
-                    <script type="text/javascript" src="//developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
-                </div>
-
-                <div class="space-y-12">
-                    <div class="space-y-6 text-center">
-                        <span class="px-4 py-2 bg-sky-500/10 text-sky-400 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border border-sky-500/20">Research Intelligence Report [{blog['ticker']}]</span>
-                        <h1 class="text-7xl font-black tracking-tighter uppercase leading-none">{blog['title']}</h1>
-                        <div id="summary-content" class="text-xl text-slate-400 font-bold leading-relaxed mt-10 max-w-4xl mx-auto"></div>
-                    </div>
-
-                    <div class="glass-card p-12 border-l-[16px] border-l-{active_color}-500 shadow-2xl relative overflow-hidden">
-                        <div class="flex justify-between items-start mb-12 relative z-10">
-                            <div>
-                                <h2 class="text-7xl font-black tracking-tighter m-0 leading-none">{blog['ticker']}</h2>
-                                <div class="flex gap-4 mt-10">
-                                    <a href="#" class="w-12 h-12 flex items-center justify-center bg-white/5 text-slate-400 rounded-2xl hover:text-sky-400 border border-white/5 transition-all"><i class="fa-brands fa-twitter"></i></a>
-                                    <a href="#" class="w-12 h-12 flex items-center justify-center bg-white/5 text-slate-400 rounded-2xl hover:text-sky-400 border border-white/5 transition-all"><i class="fa-brands fa-facebook-f"></i></a>
-                                </div>
-                            </div>
-                            <div class="px-10 py-5 bg-{active_color}-500 text-black rounded-3xl text-3xl font-black uppercase shadow-xl shadow-{active_color}-500/30">{blog['decision']}</div>
-                        </div>
-                        <div id="verdict-content" class="text-xl text-slate-200 font-medium relative z-10 leading-relaxed"></div>
-                    </div>
-
-                    <div class="pt-16">
-                        <h2 class="text-3xl font-black uppercase tracking-tighter mb-12 flex items-center gap-4"><i data-lucide="layers" class="text-sky-500 w-8 h-8"></i> Neural synthesis mapping</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            <div class="glass p-10 rounded-[2.5rem] border border-white/5 space-y-6">
-                                <h3 class="text-xl font-black uppercase text-sky-400 m-0 tracking-[0.2em]">Market Analysis</h3>
-                                <div id="market-content" class="text-sm opacity-80 leading-relaxed max-h-96 overflow-y-auto custom-scrollbar"></div>
-                            </div>
-                            <div class="glass p-10 rounded-[2.5rem] border border-white/5 space-y-6">
-                                <h3 class="text-xl font-black uppercase text-amber-400 m-0 tracking-[0.2em]">Social & Sentiment</h3>
-                                <div id="sentiment-content" class="text-sm opacity-80 leading-relaxed max-h-96 overflow-y-auto custom-scrollbar"></div>
-                            </div>
-                            <div class="glass p-10 rounded-[2.5rem] border border-white/5 space-y-6">
-                                <h3 class="text-xl font-black uppercase text-emerald-400 m-0 tracking-[0.2em]">Fundamentals</h3>
-                                <div id="fundamentals-content" class="text-sm opacity-80 leading-relaxed max-h-96 overflow-y-auto custom-scrollbar"></div>
-                            </div>
-                            <div class="glass p-10 rounded-[2.5rem] border border-white/5 space-y-6">
-                                <h3 class="text-xl font-black uppercase text-rose-400 m-0 tracking-[0.2em]">Risk Assessment</h3>
-                                <div id="risk-content" class="text-sm opacity-80 leading-relaxed max-h-96 overflow-y-auto custom-scrollbar"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass-card p-12 border border-white/5">
-                        <h3 class="text-2xl font-black uppercase text-slate-500 mb-10 tracking-[0.3em]">Neural Agent Network Status</h3>
-                        <table class="w-full text-left">
-                            <thead><tr class="text-slate-600 uppercase text-[10px] font-black border-b border-white/5"><th class="pb-6 px-4">Deployment Team</th><th class="pb-6 px-4">Neural Agents</th><th class="pb-6 px-4">Verification</th></tr></thead>
-                            <tbody class="text-slate-300">
-                                {agent_rows}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="p-10 glass rounded-[40px] border-dashed border-2 border-white/5">
-                        <h3 class="text-xs font-black uppercase text-slate-500 mb-4">Academic Citation</h3>
-                        <pre class="text-[10px] text-slate-600 font-mono overflow-x-auto p-6 bg-black/40 rounded-2xl">{blog.get('citation', '')}</pre>
-                    </div>
-
-                    <div class="flex justify-center pt-10">
-                        <a href="https://wa.me/919321089065" target="_blank" class="flex items-center gap-4 px-8 py-4 bg-[#25D366]/10 text-[#25D366] rounded-full border border-[#25D366]/20 hover:bg-[#25D366] hover:text-white transition-all group">
-                            <i class="fa-brands fa-whatsapp text-2xl"></i>
-                            <div class="text-left"><p class="text-[10px] font-black uppercase tracking-widest opacity-60">Neural Support</p><p class="text-sm font-bold">Chat with Ecotron Engineers</p></div>
-                        </a>
-                    </div>
-                </div>
-            </main>
-
-            <aside class="space-y-6 hidden lg:block sticky top-32">
-                <div class="ad-native-container" style="height: 250px; width: 300px;">
-                    <span class="ad-label">Partner Intelligence</span>
-                    <script type="text/javascript">atOptions = {{ 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {{}} }};</script>
-                    <script type="text/javascript" src="//developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
-                </div>
-            </aside>
-        </div>
-    </div>
-
-    <footer class="w-full glass py-32 mt-20 border-t border-white/5 flex flex-col items-center gap-20 text-center px-10 relative overflow-hidden">
-        <div class="absolute inset-0 bg-sky-500/[0.03] blur-[150px] rounded-full translate-y-1/2"></div>
-        <div class="ad-native-container" style="height: 90px; width: 728px;">
-            <span class="ad-label">Infrastructure Sponsor</span>
-            <script type="text/javascript">atOptions = {{ 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {{}} }};</script>
-            <script type="text/javascript" src="//developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
-        </div>
-        <p class="text-slate-600 text-[10px] font-black uppercase tracking-[0.5em]">&copy; 2026 Ecotron Advanced Trading Systems. Proprietary multi-agent frameworks.</p>
-    </footer>
-
-    <script>
-        lucide.createIcons();
-        const bRaw = {json.dumps({'summary': blog['summary'], 'content': blog['content']})};
-        document.getElementById('summary-content').innerHTML = marked.parse(bRaw.summary || "");
-        document.getElementById('verdict-content').innerHTML = marked.parse(bRaw.content.get('verdict', bRaw.content.get('news', "")) || "");
-        document.getElementById('market-content').innerHTML = marked.parse(bRaw.content.market || "");
-        document.getElementById('sentiment-content').innerHTML = marked.parse(bRaw.content.news || "");
-        document.getElementById('fundamentals-content').innerHTML = marked.parse(bRaw.content.fundamentals || "");
-        document.getElementById('risk-content').innerHTML = marked.parse(bRaw.content.risk || "Neural analysis indicates standard volatility parameters.");
-    </script>
-</body>
-</html>
-"""
-        return HTMLResponse(content=html)
-    except Exception as e:
-        logger.error(f"Error rendering blog page: {e}")
-        return HTMLResponse(content=f"Error: {str(e)}", status_code=400)
+    if os.path.exists(index_path):
+        with open(index_path, "r") as f:
+            return HTMLResponse(content=f.read())
+    
+    return HTMLResponse(content="<h1>Ecotron Trading Platform</h1><p>Frontend not built. Please run npm run build.</p>")
 
 if __name__ == "__main__":
     import uvicorn
