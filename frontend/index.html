@@ -63,12 +63,6 @@
 
         <!-- Center Column: Main App -->
         <main class="main-app-center">
-            <!-- Native Banner -->
-            <div class="ad-container w-full mb-8" style="min-height: 100px;">
-                <span class="ad-label">SPONSORED CONTENT</span>
-                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
-                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
-            </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <!-- App Controls -->
@@ -88,12 +82,11 @@
                                 <div>
                                     <label class="block text-sm font-medium text-slate-400 mb-1.5">Intelligence Provider</label>
                                     <select id="provider" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all text-sm">
-                                        <option value="ollama">Ollama (Local - Llama 3.1)</option>
+                                        <option value="google" selected>Google (Fast - Gemini 2.0)</option>
                                         <option value="openai">OpenAI (Fast - GPT-4o)</option>
-                                        <option value="google">Google (Fast - Gemini 2.0)</option>
                                     </select>
                                 </div>
-                                <div id="api-key-group" class="hidden">
+                                <div id="api-key-group">
                                     <label class="block text-sm font-medium text-slate-400 mb-1.5">Personal API Key</label>
                                     <input id="api-key" type="password" placeholder="sk-..." class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all text-sm font-mono">
                                     <p class="text-[10px] text-slate-500 mt-1">Key is sent securely for this session only.</p>
@@ -178,6 +171,12 @@
                 </script>
                 <script src="https://developdomicile.com/f60abc3ad258484f0670ebbbace5b661/invoke.js"></script>
             </div>
+            <!-- Sponsored Sidebar Content -->
+            <div class="ad-container w-full" style="min-height: 100px;">
+                <span class="ad-label">SPONSORED CONTENT</span>
+                <script async="async" data-cfasync="false" src="https://developdomicile.com/bc5972dfd55ab0a5e10b6ee43572241a/invoke.js"></script>
+                <div id="container-bc5972dfd55ab0a5e10b6ee43572241a"></div>
+            </div>
             <div class="card glass p-6 rounded-2xl">
                 <h4 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-tighter">Market Pulse</h4>
                 <div class="space-y-3">
@@ -251,30 +250,24 @@
             if (!el) return;
             el.classList.remove('opacity-50');
             const statusEl = el.querySelector('span:last-child');
-            const iconEl = el.querySelector('i');
+            const iconEl = el.querySelector('i, svg');
             
             if (status === 'active') {
                 el.classList.add('bg-sky-500/10');
                 statusEl.innerText = 'Analyzing...';
                 statusEl.className = 'text-[10px] uppercase font-bold text-sky-400 animate-pulse';
-                iconEl.className = 'w-4 h-4 text-sky-400';
+                if (iconEl) iconEl.setAttribute('class', 'w-4 h-4 text-sky-400');
             } else if (status === 'done') {
                 el.classList.remove('bg-sky-500/10');
                 el.classList.add('bg-green-500/5');
                 statusEl.innerText = 'Completed';
                 statusEl.className = 'text-[10px] uppercase font-bold text-green-500';
-                iconEl.className = 'w-4 h-4 text-green-500';
+                if (iconEl) iconEl.setAttribute('class', 'w-4 h-4 text-green-500');
             }
         }
 
         const providerSelect = document.getElementById('provider');
-        const apiKeyGroup = document.getElementById('api-key-group');
         const apiKeyInput = document.getElementById('api-key');
-
-        providerSelect.addEventListener('change', () => {
-            const val = providerSelect.value;
-            apiKeyGroup.classList.toggle('hidden', val === 'ollama');
-        });
 
         analyzeBtn.addEventListener('click', async () => {
             const ticker = tickerInput.value.trim().toUpperCase();
