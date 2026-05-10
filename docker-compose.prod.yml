@@ -13,21 +13,6 @@ services:
       - trading-network
     restart: always
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: trading-ollama
-    volumes:
-      - ollama_data:/root/.ollama
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-    healthcheck:
-      test: ["CMD", "ollama", "list"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - trading-network
-    restart: always
 
   api:
     build:
@@ -35,7 +20,6 @@ services:
       dockerfile: Dockerfile.api
     container_name: trading-api
     environment:
-      - OLLAMA_HOST=http://trading-ollama:11434
       - MONGO_URI=mongodb://mongodb:27017/tradingagents
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
@@ -48,7 +32,6 @@ services:
     volumes:
       - trading_data:/app/data
     depends_on:
-      - ollama
       - mongodb
     networks:
       - trading-network
@@ -82,8 +65,7 @@ networks:
     driver: bridge
 
 volumes:
-  ollama_data:
-  trading_data:
-  mongo_data:
   caddy_data:
   caddy_config:
+  mongo_data:
+  trading_data:
