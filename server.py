@@ -242,7 +242,23 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
                 "alpha": 85 + (len(result["reports"]["market"]) % 15),
                 "sentiment": 60 + (len(result["reports"]["sentiment"]) % 30),
                 "fundamental": 50 + (len(result["reports"]["fundamentals"]) % 40)
-            }
+            },
+            "citation": """@misc{xiao2025tradingagentsmultiagentsllmfinancial,
+      title={TradingAgents: Multi-Agents LLM Financial Trading Framework}, 
+      author={Yijia Xiao and Edward Sun and Di Luo and Wei Wang},
+      year={2025},
+      eprint={2412.20138},
+      archivePrefix={arXiv},
+      primaryClass={q-fin.TR},
+      url={https://arxiv.org/abs/2412.20138}, 
+}""",
+            "agent_status": [
+                {"team": "Analyst Team", "agents": ["Market Analyst", "Social Analyst", "News Analyst", "Fundamentals Analyst"]},
+                {"team": "Research Team", "agents": ["Bull Researcher", "Bear Researcher", "Research Manager"]},
+                {"team": "Trading Team", "agents": ["Trader"]},
+                {"team": "Risk Management", "agents": ["Risky Analyst", "Neutral Analyst", "Safe Analyst"]},
+                {"team": "Portfolio Management", "agents": ["Portfolio Manager"]}
+            ]
         }
         res = await blogs_collection.insert_one(blog_post)
         result["blog_id"] = str(res.inserted_id)
@@ -512,6 +528,29 @@ async def get_blog_page(blog_id: str):
                         <h3 class="text-2xl font-black uppercase text-amber-400">Sentiment Intelligence</h3>
                         <div id="sentiment-content"></div>
                     </div>
+                </div>
+
+                <div class="glass p-10 rounded-[40px] border border-white/5">
+                    <h3 class="text-2xl font-black uppercase text-slate-500 mb-8">Neural Agent Network Status</h3>
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-slate-500 uppercase text-[10px] font-black border-bottom border-white/5">
+                                <th class="pb-4">Team</th>
+                                <th class="pb-4">Agent</th>
+                                <th class="pb-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-slate-300">
+                            { "".join([f"<tr><td class='py-3 font-bold text-sky-500'>{team['team']}</td><td class='py-3'>{', '.join(team['agents'])}</td><td class='py-3'><span class='text-emerald-500 font-black uppercase text-[10px]'>[COMPLETED]</span></td></tr>" for team in blog.get('agent_status', [])]) }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="p-10 glass rounded-[40px] border-dashed border-2 border-white/5">
+                    <h3 class="text-xs font-black uppercase text-slate-500 mb-4">Academic Citation</h3>
+                    <pre class="text-[10px] text-slate-600 font-mono overflow-x-auto p-6 bg-black/40 rounded-2xl">
+{blog.get('citation', '')}
+                    </pre>
                 </div>
             </div>
         </main>
