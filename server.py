@@ -30,6 +30,7 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/tradingagents")
 mongo_client = AsyncIOMotorClient(MONGO_URI)
 db = mongo_client.get_default_database()
 activity_collection = db.activity
+blogs_collection = db.blogs
 
 # Global task storage
 _tasks: Dict[str, Any] = {}
@@ -135,8 +136,24 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
             },
             "final_trade_decision": final_state.get("final_trade_decision")
         }
+
+        # Generate Dynamic Blog
+        blog_post = {
+            "ticker": request.ticker,
+            "title": f"Deep Dive: Why {request.ticker} is a {result['decision']} Today",
+            "summary": result["final_trade_decision"][:300] + "...",
+            "content": result["reports"],
+            "decision": result["decision"],
+            "timestamp": datetime.now(),
+            "user_id": request.user_id
+        }
+        await blogs_collection.insert_one(blog_post)
+        
+        # Update Task Result with Blog Info
+        result["blog_id"] = str(blog_post["_id"])
+        _tasks[task_id]["result"] = result
         _tasks[task_id]["status"] = "completed"
-        _tasks[task_id]["logs"].append("Analysis finalized. Generating signal...")
+        _tasks[task_id]["logs"].append("Blog generated and published to Neural Feed.")
         
         # Update MongoDB activity
         await activity_collection.update_one(
@@ -153,6 +170,20 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
             {"task_id": task_id},
             {"$set": {"status": "failed", "error": str(e), "failed_at": datetime.now()}}
         )
+
+@app.get("/blogs")
+async def get_latest_blogs(limit: int = 10):
+    try:
+        cursor = blogs_collection.find().sort("timestamp", -1).limit(limit)
+        blogs = []
+        async for doc in cursor:
+            doc["_id"] = str(doc["_id"])
+            doc["timestamp"] = doc["timestamp"].isoformat()
+            blogs.append(doc)
+        return blogs
+    except Exception as e:
+        logger.error(f"Failed to fetch blogs: {e}")
+        return []
 
 @app.get("/status/{task_id}")
 async def get_status(task_id: str):
