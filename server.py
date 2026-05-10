@@ -29,11 +29,19 @@ app.add_middleware(
 )
 
 # MongoDB setup
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/tradingagents")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/tradingagents")
 mongo_client = AsyncIOMotorClient(MONGO_URI)
 db = mongo_client.get_default_database()
 activity_collection = db.activity
 blogs_collection = db.blogs
+
+@app.on_event("startup")
+async def startup_db_client():
+    try:
+        await mongo_client.admin.command('ping')
+        logger.info("Successfully connected to MongoDB.")
+    except Exception as e:
+        logger.error(f"Could not connect to MongoDB: {e}")
 
 security = HTTPBasic()
 
