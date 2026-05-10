@@ -689,6 +689,25 @@ async def get_blog_page(blog_id: str):
         </aside>
     </div>
 
+            <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">&copy; 2026 Ecotron Advanced Trading Systems</p>
+        </div>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="fixed bottom-10 right-10 z-[300] glass p-6 rounded-3xl border-l-8 border-l-emerald-500 shadow-2xl notification-toast w-[400px]" style="transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); display: none;">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-emerald-500/20 text-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i data-lucide="check-circle" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-grow">
+                <h4 class="text-sm font-black uppercase text-white mb-1">Intelligence Scan Complete</h4>
+                <p id="toast-message" class="text-xs text-slate-400 leading-relaxed mb-4">Research report for <span class="text-white font-bold" id="toast-ticker">BTC</span> is now available in the feed.</p>
+                <button id="toast-view-btn" class="w-full bg-emerald-500 text-black font-black py-2 rounded-xl text-[10px] uppercase tracking-widest hover:bg-emerald-400 transition-colors">View Report Now</button>
+            </div>
+            <button onclick="hideToast()" class="text-slate-600 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
         const setHtml = (id, content) => {{
@@ -702,6 +721,46 @@ async def get_blog_page(blog_id: str):
         setHtml('sentiment-content', {repr(blog['content'].get('sentiment', blog['content'].get('news', '')))});
         setHtml('fundamentals-content', {repr(blog['content'].get('fundamentals', ''))});
         setHtml('risk-content', {repr(blog['summary'])});
+
+        // Global Task Poller for Blog Pages
+        let activeTaskId = localStorage.getItem('active_task_id');
+        const taskIndicator = document.getElementById('active-task-indicator');
+        const notificationToast = document.getElementById('notification-toast');
+        const toastTicker = document.getElementById('toast-ticker');
+        const toastViewBtn = document.getElementById('toast-view-btn');
+
+        function showToast(ticker, blogId) {{
+            toastTicker.innerText = ticker;
+            toastViewBtn.onclick = () => window.location.href = `/blog/${{blogId}}`;
+            notificationToast.style.display = 'block';
+            setTimeout(() => notificationToast.style.transform = 'translateX(0)', 100);
+            setTimeout(hideToast, 10000);
+        }}
+
+        function hideToast() {{
+            notificationToast.style.transform = 'translateX(120%)';
+            setTimeout(() => notificationToast.style.display = 'none', 500);
+        }}
+
+        if (activeTaskId) {{
+            if (taskIndicator) taskIndicator.classList.remove('hidden');
+            const interval = setInterval(async () => {{
+                try {{
+                    const res = await fetch(`/status/${{activeTaskId}}`);
+                    const data = await res.json();
+                    if (data.status === 'completed') {{
+                        clearInterval(interval);
+                        localStorage.removeItem('active_task_id');
+                        if (taskIndicator) taskIndicator.classList.add('hidden');
+                        showToast(localStorage.getItem('active_task_ticker'), data.result.blog_id);
+                    }} else if (data.status === 'failed') {{
+                        clearInterval(interval);
+                        localStorage.removeItem('active_task_id');
+                        if (taskIndicator) taskIndicator.classList.add('hidden');
+                    }}
+                } catch (e) {{}}
+            }}, 5000);
+        }}
     </script>
 </body>
 </html>
