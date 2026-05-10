@@ -36,7 +36,7 @@
                 </nav>
                 <div class="flex items-center gap-2 text-xs text-slate-500">
                     <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                    Llama 3 8B Active
+                    Llama 3.1 8B Active
                 </div>
             </div>
         </div>
@@ -85,7 +85,7 @@
                             </div>
                             <div class="p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl flex items-center gap-3">
                                 <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                <span class="text-xs text-sky-400 font-medium">Local Intelligence Active: Llama 3 8B</span>
+                                <span class="text-xs text-sky-400 font-medium">Local Intelligence Active: Llama 3.1 8B</span>
                             </div>
                             <button id="analyze-btn" class="w-full bg-sky-500 hover:bg-sky-400 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-sky-500/20 flex justify-center items-center gap-2">
                                 <span>Run Multi-Agent Research</span>
@@ -259,8 +259,8 @@
                     body: JSON.stringify({ 
                         ticker: ticker,
                         llm_provider: 'ollama',
-                        deep_think_llm: 'llama3:8b',
-                        quick_think_llm: 'llama3:8b'
+                        deep_think_llm: 'llama3.1:8b',
+                        quick_think_llm: 'llama3.1:8b'
                     })
                 });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
