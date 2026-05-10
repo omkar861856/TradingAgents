@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingAgents | AI Financial Intelligence</title>
+    <title>Ecotron Trading | AI Financial Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,9 +11,9 @@
         body { font-family: 'Inter', sans-serif; background: #050507; color: #f8fafc; overflow-x: hidden; }
         .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
         .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .ad-sidebar { width: 140px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.3s; }
+        .ad-sidebar { width: 140px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.3s; position: sticky; top: 120px; height: fit-content; }
         .ad-sidebar:hover { opacity: 1; }
-        .ad-sidebar-right { width: 300px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.3s; }
+        .ad-sidebar-right { width: 300px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.3s; position: sticky; top: 120px; height: fit-content; }
         .ad-sidebar-right:hover { opacity: 1; }
         .main-app-center { flex-grow: 1; min-width: 0; max-width: 1000px; }
         .ad-container { position: relative; margin-bottom: 1rem; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.2); }
@@ -31,7 +31,7 @@
                 <div class="p-2 bg-sky-500/20 rounded-lg">
                     <i data-lucide="trending-up" class="text-sky-400"></i>
                 </div>
-                <h1 class="text-2xl font-bold tracking-tight">Trading<span class="gradient-text">Agents</span></h1>
+                <h1 class="text-2xl font-bold tracking-tight">Ecotron <span class="gradient-text">Trading</span></h1>
             </div>
             <div class="flex items-center gap-6">
                 <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
@@ -41,7 +41,7 @@
                 </nav>
                 <div class="flex items-center gap-2 text-xs text-slate-500">
                     <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                    Llama 3.1 8B Active
+                    Neural Intelligence Active
                 </div>
             </div>
         </div>
@@ -169,6 +169,25 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Blog / Intelligence Feed -->
+            <div class="mt-16 border-t border-slate-800/50 pt-12">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold flex items-center gap-3">
+                            <i data-lucide="scroll-text" class="text-sky-400"></i>
+                            Neural Intelligence Feed
+                        </h2>
+                        <p class="text-slate-500 text-sm mt-1">Dynamically generated reports from recent AI research</p>
+                    </div>
+                    <button onclick="fetchBlogs()" class="text-xs text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh Feed
+                    </button>
+                </div>
+                <div id="blog-feed" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Blogs will be injected here -->
+                </div>
+            </div>
         </main>
 
         <!-- Right Column: Ads -->
@@ -220,7 +239,7 @@
             </script>
             <script src="https://developdomicile.com/d9b9196cf2814e58242076df2f21e5dc/invoke.js"></script>
         </div>
-        <p class="text-slate-600 text-xs mt-4">&copy; 2026 Ecotron Advanced Systems. Hosted on ecotron.co.in</p>
+        <p class="text-slate-600 text-xs mt-4">&copy; 2026 Ecotron Trading Advanced Systems. Hosted on ecotron.co.in</p>
     </footer>
 
     <script>
@@ -381,6 +400,7 @@
                         clearInterval(pollInterval);
                         ['risk', 'final'].forEach(s => updateProgress(s, 'done'));
                         displayResults(data.result);
+                        fetchBlogs(); // Refresh feed
                         analyzeBtn.disabled = false;
                         analyzeBtn.innerHTML = `<span>Run Multi-Agent Research</span><i data-lucide="zap" class="w-4 h-4"></i>`;
                     } else if (data.status === 'failed') {
@@ -426,6 +446,38 @@
             }
             lucide.createIcons();
         }
+
+        async function fetchBlogs() {
+            try {
+                const res = await fetch('/blogs');
+                const blogs = await res.json();
+                const container = document.getElementById('blog-feed');
+                if (blogs.length === 0) {
+                    container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-600">No intelligence reports published yet.</div>`;
+                    return;
+                }
+                container.innerHTML = blogs.map(blog => `
+                    <div class="glass p-6 rounded-2xl border-l-4 ${blog.decision.includes('BUY') ? 'border-l-green-500' : (blog.decision.includes('SELL') ? 'border-l-red-500' : 'border-l-yellow-500')} hover:translate-y-[-4px] transition-all cursor-pointer">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-[10px] font-black bg-slate-800 px-2 py-1 rounded text-sky-400 uppercase tracking-widest">${blog.ticker}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${new Date(blog.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <h3 class="text-sm font-bold mb-3 leading-tight line-clamp-2">${blog.title}</h3>
+                        <p class="text-[11px] text-slate-400 line-clamp-3 mb-4 leading-relaxed">${blog.summary}</p>
+                        <div class="flex items-center gap-2 text-[10px] font-bold ${blog.decision.includes('BUY') ? 'text-green-400' : (blog.decision.includes('SELL') ? 'text-red-400' : 'text-yellow-400')}">
+                            <i data-lucide="trending-up" class="w-3 h-3"></i>
+                            ${blog.decision} SIGNAL
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            } catch (e) {
+                console.error("Failed to fetch blogs", e);
+            }
+        }
+
+        // Initial load
+        fetchBlogs();
     </script>
 </body>
 </html>
