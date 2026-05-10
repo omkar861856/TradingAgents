@@ -39,11 +39,12 @@
         .prose-custom th { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
         .prose-custom td { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8; }
 
-        /* Masonry Layout */
-        .feed-columns { column-gap: 1.5rem; }
-        .feed-columns > div { break-inside: avoid; margin-bottom: 1.5rem; }
-        @media (min-width: 768px) { .feed-columns { column-count: 2; } }
-        @media (min-width: 1024px) { .feed-columns { column-count: 3; } }
+        /* Grid Layout */
+        .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+        .blog-card { height: 500px; display: flex; flex-direction: column; overflow: hidden; }
+        .card-summary { flex-grow: 1; overflow-y: auto; padding-right: 8px; }
+        .card-summary::-webkit-scrollbar { width: 4px; }
+        .card-summary::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
         .section-market { border-top: 8px solid #38bdf8; background: rgba(56, 189, 248, 0.02); }
         .section-sentiment { border-top: 8px solid #fbbf24; background: rgba(251, 191, 36, 0.02); }
@@ -58,7 +59,7 @@
         .nav-link { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; transition: all 0.3s; cursor: pointer; }
         .nav-link.active { color: #38bdf8; }
 
-        .share-btn { width: 32px; height: 32px; display: flex; items-center: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.05); color: #94a3b8; transition: all 0.2s; }
+        .share-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.05); color: #94a3b8; transition: all 0.2s; }
         .share-btn:hover { background: #38bdf8; color: #000; }
     </style>
 </head>
@@ -79,20 +80,18 @@
     </header>
 
     <div class="app-container mt-10 pb-20">
+        <!-- Left Ads -->
         <aside class="ad-left hidden xl:block">
             <div class="ad-box" style="width: 160px; height: 600px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = { 'key' : '419b347d315cd1215c1db06b7db000a5', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };</script>
                 <script src="https://developdomicile.com/419b347d315cd1215c1db06b7db000a5/invoke.js"></script>
             </div>
-            <div class="ad-box" style="width: 160px; height: 300px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
-                <script>atOptions = { 'key' : '7f1e1c3d11870c7899ccce329cdd56e9', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };</script>
-                <script src="https://developdomicile.com/7f1e1c3d11870c7899ccce329cdd56e9/invoke.js"></script>
-            </div>
         </aside>
 
+        <!-- Main Column -->
         <main class="main-content">
+            <!-- Hero Top Ad -->
             <div class="ad-box mx-auto" style="width: 468px; height: 60px;">
                 <span class="ad-tag">SPONSORED</span>
                 <script>atOptions = { 'key' : 'd9b9196cf2814e58242076df2f21e5dc', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };</script>
@@ -101,6 +100,7 @@
 
             <div id="view-dashboard" class="view-section space-y-12">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Engine -->
                     <div class="lg:col-span-5 space-y-6">
                         <div class="glass p-8 rounded-3xl border border-white/5 shadow-2xl space-y-8">
                             <h2 class="text-xl font-black uppercase tracking-tight flex items-center gap-3">
@@ -116,11 +116,12 @@
                         </div>
                     </div>
 
+                    <!-- Results -->
                     <div class="lg:col-span-7">
-                        <div id="empty-state" class="glass h-[400px] rounded-3xl flex flex-col items-center justify-center text-center p-10 border-2 border-dashed border-white/5">
-                            <i id="brain-icon" data-lucide="brain-circuit" class="w-16 h-16 text-slate-800 mb-6"></i>
-                            <div id="loading-spinner" class="hidden w-16 h-16 border-4 border-sky-500/10 border-t-sky-500 rounded-full animate-spin"></div>
-                            <p class="text-xs font-bold text-slate-600 uppercase tracking-widest mt-4">Neural Stream Offline</p>
+                        <div id="empty-state" class="glass h-[200px] rounded-3xl flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/5">
+                            <i id="brain-icon" data-lucide="brain-circuit" class="w-12 h-12 text-slate-800 mb-4"></i>
+                            <div id="loading-spinner" class="hidden w-12 h-12 border-4 border-sky-500/10 border-t-sky-500 rounded-full animate-spin"></div>
+                            <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Neural Stream Offline</p>
                         </div>
 
                         <div id="result-summary" class="hidden space-y-8 animate-fade"></div>
@@ -130,29 +131,22 @@
                                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
                         </div>
-                        <div id="log-container" class="hidden mt-8 glass p-6 rounded-3xl">
-                            <div id="logs" class="space-y-1.5 font-mono text-[10px] text-slate-500 max-h-40 overflow-y-auto custom-scrollbar"></div>
-                        </div>
                     </div>
                 </div>
 
-                <div class="pt-12 border-t border-white/5">
+                <div class="pt-8 border-t border-white/5">
                     <h2 class="text-2xl font-black uppercase tracking-tighter mb-8">Intelligence <span class="text-sky-500">Feed</span></h2>
-                    <div id="blog-feed" class="feed-columns"></div>
+                    <div id="blog-feed" class="feed-grid"></div>
                 </div>
             </div>
         </main>
 
+        <!-- Right Ads -->
         <aside class="ad-right hidden lg:block">
             <div class="ad-box" style="width: 300px; height: 250px;">
                 <span class="ad-tag">ADVERTISEMENT</span>
                 <script>atOptions = { 'key' : 'eca2cd8a7fd561c8d9ddc9b4e1302ac9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };</script>
                 <script src="https://developdomicile.com/eca2cd8a7fd561c8d9ddc9b4e1302ac9/invoke.js"></script>
-            </div>
-            <div class="ad-box" style="width: 320px; height: 50px;">
-                <span class="ad-tag">ADVERTISEMENT</span>
-                <script>atOptions = { 'key' : 'f60abc3ad258484f0670ebbbace5b661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };</script>
-                <script src="https://developdomicile.com/f60abc3ad258484f0670ebbbace5b661/invoke.js"></script>
             </div>
         </aside>
     </div>
@@ -164,7 +158,6 @@
             <script>atOptions = { 'key' : 'c25ecd0c0fe9d93f6cf66f0016cbd198', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };</script>
             <script src="https://developdomicile.com/c25ecd0c0fe9d93f6cf66f0016cbd198/invoke.js"></script>
         </div>
-        
         <div class="max-w-4xl w-full px-6 text-center space-y-4">
             <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">Built on the TradingAgents Framework</p>
             <pre class="text-[9px] text-slate-800 font-mono text-left bg-black/20 p-6 rounded-2xl overflow-x-auto border border-white/5">@misc{xiao2025tradingagentsmultiagentsllmfinancial,
@@ -177,21 +170,8 @@
       url={https://arxiv.org/abs/2412.20138}, 
 }</pre>
         </div>
-        
         <p class="text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">&copy; 2026 Ecotron Advanced Trading Systems</p>
     </footer>
-
-    <div id="research-popup" class="fixed inset-0 z-[200] flex items-center justify-center p-6 hidden">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="document.getElementById('research-popup').classList.add('hidden')"></div>
-        <div class="glass max-w-md w-full p-10 rounded-[40px] border border-white/10 relative z-10 text-center space-y-6 animate-fade">
-            <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i data-lucide="coffee" class="w-10 h-10 text-sky-400"></i>
-            </div>
-            <h3 class="text-2xl font-black uppercase tracking-tighter text-white">Sit Back & Relax</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">Our neural agents are now synthesizing your request. Grab a coffee or explore the featured ads—it directly helps us fund the high-performance GPU clusters.</p>
-            <button onclick="document.getElementById('research-popup').classList.add('hidden')" class="w-full py-4 bg-sky-500 hover:bg-sky-400 text-black font-black rounded-2xl uppercase tracking-widest text-[10px] transition-all">Understood, Proceed</button>
-        </div>
-    </div>
 
     <script>
         const analyzeBtn = document.getElementById('analyze-btn');
@@ -200,8 +180,6 @@
         const resultSummary = document.getElementById('result-summary');
         const navBridge = document.getElementById('navigation-bridge');
         const viewReportBtn = document.getElementById('view-report-btn');
-        const logsDiv = document.getElementById('logs');
-        const logContainer = document.getElementById('log-container');
         const loadingSpinner = document.getElementById('loading-spinner');
         const brainIcon = document.getElementById('brain-icon');
 
@@ -224,10 +202,6 @@
             loadingSpinner.classList.remove('hidden');
             resultSummary.classList.add('hidden');
             navBridge.classList.add('hidden');
-            logContainer.classList.add('hidden');
-            logsDiv.innerHTML = '';
-            document.getElementById('research-popup').classList.remove('hidden');
-            lucide.createIcons();
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
@@ -243,7 +217,6 @@
             const interval = setInterval(async () => {
                 const res = await fetch(`/status/${taskId}`);
                 const data = await res.json();
-                if (data.logs) logsDiv.innerHTML = data.logs.map(l => `<div class="flex gap-2"><span>•</span><span>${l}</span></div>`).join('');
                 if (data.status === 'completed') {
                     clearInterval(interval);
                     resetUI();
@@ -251,7 +224,6 @@
                     resultSummary.classList.remove('hidden');
                     navBridge.classList.remove('hidden');
                     emptyState.classList.add('hidden');
-                    logContainer.classList.remove('hidden');
                     viewReportBtn.onclick = () => openBlog(data.result.blog_id);
                     fetchBlogs();
                 }
@@ -272,16 +244,16 @@
                          (data.decision.includes('SELL') || data.decision.includes('BEAR') ? 'rose' : 'sky');
             
             container.innerHTML = `
-                <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-${color}-500 shadow-2xl relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-10 relative z-10">
+                <div class="glass p-8 rounded-[40px] border-l-[16px] border-l-${color}-500 shadow-2xl relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-6 relative z-10">
                         <div>
-                            <h2 class="text-7xl font-black tracking-tighter mb-2 leading-none">${data.ticker}</h2>
-                            <p class="text-slate-500 text-xs font-black uppercase tracking-widest">Neural Consensus Signal</p>
+                            <h2 class="text-5xl font-black tracking-tighter mb-2 leading-none">${data.ticker}</h2>
+                            <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Neural Consensus</p>
                         </div>
-                        <div class="px-12 py-6 bg-${color}-500 text-black rounded-3xl text-4xl font-black uppercase shadow-xl shadow-${color}-500/30">${data.decision}</div>
+                        <div class="px-8 py-4 bg-${color}-500 text-black rounded-2xl text-2xl font-black uppercase">${data.decision}</div>
                     </div>
-                    <div class="p-8 bg-white/5 rounded-3xl border border-white/5 relative z-10">
-                        <div class="text-xl text-slate-100 font-bold leading-tight prose-custom">${marked.parse(data.final_trade_decision || data.summary || '')}</div>
+                    <div class="p-6 bg-white/5 rounded-3xl border border-white/5 relative z-10 overflow-y-auto max-h-[200px] custom-scrollbar">
+                        <div class="text-sm text-slate-100 font-bold leading-relaxed prose-custom">${marked.parse(data.final_trade_decision || data.summary || '')}</div>
                     </div>
                 </div>
             `;
@@ -297,16 +269,16 @@
                     const url = encodeURIComponent(`https://ecotron.co.in/blog/${b._id}`);
                     const text = encodeURIComponent(b.title);
                     return `
-                    <div class="glass p-8 rounded-3xl border border-white/5 hover:border-sky-500/40 transition-all cursor-pointer group">
-                        <div onclick="openBlog('${b._id}')">
-                            <div class="flex justify-between items-center mb-6">
+                    <div class="blog-card glass p-8 rounded-3xl border border-white/5 hover:border-sky-500/40 transition-all cursor-pointer group">
+                        <div onclick="openBlog('${b._id}')" class="flex-grow flex flex-col min-h-0">
+                            <div class="flex justify-between items-center mb-4">
                                 <span class="px-3 py-1 bg-slate-900 rounded-lg text-[10px] font-black text-sky-500 uppercase tracking-widest border border-white/5">${b.ticker}</span>
                                 <span class="text-[10px] text-slate-600 font-bold uppercase">${new Date(b.timestamp).toLocaleDateString()}</span>
                             </div>
                             <h3 class="text-lg font-black leading-tight mb-4 group-hover:text-sky-400 transition-colors uppercase tracking-tight">${b.title}</h3>
-                            <div class="text-[11px] text-slate-400 prose-custom mb-6">${marked.parse(b.summary)}</div>
+                            <div class="card-summary text-[11px] text-slate-400 prose-custom mb-6">${marked.parse(b.summary)}</div>
                         </div>
-                        <div class="flex items-center justify-between pt-6 border-t border-white/5">
+                        <div class="flex items-center justify-between pt-6 border-t border-white/5 flex-shrink-0">
                             <div class="flex gap-2">
                                 <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="share-btn bg-[#1DA1F2]/10 text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white transition-all"><i class="fa-brands fa-twitter"></i></a>
                                 <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="share-btn bg-[#4267B2]/10 text-[#4267B2] hover:bg-[#4267B2] hover:text-white transition-all"><i class="fa-brands fa-facebook-f"></i></a>
@@ -331,9 +303,7 @@
             alert("Report link copied to clipboard!");
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const blogId = urlParams.get('blog');
-        if (blogId) openBlog(blogId); else fetchBlogs();
+        fetchBlogs();
     </script>
 </body>
 </html>
