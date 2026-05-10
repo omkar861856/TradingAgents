@@ -1,5 +1,8 @@
 FROM python:3.13-slim
 
+# Install the uv binary from the official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
+
 WORKDIR /app
 
 # Install system dependencies
@@ -9,14 +12,13 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv for fast dependency management
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.cargo/bin:${PATH}"
+# Add uv to path
+ENV PATH="/uv/bin:${PATH}"
 
 # Copy project files
 COPY . .
 
-# Install dependencies including the local package
+# Install dependencies
 RUN uv pip install --system -e .
 RUN uv pip install --system fastapi uvicorn python-dotenv
 
