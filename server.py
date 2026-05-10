@@ -443,6 +443,21 @@ async def get_blog_page(blog_id: str):
         if not blog:
             return "Blog not found", 404
             
+        # Color spectrum logic
+        decision = blog['decision'].upper()
+        color_map = {
+            "BUY": "emerald",
+            "OVERWEIGHT": "sky",
+            "HOLD": "amber",
+            "UNDERWEIGHT": "orange",
+            "SELL": "rose"
+        }
+        active_color = "sky"
+        for key, val in color_map.items():
+            if key in decision:
+                active_color = val
+                break
+
         # Rich SSR for indexing and standalone viewing
         html = f"""
 <!DOCTYPE html>
@@ -468,6 +483,12 @@ async def get_blog_page(blog_id: str):
         .prose-custom table {{ width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: rgba(255,255,255,0.02); }}
         .prose-custom th {{ background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; text-align: left; }}
         .prose-custom td {{ padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); }}
+        
+        .card-emerald {{ border-top: 4px solid #10b981; background: rgba(16, 185, 129, 0.05); }}
+        .card-sky {{ border-top: 4px solid #0ea5e9; background: rgba(14, 165, 233, 0.05); }}
+        .card-amber {{ border-top: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05); }}
+        .card-orange {{ border-top: 4px solid #f97316; background: rgba(249, 115, 22, 0.05); }}
+        .card-rose {{ border-top: 4px solid #f43f5e; background: rgba(244, 63, 94, 0.05); }}
     </style>
 </head>
 <body>
@@ -504,7 +525,7 @@ async def get_blog_page(blog_id: str):
                     <div id="summary-content" class="text-2xl text-slate-400 font-bold leading-tight"></div>
                 </div>
 
-                <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{ 'emerald' if 'BUY' in blog['decision'] or 'BULL' in blog['decision'] else 'rose' if 'SELL' in blog['decision'] or 'BEAR' in blog['decision'] else 'sky' }-500">
+                <div class="glass p-10 rounded-[40px] border-l-[16px] border-l-{active_color}-500">
                     <div class="flex justify-between items-start mb-10">
                         <div>
                             <h2 class="text-6xl font-black tracking-tighter m-0">{blog['ticker']}</h2>
@@ -514,19 +535,32 @@ async def get_blog_page(blog_id: str):
                                 <a href="https://api.whatsapp.com/send?text={blog['title']}%20https://ecotron.co.in/blog/{blog_id}" target="_blank" class="w-12 h-12 flex items-center justify-center bg-[#25D366]/10 text-[#25D366] rounded-xl hover:bg-[#25D366] hover:text-white transition-all shadow-lg"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                         </div>
-                        <div class="px-10 py-5 bg-white text-black rounded-3xl text-3xl font-black uppercase">{blog['decision']}</div>
+                        <div class="px-10 py-5 bg-{active_color}-500 text-black rounded-3xl text-3xl font-black uppercase shadow-xl shadow-{active_color}-500/30">{blog['decision']}</div>
                     </div>
                     <div id="verdict-content" class="text-xl text-slate-100 font-bold"></div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    <div class="glass p-10 rounded-[40px] border-t-8 border-t-sky-500/50">
-                        <h3 class="text-2xl font-black uppercase text-sky-400">Market Dynamics</h3>
-                        <div id="market-content"></div>
-                    </div>
-                    <div class="glass p-10 rounded-[40px] border-t-8 border-t-amber-500/50">
-                        <h3 class="text-2xl font-black uppercase text-amber-400">Sentiment Intelligence</h3>
-                        <div id="sentiment-content"></div>
+                <div class="pt-12">
+                    <h2 class="text-3xl font-black uppercase tracking-tighter mb-8 flex items-center gap-4">
+                        <i data-lucide="layers" class="text-sky-500"></i> Analyst Synthesis
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="glass p-8 rounded-3xl card-sky space-y-4">
+                            <h3 class="text-xl font-black uppercase text-sky-400 m-0">Market Analysis</h3>
+                            <div id="market-content" class="text-sm opacity-80 leading-relaxed max-h-80 overflow-y-auto custom-scrollbar"></div>
+                        </div>
+                        <div class="glass p-8 rounded-3xl card-amber space-y-4">
+                            <h3 class="text-xl font-black uppercase text-amber-400 m-0">Social & Sentiment</h3>
+                            <div id="sentiment-content" class="text-sm opacity-80 leading-relaxed max-h-80 overflow-y-auto custom-scrollbar"></div>
+                        </div>
+                        <div class="glass p-8 rounded-3xl card-emerald space-y-4">
+                            <h3 class="text-xl font-black uppercase text-emerald-400 m-0">Fundamentals</h3>
+                            <div id="fundamentals-content" class="text-sm opacity-80 leading-relaxed max-h-80 overflow-y-auto custom-scrollbar"></div>
+                        </div>
+                        <div class="glass p-8 rounded-3xl card-rose space-y-4">
+                            <h3 class="text-xl font-black uppercase text-rose-400 m-0">Risk Assessment</h3>
+                            <div id="risk-content" class="text-sm opacity-80 leading-relaxed max-h-80 overflow-y-auto custom-scrollbar"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -562,6 +596,8 @@ async def get_blog_page(blog_id: str):
         document.getElementById('verdict-content').innerHTML = marked.parse({repr(blog['summary'])});
         document.getElementById('market-content').innerHTML = marked.parse({repr(blog['content'].get('market', ''))});
         document.getElementById('sentiment-content').innerHTML = marked.parse({repr(blog['content'].get('sentiment', blog['content'].get('news', '')))});
+        document.getElementById('fundamentals-content').innerHTML = marked.parse({repr(blog['content'].get('fundamentals', ''))});
+        document.getElementById('risk-content').innerHTML = marked.parse({repr(blog['summary'])});
     </script>
 </body>
 </html>

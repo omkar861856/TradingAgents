@@ -240,8 +240,13 @@
 
         function renderInfographics(data, targetId) {
             const container = document.getElementById(targetId);
-            const color = data.decision.includes('BUY') || data.decision.includes('BULL') ? 'emerald' : 
-                         (data.decision.includes('SELL') || data.decision.includes('BEAR') ? 'rose' : 'sky');
+            const decision = data.decision.toUpperCase();
+            let color = 'sky';
+            if (decision.includes('BUY')) color = 'emerald';
+            else if (decision.includes('OVERWEIGHT')) color = 'sky';
+            else if (decision.includes('HOLD')) color = 'amber';
+            else if (decision.includes('UNDERWEIGHT')) color = 'orange';
+            else if (decision.includes('SELL')) color = 'rose';
             
             container.innerHTML = `
                 <div class="glass p-8 rounded-[40px] border-l-[16px] border-l-${color}-500 shadow-2xl relative overflow-hidden">
@@ -285,7 +290,13 @@
                                 <a href="https://api.whatsapp.com/send?text=${text}%20${url}" target="_blank" class="share-btn bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all"><i class="fa-brands fa-whatsapp"></i></a>
                                 <button onclick="copyLink('${b._id}')" class="share-btn bg-slate-800 text-slate-400 hover:bg-sky-500 hover:text-black transition-all"><i class="fa-solid fa-link"></i></button>
                             </div>
-                            <span class="text-[10px] font-black uppercase ${b.decision.includes('BUY') ? 'text-emerald-400' : 'text-rose-400'}">${b.decision}</span>
+                            <span class="text-[10px] font-black uppercase text-${
+                                b.decision.toUpperCase().includes('BUY') ? 'emerald' : 
+                                b.decision.toUpperCase().includes('OVERWEIGHT') ? 'sky' : 
+                                b.decision.toUpperCase().includes('HOLD') ? 'amber' : 
+                                b.decision.toUpperCase().includes('UNDERWEIGHT') ? 'orange' : 
+                                b.decision.toUpperCase().includes('SELL') ? 'rose' : 'sky'
+                            }-400">${b.decision}</span>
                         </div>
                     </div>`;
                 }).join('');
