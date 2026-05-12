@@ -159,6 +159,7 @@ const Dashboard = ({
   const [filterTicker, setFilterTicker] = useState('');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [currentIconIdx, setCurrentIconIdx] = useState(0);
+  const [dataSource, setDataSource] = useState('yfinance');
 
   useEffect(() => {
     let interval;
@@ -190,7 +191,7 @@ const Dashboard = ({
       fetch('/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker: ticker.toUpperCase(), user_id: userId })
+        body: JSON.stringify({ ticker: ticker.toUpperCase(), user_id: userId, data_source: dataSource })
       }).then(async res => {
         if (!res.ok) throw new Error('API Rejection');
         const data = await res.json();
@@ -244,6 +245,17 @@ const Dashboard = ({
                       className="w-full bg-transparent text-4xl font-black uppercase tracking-[0.3em] py-12 px-14 outline-none placeholder:text-black/10 text-black"
                     />
                     <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                      <div className="relative group/source hidden md:block">
+                        <select 
+                          value={dataSource}
+                          onChange={(e) => setDataSource(e.target.value)}
+                          className="bg-black text-white text-[10px] font-black uppercase px-4 py-2 outline-none appearance-none cursor-pointer border-2 border-black pr-8"
+                        >
+                          <option value="yfinance">Yahoo Finance</option>
+                          <option value="alpha_vantage">Alpha Vantage</option>
+                        </select>
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white"><ChevronDown className="w-3 h-3" /></div>
+                      </div>
                       <div className="text-black/30 text-[14px] font-black tracking-widest hidden sm:block">PRESS ENTER ↵</div>
                     </div>
                   </div>
@@ -401,11 +413,38 @@ const BlogDetail = () => {
 
       <div className="text-2xl text-slate-700 font-medium leading-relaxed prose max-w-none border-l-8 border-black/5 pl-12 py-8" dangerouslySetInnerHTML={{ __html: marked.parse(blog.summary) }} />
       
+      {blog.agent_status && blog.agent_status.length > 0 && (
+        <div className="border-4 border-black p-10 bg-white">
+          <h3 className="text-3xl font-black uppercase tracking-tighter mb-8 border-b-4 border-black pb-4 text-black">Neural Expert Teams Deployed</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {blog.agent_status.map((team, idx) => (
+              <div key={idx} className="space-y-4">
+                <h4 className="text-xl font-black uppercase text-black/40">{team.team}</h4>
+                <div className="flex flex-wrap gap-2">
+                  {team.agents.map((agent, aIdx) => (
+                    <span key={aIdx} className="px-3 py-1 border-2 border-black text-[12px] font-black uppercase text-black bg-black/5">{agent}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-12">
-        <ReportSection title="Market Analysis" content={blog.content.market} icon="Chillin.svg" />
-        <ReportSection title="Social & Sentiment" content={blog.content.news} icon="Pacheco.svg" />
-        <ReportSection title="Fundamentals" content={blog.content.fundamentals} icon="Roboto.svg" />
-        <ReportSection title="Risk Assessment" content={blog.content.risk || "Neural analysis indicates standard volatility parameters."} icon="Waiting.svg" />
+        {Object.entries(blog.content || {}).map(([key, content], idx) => {
+          if (!content) return null;
+          const titles = {
+            market: "Market Analysis",
+            sentiment: "Sentiment Analysis",
+            news: "Social & Sentiment",
+            fundamentals: "Fundamentals"
+          };
+          const icons = ["Chillin.svg", "Pacheco.svg", "Roboto.svg", "Waiting.svg", "Consumer.svg", "Growth.svg"];
+          const title = titles[key] || key.toUpperCase();
+          const icon = icons[idx % icons.length];
+          return <ReportSection key={key} title={title} content={content} icon={icon} />;
+        })}
       </div>
 
 

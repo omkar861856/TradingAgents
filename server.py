@@ -141,6 +141,7 @@ class AnalysisRequest(BaseModel):
     quick_think_llm: Optional[str] = "gpt-4o-mini"
     api_key: Optional[str] = None
     user_id: Optional[str] = "anonymous"
+    data_source: Optional[str] = "yfinance"
 
 @app.get("/health")
 async def health():
@@ -207,6 +208,13 @@ async def run_analysis_task(task_id: str, request: AnalysisRequest):
             "deep_think_llm": request.deep_think_llm,
             "quick_think_llm": request.quick_think_llm,
         }
+        if request.data_source:
+            config_overrides["data_vendors"] = {
+                "core_stock_apis": request.data_source,
+                "technical_indicators": request.data_source,
+                "fundamental_data": request.data_source,
+                "news_data": request.data_source,
+            }
         
         if request.api_key:
             config_overrides["api_key"] = request.api_key
