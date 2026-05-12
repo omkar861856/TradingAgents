@@ -456,29 +456,25 @@ const MainContainer = () => {
     fetchBlogs();
     if (activeTaskId) startPolling(activeTaskId);
 
-    const CURRENT_VERSION = 'v2.0';
+    const CURRENT_VERSION = 'v2.1';
     const storedVersion = localStorage.getItem('app_version');
     if (storedVersion !== CURRENT_VERSION) {
-      toast('System Update Required', {
-        description: 'A major neural update is available. Please update to clear old caches.',
-        action: {
-          label: 'Update Now',
-          onClick: async () => {
-            const userId = localStorage.getItem('trading_user_id');
-            localStorage.clear();
-            sessionStorage.clear();
-            if (userId) localStorage.setItem('trading_user_id', userId);
-            localStorage.setItem('app_version', CURRENT_VERSION);
-            
-            if ('caches' in window) {
-              const cacheNames = await caches.keys();
-              await Promise.all(cacheNames.map(name => caches.delete(name)));
-            }
-            window.location.reload(true);
-          }
-        },
-        duration: Infinity,
-      });
+      const performHardRefresh = async () => {
+        const userId = localStorage.getItem('trading_user_id');
+        localStorage.clear();
+        sessionStorage.clear();
+        if (userId) localStorage.setItem('trading_user_id', userId);
+        localStorage.setItem('app_version', CURRENT_VERSION);
+        
+        if ('caches' in window) {
+          try {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(name => caches.delete(name)));
+          } catch (e) {}
+        }
+        window.location.reload(true);
+      };
+      performHardRefresh();
     }
   }, []);
 
