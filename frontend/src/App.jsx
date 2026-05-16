@@ -220,18 +220,18 @@ const Dashboard = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="relative z-10 w-full space-y-16 px-12"
+              className="relative z-10 w-full space-y-10 md:space-y-16 px-4 md:px-12"
             >
-              <div className="text-center space-y-8">
-                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white text-black border-2 border-black mb-6">
-                  <span className="text-[14px] font-black uppercase tracking-[0.4em]">Neural Terminal v4.0</span>
+              <div className="text-center space-y-6 md:space-y-8">
+                <div className="inline-flex items-center gap-3 px-4 py-2 md:px-6 md:py-3 bg-white text-black border-2 border-black mb-4 md:mb-6 mt-10 md:mt-0">
+                  <span className="text-[12px] md:text-[14px] font-black uppercase tracking-widest md:tracking-[0.4em]">Neural Terminal v4.0</span>
                 </div>
-                <h2 className="text-8xl font-black uppercase tracking-tighter leading-none text-black">
+                <h2 className="text-5xl sm:text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none text-black break-words">
                   NEURAL <span className="text-black">SEARCH</span>
                 </h2>
-                <p className="text-black/40 text-[12px] font-black uppercase tracking-[0.8em]">Deploy multi-agent expert systems for institutional research</p>
+                <p className="text-black/40 text-[10px] md:text-[12px] font-black uppercase tracking-widest md:tracking-[0.8em] px-2">Deploy multi-agent expert systems for institutional research</p>
               </div>
-              <div className="flex flex-col gap-8 max-w-3xl mx-auto">
+              <div className="flex flex-col gap-8 max-w-3xl mx-auto w-full px-2 md:px-0">
                 <div className="relative group/input">
                   <div className="absolute -inset-2 bg-black/5 blur opacity-0 group-focus-within/input:opacity-100 transition duration-500"></div>
                   <div className="relative bg-white border-4 border-black group-focus-within/input:translate-x-1 group-focus-within/input:translate-y-1 transition-all">
@@ -241,10 +241,10 @@ const Dashboard = ({
                       onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
                       type="text" 
                       placeholder="ENTER TICKER..." 
-                      className="w-full bg-transparent text-4xl font-black uppercase tracking-[0.3em] py-12 px-14 outline-none placeholder:text-black/10 text-black"
+                      className="w-full bg-transparent text-2xl md:text-4xl font-black uppercase tracking-[0.1em] md:tracking-[0.3em] py-6 px-6 md:py-12 md:px-14 outline-none placeholder:text-black/10 text-black"
                     />
-                    <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-6">
-                      <div className="text-black/30 text-[14px] font-black tracking-widest hidden sm:block">PRESS ENTER ↵</div>
+                    <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                      <div className="text-black/30 text-[10px] md:text-[14px] font-black tracking-widest hidden sm:block">PRESS ENTER ↵</div>
                     </div>
                   </div>
                 </div>
