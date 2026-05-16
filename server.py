@@ -357,6 +357,52 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
                 <h1 style="color: #38bdf8; margin: 0;">Ecotron Neural Logs <span class="badge">PRO</span></h1>
                 <div style="color: #64748b; font-size: 12px;">Authenticated: {username}</div>
             </div>
+            
+            <div style="background: #0f172a; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #1e293b;">
+                <h2 style="font-size: 14px; color: #f8fafc; margin-top: 0; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.05em;">Run Historical Backtest</h2>
+                <div style="display: flex; gap: 15px; align-items: flex-end;">
+                    <div>
+                        <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">Ticker</label>
+                        <input type="text" id="bt_ticker" placeholder="e.g. AAPL" style="background: #1e293b; border: 1px solid #334155; color: white; padding: 8px 12px; border-radius: 4px; outline: none; width: 120px; text-transform: uppercase;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">Historical Date</label>
+                        <input type="date" id="bt_date" style="background: #1e293b; border: 1px solid #334155; color: white; padding: 8px 12px; border-radius: 4px; outline: none; width: 150px;">
+                    </div>
+                    <button onclick="runBacktest()" style="background: #38bdf8; color: black; border: none; padding: 9px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;">Initiate Backtest</button>
+                </div>
+            </div>
+
+            <script>
+                async function runBacktest() {
+                    const ticker = document.getElementById('bt_ticker').value.trim();
+                    const date = document.getElementById('bt_date').value;
+                    if (!ticker || !date) { alert("Please enter both ticker and historical date."); return; }
+                    
+                    const btn = document.querySelector('button[onclick="runBacktest()"]');
+                    btn.innerText = "Queueing Synthesis...";
+                    btn.disabled = true;
+                    
+                    try {
+                        const res = await fetch('/analyze', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ ticker: ticker, date: date, user_id: 'system_admin_backtest' })
+                        });
+                        if(res.ok) {
+                            alert(`Backtest for ${ticker} on ${date} queued successfully. The framework is strictly utilizing historical data up to this date to prevent look-ahead bias. You can view the results in the terminal once completed.`);
+                        } else {
+                            alert("Failed to queue backtest. Check API limits.");
+                        }
+                    } catch(e) {
+                        alert("Network error occurred.");
+                    }
+                    
+                    btn.innerText = "Initiate Backtest";
+                    btn.disabled = false;
+                }
+            </script>
+
             <table>
                 <thead>
                     <tr><th>User Fingerprint</th><th>Last Active</th><th style="text-align: center;">Activity Volume</th><th>Latest Asset</th><th style="text-align: right;">Action</th></tr>
