@@ -326,9 +326,10 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
     users_html = []
     async for user in cursor:
         uid = user['_id'] or "anonymous"
+        admin_badge = " <span style='background: #dc2626; color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-left: 8px;'>ADMIN</span>" if uid in ["user_1d9lyn2oe_1778427332796", "user_sbpd20f24_1778425762224"] else ""
         users_html.append(f"""
             <tr style="border-bottom: 1px solid #334155; cursor: pointer;" onclick="window.location='/admin/user/{uid}'">
-                <td style="padding: 12px; font-family: monospace; font-size: 11px;">{uid}</td>
+                <td style="padding: 12px; font-family: monospace; font-size: 11px;">{uid}{admin_badge}</td>
                 <td style="padding: 12px;">{user['last_active']}</td>
                 <td style="padding: 12px; text-align: center;">
                     <span style="background: #0369a1; padding: 2px 8px; border-radius: 99px; font-size: 11px;">{user['task_count']} Tasks</span>
