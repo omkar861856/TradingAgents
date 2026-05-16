@@ -338,6 +338,20 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
                 <td style="padding: 12px; text-align: right; color: #94a3b8;">View Details &rarr;</td>
             </tr>
         """)
+        
+    backtests_cursor = blogs_collection.find({"user_id": "system_admin_backtest"}).sort("timestamp", -1).limit(50)
+    backtests_html = []
+    async for bt in backtests_cursor:
+        bid = str(bt['_id'])
+        decision_color = "#10b981" if "BUY" in str(bt.get('decision', '')).upper() or "OVERWEIGHT" in str(bt.get('decision', '')).upper() else "#ef4444" if "SELL" in str(bt.get('decision', '')).upper() or "UNDERWEIGHT" in str(bt.get('decision', '')).upper() else "#f59e0b"
+        backtests_html.append(f"""
+            <tr style="border-bottom: 1px solid #334155; background: #0f172a;">
+                <td style="padding: 12px; font-family: monospace; font-size: 11px; color: #94a3b8;">{str(bt.get('timestamp', ''))[:19]}</td>
+                <td style="padding: 12px; font-weight: bold; color: #38bdf8;">{bt.get('ticker')}</td>
+                <td style="padding: 12px; font-weight: bold; color: {decision_color};">{bt.get('decision')}</td>
+                <td style="padding: 12px; text-align: right;"><a href="/blog/{bid}" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: bold; font-size: 11px;">View Report &rarr;</a></td>
+            </tr>
+        """)
     
     html_content = f"""
     <html>
@@ -372,6 +386,14 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
                     <button onclick="runBacktest()" style="background: #38bdf8; color: black; border: none; padding: 9px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;">Initiate Backtest</button>
                 </div>
             </div>
+            
+            <h2 style="font-size: 14px; color: #f8fafc; margin-top: 0; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.05em;">Historical Backtest Results</h2>
+            <table style="margin-bottom: 40px; border: 1px solid #1e293b;">
+                <thead>
+                    <tr><th>Completion Time</th><th>Ticker</th><th>Simulated Decision</th><th style="text-align: right;">Report Link</th></tr>
+                </thead>
+                <tbody>{"".join(backtests_html) if backtests_html else '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #475569;">No historical backtests run yet.</td></tr>'}</tbody>
+            </table>
 
             <script>
                 async function runBacktest() {{
@@ -390,7 +412,7 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
                             body: JSON.stringify({{ ticker: ticker, date: date, user_id: 'system_admin_backtest' }})
                         }});
                         if(res.ok) {{
-                            alert(`Backtest for ${{ticker}} on ${{date}} queued successfully. The framework is strictly utilizing historical data up to this date to prevent look-ahead bias. You can view the results in the terminal once completed.`);
+                            alert(`Backtest for ${{ticker}} on ${{date}} queued successfully. You can view the results below or in the public terminal once completed.`);
                         }} else {{
                             alert("Failed to queue backtest. Check API limits.");
                         }}
@@ -403,6 +425,7 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
                 }}
             </script>
 
+            <h2 style="font-size: 14px; color: #f8fafc; margin-top: 0; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.05em;">User Activity Logs</h2>
             <table>
                 <thead>
                     <tr><th>User Fingerprint</th><th>Last Active</th><th style="text-align: center;">Activity Volume</th><th>Latest Asset</th><th style="text-align: right;">Action</th></tr>
