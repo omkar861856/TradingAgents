@@ -379,13 +379,50 @@ async def user_detail(user_id: str, username: str = Depends(get_current_username
                 <td style="padding: 12px; font-weight: bold; color: #38bdf8;">{doc.get('ticker')}</td>
                 <td style="padding: 12px;"><span style="background: #1e293b; padding: 4px 8px; border-radius: 4px; font-size: 11px;">{doc.get('status')}</span></td>
                 <td style="padding: 12px; font-family: monospace; font-size: 10px; color: #475569;">{doc.get('task_id')}</td>
+                <td style="padding: 12px;">
+                    <button onclick="copyQuora('{doc.get('ticker')}')" style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">Copy Quora Blog</button>
+                </td>
             </tr>
         """)
 
     html_content = f"""
     <html>
-        <head><title>User History | {user_id}</title><style>body {{ font-family: sans-serif; background: #050507; color: #f8fafc; padding: 40px; }} .back {{ color: #38bdf8; text-decoration: none; font-size: 14px; margin-bottom: 20px; display: inline-block; }} table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; }} th {{ text-align: left; background: #1e293b; padding: 15px 12px; color: #94a3b8; font-size: 11px; text-transform: uppercase; }}</style></head>
-        <body><a href="/admin" class="back">&larr; Back to Users</a><h1 style="color: #38bdf8; margin-top: 10px;">Activity Report</h1><p style="font-family: monospace; color: #64748b; font-size: 12px; margin-bottom: 30px;">ID: {user_id}</p><table><thead><tr><th>Timestamp</th><th>Ticker</th><th>Status</th><th>Task ID</th></tr></thead><tbody>{"".join(history_html)}</tbody></table></body>
+        <head>
+            <title>User History | {user_id}</title>
+            <style>
+                body {{ font-family: sans-serif; background: #050507; color: #f8fafc; padding: 40px; }} 
+                .back {{ color: #38bdf8; text-decoration: none; font-size: 14px; margin-bottom: 20px; display: inline-block; }} 
+                table {{ width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; overflow: hidden; }} 
+                th {{ text-align: left; background: #1e293b; padding: 15px 12px; color: #94a3b8; font-size: 11px; text-transform: uppercase; }}
+            </style>
+            <script>
+                const quoraTemplates = {{
+                    'BTC': "Is Bitcoin still a good investment right now? According to the latest autonomous multi-agent synthesis from Ecotron, the on-chain metrics and macroeconomic environment present a highly dynamic case. Our AI agents analyze fundamentals, sentiment, and risk in real-time. [Read the full neural synthesis here: https://ecotron.co.in/]",
+                    'ETH': "What is the future of Ethereum? Our Ecotron neural agents recently completed a deep dive into ETH fundamentals, revealing strong network growth and shifting DeFi mechanics. [Check out the full institutional-grade AI analysis at https://ecotron.co.in/]",
+                    'AAPL': "Will Apple stock continue to dominate the market? Ecotron's autonomous financial researchers just synthesized the latest earnings and supply chain data. The sentiment from our multi-agent framework is clear. [See the real-time AI report on https://ecotron.co.in/]"
+                }};
+
+                function copyQuora(ticker) {{
+                    if (!ticker) return;
+                    let post = quoraTemplates[ticker.toUpperCase()];
+                    if (!post) {{
+                        post = `What are the current market prospects for ${{ticker.toUpperCase()}}? Our autonomous neural network, Ecotron, just synthesized real-time market data, fundamentals, and social sentiment for ${{ticker.toUpperCase()}}. The findings from our multi-agent quantitative framework provide institutional-grade insights for retail investors. [Read the full AI-generated research report here: https://ecotron.co.in/]`;
+                    }}
+                    navigator.clipboard.writeText(post).then(() => alert(`Quora blog post for ${{ticker}} copied to clipboard!`));
+                }}
+            </script>
+        </head>
+        <body>
+            <a href="/admin" class="back">&larr; Back to Users</a>
+            <h1 style="color: #38bdf8; margin-top: 10px;">Activity Report</h1>
+            <p style="font-family: monospace; color: #64748b; font-size: 12px; margin-bottom: 30px;">ID: {user_id}</p>
+            <table>
+                <thead>
+                    <tr><th>Timestamp</th><th>Ticker</th><th>Status</th><th>Task ID</th><th>Marketing</th></tr>
+                </thead>
+                <tbody>{"".join(history_html)}</tbody>
+            </table>
+        </body>
     </html>
     """
     return HTMLResponse(content=html_content)
