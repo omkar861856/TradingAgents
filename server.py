@@ -374,33 +374,33 @@ async def admin_dashboard(username: str = Depends(get_current_username)):
             </div>
 
             <script>
-                async function runBacktest() {
+                async function runBacktest() {{
                     const ticker = document.getElementById('bt_ticker').value.trim();
                     const date = document.getElementById('bt_date').value;
-                    if (!ticker || !date) { alert("Please enter both ticker and historical date."); return; }
+                    if (!ticker || !date) {{ alert("Please enter both ticker and historical date."); return; }}
                     
                     const btn = document.querySelector('button[onclick="runBacktest()"]');
                     btn.innerText = "Queueing Synthesis...";
                     btn.disabled = true;
                     
-                    try {
-                        const res = await fetch('/analyze', {
+                    try {{
+                        const res = await fetch('/analyze', {{
                             method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ ticker: ticker, date: date, user_id: 'system_admin_backtest' })
-                        });
-                        if(res.ok) {
-                            alert(`Backtest for ${ticker} on ${date} queued successfully. The framework is strictly utilizing historical data up to this date to prevent look-ahead bias. You can view the results in the terminal once completed.`);
-                        } else {
+                            headers: {{'Content-Type': 'application/json'}},
+                            body: JSON.stringify({{ ticker: ticker, date: date, user_id: 'system_admin_backtest' }})
+                        }});
+                        if(res.ok) {{
+                            alert(`Backtest for ${{ticker}} on ${{date}} queued successfully. The framework is strictly utilizing historical data up to this date to prevent look-ahead bias. You can view the results in the terminal once completed.`);
+                        }} else {{
                             alert("Failed to queue backtest. Check API limits.");
-                        }
-                    } catch(e) {
+                        }}
+                    }} catch(e) {{
                         alert("Network error occurred.");
-                    }
+                    }}
                     
                     btn.innerText = "Initiate Backtest";
                     btn.disabled = false;
-                }
+                }}
             </script>
 
             <table>
